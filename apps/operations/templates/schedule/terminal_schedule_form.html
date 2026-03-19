@@ -19,14 +19,6 @@
     <p class="sdt-page-sub">Configure terminal name and assign supervisors by staff number</p>
   </div>
 
-  {% if messages %}
-  <div class="sdt-messages">
-    {% for message in messages %}
-    <div class="sdt-alert sdt-alert-{{ message.tags }}">{{ message }}</div>
-    {% endfor %}
-  </div>
-  {% endif %}
-
   <div class="sdt-form-card">
     <form method="post" id="terminalForm">
       {% csrf_token %}

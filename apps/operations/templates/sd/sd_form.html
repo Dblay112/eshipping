@@ -19,10 +19,6 @@
     <p class="sdt-page-sub">Enter shipping declaration details. You can save a draft first, then come back to add loading details.</p>
   </div>
 
-  {% if messages %}
-  <div class="sdt-messages">{% for m in messages %}<div class="sdt-alert sdt-alert-{{ m.tags }}">{{ m }}</div>{% endfor %}</div>
-  {% endif %}
-
   {% if form.errors or alloc_formset.errors or alloc_formset.non_form_errors or container_formset.errors or container_formset.non_form_errors or clerk_formset.errors or clerk_formset.non_form_errors %}
   <div class="sdt-messages">
     <div class="sdt-alert sdt-alert-error">

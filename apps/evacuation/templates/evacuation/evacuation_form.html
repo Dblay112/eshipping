@@ -21,14 +21,6 @@
     <p class="sdt-page-sub">Evacuation Desk — Log container evacuations per shift</p>
   </div>
 
-  {% if messages %}
-  <div class="sdt-messages">
-    {% for message in messages %}
-    <div class="sdt-alert sdt-alert-{{ message.tags }}">{{ message }}</div>
-    {% endfor %}
-  </div>
-  {% endif %}
-
   <form method="post" enctype="multipart/form-data" id="evacForm" class="sdt-form-wrap">
     {% csrf_token %}
 

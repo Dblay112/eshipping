@@ -50,14 +50,6 @@
     </form>
   </div>
 
-  {% if messages %}
-  <div class="sdt-messages" style="margin-bottom:12px;">
-    {% for msg in messages %}
-    <div class="sdt-alert sdt-alert-{{ msg.tags }}">{{ msg }}</div>
-    {% endfor %}
-  </div>
-  {% endif %}
-
   <div class="sdt-schedule-layout" style="gap:16px;">
 
     <!-- LEFT: Calendar Panel -->

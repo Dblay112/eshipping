@@ -21,14 +21,6 @@
     <p class="sdt-page-sub">Set the SDs to be loaded and assign staff</p>
   </div>
 
-  {% if messages %}
-  <div class="sdt-messages">
-    {% for message in messages %}
-    <div class="sdt-alert sdt-alert-{{ message.tags }}">{{ message }}</div>
-    {% endfor %}
-  </div>
-  {% endif %}
-
   <form method="post" class="sdt-form-wrap">
     {% csrf_token %}
 

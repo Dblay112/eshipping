@@ -21,14 +21,6 @@
     <p class="sdt-page-sub">E-Booking Desk — Bill of Lading Tracking</p>
   </div>
 
-  {% if messages %}
-  <div class="sdt-messages">
-    {% for msg in messages %}
-    <div class="sdt-alert sdt-alert-{{ msg.tags }}">{{ msg }}</div>
-    {% endfor %}
-  </div>
-  {% endif %}
-
   <form method="post" enctype="multipart/form-data" id="bookingForm" class="sdt-form-wrap">
     {% csrf_token %}
 

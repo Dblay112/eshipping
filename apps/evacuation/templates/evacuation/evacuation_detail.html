@@ -38,16 +38,6 @@
 
   <div style="max-width:960px;margin:32px auto;padding:0 16px;">
 
-    {% if messages %}
-    <div class="mb-3">
-      {% for msg in messages %}
-      <div class="alert alert-{{ msg.tags }} alert-dismissible fade show">
-        {{ msg }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-      </div>
-      {% endfor %}
-    </div>
-    {% endif %}
-
     <!-- Summary strip -->
     <div class="row g-3 mb-4">
       <div class="col-4">

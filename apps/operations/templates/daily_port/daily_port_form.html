@@ -21,14 +21,6 @@
     <p class="sdt-page-sub">Upload the daily port SD document and spreadsheet</p>
   </div>
 
-  {% if messages %}
-  <div class="sdt-messages">
-    {% for message in messages %}
-    <div class="sdt-alert sdt-alert-{{ message.tags }}">{{ message }}</div>
-    {% endfor %}
-  </div>
-  {% endif %}
-
   <form method="post" enctype="multipart/form-data" class="sdt-form-wrap">
     {% csrf_token %}
 
