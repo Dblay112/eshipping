@@ -1,0 +1,579 @@
+{% extends "includes/base.html" %}
+{% load static %}
+{% load tally_tags %}
+{% block title %} 20ft Straight Loading {% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/tally/tally_type/20_straight_loading.css' %}">
+<link rel="stylesheet" href="{% static 'css/tally/tally_type/20_straight_loading_mobile.css' %}">
+<link rel="stylesheet" href="{% static 'css/custom-datepicker.css' %}">
+{% endblock %}
+{% block content %}
+<div class="background1">
+    <img class="background" src="{% static 'images/shipping_vessel.png' %}">
+</div>
+
+<form id="straightTallyForm" method="post"
+    action="{% if edit_mode %}{% url 'tally_edit' tally.pk %}{% else %}{% url 'straight_20' %}{% endif %}"
+    enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <main class="page-content">
+        <div class="page-shell">
+
+            <div class="card form-card">
+                <div class="card-body p-4 p-md-5">
+
+                    <h2 class="form-title text-center mb-2">20ft STRAIGHT LOADING TALLY SHEET</h2>
+                    <div class="produce-title text-center mb-4">PRODUCE: RAW COCOA BEANS</div>
+
+                    <div class="header-grid mb-4">
+                        <div class="header-col">
+                            <div class="field-row">
+                                <label class="caps-label" for="crop_year">CROP YEAR</label>
+                                <select id="crop_year" name="crop_year" class="form-control" required>
+                                    <option value="">— Select —</option>
+                                    {% for value, label in crop_year_choices %}
+                                    <option value="{{ value }}" {% if edit_mode and tally.crop_year == value %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="field-row">
+                                <label class="caps-label" for="sd_number">SD NUMBER</label>
+                                <input id="sd_number" type="text" name="sd_number" class="form-control"
+                                    placeholder="ENTER SD NUMBER" required list="sd-datalist"
+                                    value="{% if edit_mode %}{{ tally.sd_number }}{% endif %}">
+                                <datalist id="sd-datalist">
+                                    {% for sd in all_sd_numbers %}
+                                    <option value="{{ sd }}">
+                                    {% endfor %}
+                                </datalist>
+                            </div>
+
+                            <div class="field-row">
+                                <label class="caps-label" for="mk_number">MK NUMBER</label>
+                                <input id="mk_number" type="text" name="mk_number" class="form-control"
+                                    placeholder="ENTER MK NUMBER" required
+                                    value="{% if edit_mode %}{{ tally.mk_number }}{% endif %}">
+                            </div>
+
+                            <div class="field-row">
+                                <label class="caps-label" for="agent">AGENT</label>
+                                <input id="agent" type="text" name="agent" class="form-control"
+                                    placeholder="ENTER AGENT"
+                                    value="{% if edit_mode %}{{ tally.agent }}{% endif %}">
+                            </div>
+
+                            <div class="field-row">
+                                <label class="caps-label" for="vessel">VESSEL</label>
+                                <input id="vessel" type="text" name="vessel" class="form-control"
+                                    placeholder="ENTER VESSEL NAME" required
+                                    value="{% if edit_mode %}{{ tally.vessel }}{% endif %}">
+                            </div>
+                        </div>
+
+                        <div class="header-col">
+                            <div class="field-row">
+                                <label class="caps-label" for="destination">DESTINATION</label>
+                                <input id="destination" type="text" name="destination" class="form-control"
+                                    placeholder="ENTER DESTINATION" required
+                                    value="{% if edit_mode %}{{ tally.destination }}{% endif %}">
+                            </div>
+
+                            <div class="field-row">
+                                <label class="caps-label" for="terminal">TERMINAL</label>
+                                {% get_terminals as terminals %}
+                                <select id="terminal" name="terminal" class="form-control" required>
+                                    <option value="">— SELECT TERMINAL —</option>
+                                    {% for t in terminals %}
+                                    <option value="{{ t.id }}"
+                                        {% if edit_mode and tally.terminal_id == t.id %}selected
+                                        {% elif edit_mode and not tally.terminal_id and tally.terminal_name == t.name %}selected
+                                        {% endif %}>{{ t.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="field-row">
+                                <label class="caps-label" for="loading_date">DATE</label>
+                                <input id="loading_date" type="text" name="loading_date" class="form-control" placeholder="YYYY-MM-DD" required data-datepicker readonly
+                                    value="{% if edit_mode %}{{ tally.loading_date|date:'Y-m-d' }}{% endif %}">
+                            </div>
+
+                            <div class="field-row">
+                                <label class="caps-label" for="marks_numbers">MARKS &amp; NUMBERS</label>
+                                <input id="marks_numbers" type="text" name="marks_and_numbers" class="form-control"
+                                    value="GCB" readonly required>
+                            </div>
+
+                            <div class="field-row">
+                                <label class="caps-label" for="cocoa_type">COCOA TYPE</label>
+                                <input id="cocoa_type" type="text" name="cocoa_type" class="form-control"
+                                    placeholder="ENTER COCOA TYPE" required
+                                    value="{% if edit_mode %}{{ tally.cocoa_type }}{% endif %}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="header-grid mb-4">
+
+                        <div class="header-col">
+                            <div class="field-row">
+                                <label class="caps-label" for="superintendent_type">SUPERINTENDANT</label>
+                                <select id="superintendent_type" name="superintendent_type" class="form-select" required>
+                                    <option value="NONE" {% if edit_mode and tally.superintendent_type == "NONE" %}selected{% endif %}>NONE</option>
+                                    <option value="JLB"  {% if edit_mode and tally.superintendent_type == "JLB"  %}selected{% endif %}>JLB</option>
+                                    <option value="CWT"  {% if edit_mode and tally.superintendent_type == "CWT"  %}selected{% endif %}>CWT</option>
+                                    <option value="CWT + JLB" {% if edit_mode and tally.superintendent_type == "CWT + JLB" %}selected{% endif %}>CWT + JLB</option>
+                                </select>
+                            </div>
+
+                            <div class="field-row align-items-start">
+                                <label class="caps-label">SUPERINTENDANT NAME(S)</label>
+                                <div>
+                                    <div class="name-row">
+                                        <input type="text" class="form-control" id="superintendentInput" name="s_name"
+                                            placeholder="ENTER SUPERINTENDANT NAME">
+                                        <div class="d-flex gap-2">
+                                            <button type="button" class="btn btn-outline-secondary btn-sm add-btn" id="addSuperintendentBtn">ADD</button>
+                                            <button type="button" class="btn btn-outline-danger btn-sm remove-btn" id="removeSuperintendentBtn">REMOVE</button>
+                                        </div>
+                                    </div>
+                                    <div id="superintendentChips" class="name-chips mt-2" aria-live="polite"></div>
+                                    <div id="superintendentHidden" class="d-none"></div>
+                                    <div class="small text-muted mt-2">Select NONE if no SUPERINTENDANT</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="header-col">
+                            <div class="field-row align-items-start">
+                                <label class="caps-label">CLERKS&#39; NAMES</label>
+                                <div>
+                                    <div class="name-row">
+                                        <input type="text" class="form-control" id="clerkInput" name="clerk_name"
+                                            placeholder="ENTER CLERK NAME">
+                                        <div class="d-flex gap-2">
+                                            <button type="button" class="btn btn-outline-secondary btn-sm add-btn" id="addClerkBtn">ADD</button>
+                                            <button type="button" class="btn btn-outline-danger btn-sm remove-btn" id="removeClerkBtn">REMOVE</button>
+                                        </div>
+                                    </div>
+                                    <div id="clerkChips" class="name-chips mt-2" aria-live="polite"></div>
+                                    <div id="clerkHidden" class="d-none"></div>
+                                </div>
+                            </div>
+
+                            <div class="field-row">
+                                <label class="caps-label" for="dry_bags">DRY BAGS</label>
+                                <input id="dry_bags" type="text" name="dry_bags" class="form-control"
+                                    placeholder="ENTER DRY BAGS" required
+                                    value="{% if edit_mode %}{{ tally.dry_bags }}{% endif %}">
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <hr class="my-4">
+
+                    <h3 class="section-title mb-3">CONTAINER PARTICULARS</h3>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered align-middle container-table">
+                            <thead>
+                                <tr>
+                                    <th style="width:70px;">NO.</th>
+                                    <th>CONTAINER NUMBER</th>
+                                    <th>SEAL NUMBER</th>
+                                    <th style="width:140px;">BAGS</th>
+                                    <th style="width:140px;">TONNAGE</th>
+                                    <th style="width:125px;">ACTION</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="containersBody"></tbody>
+
+                            <tfoot>
+                                <tr>
+                                    <th colspan="3" class="text-end">TOTAL</th>
+                                    <th>
+                                        <input id="totalBags" name="total_bags" class="form-control" type="text"
+                                            placeholder="0" readonly required>
+                                    </th>
+                                    <th>
+                                        <input id="totalTonnage" name="total_tonnage" class="form-control" type="text"
+                                            placeholder="0" readonly required>
+                                    </th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 mt-3">
+                        <a href="{% if edit_mode %}{% url 'tally_view' tally.pk %}{% else %}{% url 'my_tallies' %}{% endif %}"
+                            class="btn btn-outline-secondary px-4 py-2 fw-bold">CANCEL</a>
+                        <button type="submit" class="btn btn-primary px-4 py-2 fw-bold">
+                            {% if edit_mode %}SAVE CHANGES{% else %}SUBMIT{% endif %}
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+</form>
+
+{# Inject server data for edit mode prefill #}
+{% if edit_mode %}
+<script>
+    window.EDIT_MODE = true;
+    window.EDIT_SUPERINTENDENT_NAMES = {{ tally.superintendent_name|default:"[]"|safe }};
+    window.EDIT_CLERK_NAMES = {{ tally.clerk_name|default:"[]"|safe }};
+    window.EDIT_CONTAINERS = {{ containers_payload_json|default:"[]"|safe }};
+</script>
+{% else %}
+<script>
+    window.EDIT_MODE = false;
+    window.EDIT_SUPERINTENDENT_NAMES = [];
+    window.EDIT_CLERK_NAMES = [];
+    window.EDIT_CONTAINERS = [];
+</script>
+{% endif %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    function parseNum(val) {
+        const n = Number(val);
+        return Number.isFinite(n) ? n : 0;
+    }
+
+    function ensureActiveRow(arr) {
+        if (arr.length === 0) return [{ saved: false }];
+        const last = arr[arr.length - 1];
+        if (last && last.saved === true) arr.push({ saved: false });
+        return arr;
+    }
+
+    function escapeAttr(v) {
+        return String(v ?? "").replaceAll("&", "&amp;").replaceAll('"', "&quot;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+    }
+
+    function escapeHtml(v) {
+        return String(v ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+    }
+
+    function setupAutoCapitalize() {
+        const textInputs = document.querySelectorAll('input[type="text"]:not([readonly])');
+        textInputs.forEach(input => {
+            input.addEventListener('input', function(e) {
+                const start = this.selectionStart;
+                const end = this.selectionEnd;
+                this.value = this.value.toUpperCase();
+                this.setSelectionRange(start, end);
+            });
+        });
+    }
+
+    function validateContainerNumber(input) {
+        let value = input.value.toUpperCase().replace(/[^A-Z0-9\s-]/g, '');
+        let cleaned = value.replace(/[\s-]/g, '');
+        let formatted = '';
+        if (cleaned.length > 0) formatted = cleaned.substring(0, 4).replace(/[^A-Z]/g, '');
+        if (cleaned.length > 4) formatted += ' ' + cleaned.substring(4, 10).replace(/[^0-9]/g, '');
+        if (cleaned.length > 10) formatted += '-' + cleaned.substring(10, 11).replace(/[^0-9]/g, '');
+        input.value = formatted;
+        const containerPattern = /^[A-Z]{4}\s\d{6}-\d$/;
+        if (formatted.length === 13 && !containerPattern.test(formatted)) {
+            input.setCustomValidity('Container number must be in format: CAAU 171171-2');
+        } else if (formatted.length > 0 && formatted.length < 13) {
+            input.setCustomValidity('Container number must be complete: 4 letters, space, 6 digits, hyphen, 1 digit');
+        } else {
+            input.setCustomValidity('');
+        }
+    }
+
+    (function setTodayIfEmpty() {
+        const dateEl = document.getElementById("loading_date");
+        if (!dateEl.value) {
+            const now = new Date();
+            const yyyy = now.getFullYear();
+            const mm = String(now.getMonth() + 1).padStart(2, "0");
+            const dd = String(now.getDate()).padStart(2, "0");
+            dateEl.value = `${yyyy}-${mm}-${dd}`;
+        }
+    })();
+
+    function syncHiddenInputs(hiddenWrap, inputName, arr) {
+        hiddenWrap.innerHTML = "";
+        arr.forEach(v => {
+            const inp = document.createElement("input");
+            inp.type = "hidden";
+            inp.name = inputName;
+            inp.value = v;
+            hiddenWrap.appendChild(inp);
+        });
+    }
+
+    function setupNameBoxes({ formEl, typeSelectEl, inputEl, listEl, hiddenEl, addBtn, removeBtn, inputName, requiredWhenActive = false, initialValues = [] }) {
+        let values = [...initialValues];
+
+        function render() {
+            const fieldRow = inputEl.closest(".field-row");
+            if (fieldRow) fieldRow.style.display = "";
+            if (requiredWhenActive && typeSelectEl && typeSelectEl.value === "NONE") {
+                values = [];
+                listEl.innerHTML = "";
+                listEl.style.display = "none";
+                hiddenEl.innerHTML = "";
+                inputEl.value = "";
+                inputEl.required = false;
+                if (fieldRow) fieldRow.style.display = "none";
+                return;
+            }
+            if (requiredWhenActive) inputEl.required = (values.length === 0);
+            listEl.innerHTML = values.map((v, i) => `
+                <div class="name-box" data-index="${i}">
+                    <span class="name-box-text">${i + 1}. ${escapeHtml(v)}</span>
+                    <button type="button" class="btn btn-sm btn-outline-brown name-box-x" data-action="remove-one" aria-label="Remove">&times;</button>
+                </div>
+            `).join("");
+            listEl.style.display = values.length ? "grid" : "none";
+            syncHiddenInputs(hiddenEl, inputName, values);
+        }
+
+        function flushTypedIntoList() {
+            const v = String(inputEl.value || "").trim().toUpperCase();
+            if (!v) return;
+            if (requiredWhenActive && typeSelectEl && typeSelectEl.value === "NONE") { inputEl.value = ""; return; }
+            values.push(v);
+            inputEl.value = "";
+            render();
+        }
+
+        addBtn.addEventListener("click", () => { flushTypedIntoList(); inputEl.focus(); });
+        removeBtn.addEventListener("click", () => { if (values.length) values.pop(); render(); });
+        inputEl.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); addBtn.click(); } });
+        listEl.addEventListener("click", (e) => {
+            const btn = e.target.closest("button[data-action='remove-one']");
+            if (!btn) return;
+            const box = btn.closest(".name-box");
+            const idx = Number(box?.dataset.index);
+            if (!Number.isFinite(idx)) return;
+            values.splice(idx, 1);
+            render();
+        });
+        if (typeSelectEl) typeSelectEl.addEventListener("change", render);
+        if (formEl) { formEl.addEventListener("submit", () => { flushTypedIntoList(); }); }
+        render();
+    }
+
+    const straightFormEl = document.getElementById("straightTallyForm");
+
+    setupNameBoxes({
+        formEl: straightFormEl,
+        typeSelectEl: document.getElementById("superintendent_type"),
+        inputEl: document.getElementById("superintendentInput"),
+        listEl: document.getElementById("superintendentChips"),
+        hiddenEl: document.getElementById("superintendentHidden"),
+        addBtn: document.getElementById("addSuperintendentBtn"),
+        removeBtn: document.getElementById("removeSuperintendentBtn"),
+        inputName: "s_name",
+        requiredWhenActive: true,
+        initialValues: window.EDIT_SUPERINTENDENT_NAMES || []
+    });
+
+    setupNameBoxes({
+        formEl: straightFormEl,
+        typeSelectEl: null,
+        inputEl: document.getElementById("clerkInput"),
+        listEl: document.getElementById("clerkChips"),
+        hiddenEl: document.getElementById("clerkHidden"),
+        addBtn: document.getElementById("addClerkBtn"),
+        removeBtn: document.getElementById("removeClerkBtn"),
+        inputName: "clerk_name",
+        requiredWhenActive: false,
+        initialValues: window.EDIT_CLERK_NAMES || []
+    });
+
+    const containersBody = document.getElementById("containersBody");
+    const totalBagsEl = document.getElementById("totalBags");
+    const totalTonnageEl = document.getElementById("totalTonnage");
+
+    let inMemory = [];
+
+    function recalcTotals() {
+        let totalB = 0;
+        let totalT = 0;
+        const rows = Array.from(containersBody.querySelectorAll("tr.container-row"));
+        rows.forEach((row) => {
+            const bagsEl = row.querySelector("input[data-field='bags']");
+            const tonEl = row.querySelector("input[data-field='tonnage']");
+            const bags = parseNum(bagsEl?.value || 0);
+            const tonnage = bags / 16;
+            if (tonEl) tonEl.value = String(Math.round(tonnage * 1000) / 1000);
+            totalB += bags;
+            totalT += tonnage;
+        });
+        totalBagsEl.value = String(Math.round(totalB));
+        totalTonnageEl.value = String(Math.round(totalT * 1000) / 1000);
+    }
+
+    function rowIsComplete(row) {
+        const requiredInputs = row.querySelectorAll("input[required]");
+        for (const inp of requiredInputs) {
+            if (inp.type === "file") {
+                if (!inp.files || inp.files.length === 0) return false;
+            } else {
+                if (String(inp.value).trim() === "") return false;
+            }
+        }
+        return true;
+    }
+
+    function containerRowTemplate(index, data = {}) {
+        const no = index + 1;
+        const bagsVal = (data.bags ?? "");
+        const tonnageVal = (data.tonnage ?? "");
+        const containerVal = (data.container_number ?? "");
+        const sealVal = (data.seal_number ?? "");
+        const idField = data.id ? '<input type="hidden" name="containers[' + index + '][id]" value="' + escapeAttr(data.id) + '" data-existing-id>' : "";
+
+        // Build row using string concatenation to avoid template literal issues
+        let html = '<tr class="container-row" data-index="' + index + '">';
+        html += '<td class="text-center fw-bold">' + no + idField + '</td>';
+        html += '<td><input type="text" class="form-control container-number-input" data-field="container_number" name="containers[' + index + '][container_number]" placeholder="ENTER CONTAINER NUMBER" maxlength="13" required value="' + escapeAttr(containerVal) + '"></td>';
+        html += '<td><input type="text" class="form-control" data-field="seal_number" name="containers[' + index + '][seal_number]" placeholder="ENTER SEAL NUMBER" required value="' + escapeAttr(sealVal) + '"></td>';
+        html += '<td><input type="number" class="form-control" data-field="bags" name="containers[' + index + '][bags]" placeholder="200" step="1" min="0" required value="' + escapeAttr(bagsVal) + '"></td>';
+        html += '<td><input type="number" class="form-control" data-field="tonnage" name="containers[' + index + '][tonnage]" placeholder="AUTO" min="0" readonly value="' + escapeAttr(tonnageVal) + '"></td>';
+        html += '<td class="text-center action-cell">';
+        html += '<button type="button" class="btn btn-sm btn-outline-success fw-bold w-100 mb-2 js-save-row">ADD</button>';
+        html += '<button type="button" class="btn btn-sm btn-outline-danger fw-bold w-100 js-remove-row">REMOVE</button>';
+        html += '</td>';
+        html += '</tr>';
+
+        return html;
+    }
+
+    function readRowData(row) {
+        const bagsVal = row.querySelector("input[data-field='bags']")?.value || "";
+        const bagsNum = parseNum(bagsVal);
+        const tonnageNum = bagsNum / 16;
+        const tonnageStr = (bagsVal === "" ? "" : String(Math.round(tonnageNum * 1000) / 1000));
+        return {
+            saved: false,
+            container_number: row.querySelector("input[data-field='container_number']")?.value || "",
+            seal_number: row.querySelector("input[data-field='seal_number']")?.value || "",
+            bags: bagsVal,
+            tonnage: tonnageStr
+        };
+    }
+
+    function renderContainers(addActiveRow = true) {
+        if (addActiveRow) inMemory = ensureActiveRow(inMemory);
+        containersBody.innerHTML = "";
+        inMemory.forEach((rowData, idx) => {
+            const html = containerRowTemplate(idx, rowData);
+            containersBody.insertAdjacentHTML("beforeend", html);
+        });
+        setupAutoCapitalize();
+        const containerInputs = containersBody.querySelectorAll('.container-number-input');
+        containerInputs.forEach(input => {
+            input.addEventListener('input', function() { validateContainerNumber(this); });
+            input.addEventListener('blur', function() { validateContainerNumber(this); });
+        });
+        recalcTotals();
+    }
+
+    containersBody.addEventListener("click", (e) => {
+        const saveBtn = e.target.closest(".js-save-row");
+        const removeBtn = e.target.closest(".js-remove-row");
+
+        if (saveBtn) {
+            const row = saveBtn.closest("tr.container-row");
+            if (!rowIsComplete(row)) {
+                row.querySelectorAll("input[required]").forEach(inp => inp.reportValidity?.());
+                row.scrollIntoView({ behavior: "smooth", block: "center" });
+                return;
+            }
+            const idx = Number(row.dataset.index);
+            inMemory = ensureActiveRow(inMemory);
+            while (inMemory.length <= idx) inMemory.push({ saved: false });
+            const data = readRowData(row);
+            data.saved = true;
+            if (inMemory[idx] && inMemory[idx].id) {
+                data.id = inMemory[idx].id;
+            }
+            inMemory[idx] = data;
+            inMemory = ensureActiveRow(inMemory);
+            renderContainers(true);
+            return;
+        }
+
+        if (removeBtn) {
+            const row = removeBtn.closest("tr.container-row");
+            const idx = Number(row.dataset.index);
+
+            if (idx === 0) {
+                if (inMemory.length === 0) inMemory = [{ saved: false }];
+                inMemory[0] = { saved: false };
+                renderContainers(true);
+                return;
+            }
+
+            const cVal = String(row.querySelector("input[data-field='container_number']")?.value || "").trim();
+            const sVal = String(row.querySelector("input[data-field='seal_number']")?.value || "").trim();
+            const bVal = String(row.querySelector("input[data-field='bags']")?.value || "").trim();
+            const rowLooksEmpty = (cVal === "" && sVal === "" && bVal === "");
+            const exists = Number.isFinite(idx) && idx >= 0 && idx < inMemory.length;
+
+            if (exists && inMemory[idx]?.saved !== true && rowLooksEmpty && idx === inMemory.length - 1) {
+                inMemory.splice(idx, 1);
+                renderContainers(false);
+                return;
+            }
+            if (!exists) { renderContainers(true); return; }
+            inMemory.splice(idx, 1);
+            inMemory = ensureActiveRow(inMemory);
+            renderContainers(true);
+            return;
+        }
+    });
+
+    containersBody.addEventListener("input", (e) => {
+        if (e.target.closest("tr.container-row")) recalcTotals();
+    });
+
+    // ── INIT ──────────────────────────────────────────────────────────────
+    function initContainers() {
+        if (window.EDIT_MODE && window.EDIT_CONTAINERS && window.EDIT_CONTAINERS.length > 0) {
+            inMemory = window.EDIT_CONTAINERS.map(c => ({
+                saved: true,
+                id: c.id,
+                container_number: c.container_number,
+                seal_number: c.seal_number,
+                bags: c.bags,
+                tonnage: c.tonnage,
+            }));
+        } else {
+            inMemory = ensureActiveRow([]);
+        }
+        // In edit mode don't auto-append a blank row — user adds new rows manually via ADD
+        renderContainers(!window.EDIT_MODE);
+        setupAutoCapitalize();
+    }
+
+    // Ensure DOM is ready before initializing
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initContainers);
+    } else {
+        initContainers();
+    }
+</script>
+<script src="{% static 'js/features/tally/tally-sd-autofill.js' }}"></script>
+<script src="{% static 'js/features/tally/tally-prepopulation.js' %}"></script>
+<script src="{% static 'js/features/tally/tally-autosave.js' %}"></script>
+<script src="{% static 'js/ui/custom-datepicker.js' %}"></script>
+{% endblock %}

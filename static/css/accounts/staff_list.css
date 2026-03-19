@@ -1,0 +1,513 @@
+/* ── Borrowed from sd_base.css ───────────────────────────────── */
+.sdt-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 18px;
+  min-height: 38px;
+  border-radius: 9px;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: .8px;
+  text-transform: uppercase;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: all .2s;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.sdt-btn svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.sdt-btn-primary {
+  background: linear-gradient(135deg, #a47551, #7d5a3b);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(61, 40, 23, .25);
+}
+
+.sdt-btn-primary:hover {
+  background: linear-gradient(135deg, #7d5a3b, #a47551);
+  box-shadow: 0 4px 16px rgba(61, 40, 23, .35);
+  color: #fff;
+}
+
+.sdt-btn-ghost {
+  background: transparent;
+  color: #7d5a3b;
+  border: 1.5px solid #d6c5b4;
+}
+
+.sdt-btn-ghost:hover {
+  background: rgba(61, 40, 23, .06);
+  border-color: #7d5a3b;
+  color: #3d2817;
+}
+
+.sdt-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 24px;
+  padding: 16px;
+  flex-wrap: wrap;
+}
+
+.sdt-page-info {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #7d5a3b;
+  letter-spacing: .5px;
+}
+
+/* ── Staff List Styles ───────────────────────────────────────── */
+.staff-page {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 32px 24px;
+  background: #faf8f6;
+  min-height: 100vh;
+}
+
+.staff-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.staff-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #7d5a3b;
+  text-decoration: none;
+  margin-bottom: 12px;
+  transition: color 0.2s;
+}
+
+.staff-back-link:hover {
+  color: #3d2817;
+}
+
+.staff-back-link svg {
+  width: 16px;
+  height: 16px;
+}
+
+.staff-title {
+  font-size: 32px;
+  font-weight: 800;
+  color: #3d2817;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.5px;
+}
+
+.staff-subtitle {
+  font-size: 15px;
+  color: #7d5a3b;
+  margin: 0;
+}
+
+.staff-search-bar {
+  background: #fff;
+  border: 2px solid #e8ddd0;
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin: 0 auto 20px auto;
+  max-width: 980px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.staff-filter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.staff-filter-label {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #7d5a3b;
+  opacity: 0.9;
+}
+
+.staff-filter-pills {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.staff-pill {
+  appearance: none;
+  border: 1.5px solid #e8ddd0;
+  background: #fff;
+  color: #5c3d2e;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  padding: 7px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.05s;
+  white-space: nowrap;
+}
+
+.staff-pill:hover {
+  border-color: #7d5a3b;
+  background: #fdf7f3;
+}
+
+.staff-pill:active {
+  transform: translateY(1px);
+}
+
+.staff-pill.active {
+  border-color: #7d5a3b;
+  background: linear-gradient(135deg, #a47551, #7d5a3b);
+  color: #fff;
+}
+
+.staff-search-bar:focus-within {
+  border-color: #7d5a3b;
+}
+
+.staff-search-icon {
+  width: 20px;
+  height: 20px;
+  color: #7d5a3b;
+  flex-shrink: 0;
+}
+
+.staff-search-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  color: #3d2817;
+  background: transparent;
+}
+
+.staff-search-input::placeholder {
+  color: #bbb;
+}
+
+.staff-card {
+  background: #fff;
+  border: 1.5px solid #ede3da;
+  border-radius: 16px;
+  box-shadow: 0 2px 10px rgba(61, 40, 23, .05);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.staff-card-header {
+  background: linear-gradient(135deg, #3d2817 0%, #5c3d2e 100%);
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.staff-card-icon {
+  width: 40px;
+  height: 40px;
+  background: rgba(245, 237, 229, 0.15);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #f5ede5;
+}
+
+.staff-card-title {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #f5ede5;
+  margin: 0;
+}
+
+.staff-table-wrap {
+  overflow-x: auto;
+}
+
+.staff-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.staff-table thead tr {
+  background: #f8f2ec;
+  border-bottom: 2px solid #e8ddd0;
+}
+
+.staff-table th {
+  padding: 16px 20px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #5c3d2e;
+  white-space: nowrap;
+}
+
+.staff-table tbody tr {
+  border-bottom: 1px solid #f0e8e0;
+  transition: background-color 0.2s;
+}
+
+.staff-table tbody tr:hover {
+  background: #fdf7f3;
+}
+
+.staff-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.staff-table td {
+  padding: 18px 20px;
+  font-size: 14px;
+  color: #3d2817;
+  vertical-align: middle;
+}
+
+.staff-name {
+  font-weight: 700;
+  color: #3d2817;
+}
+
+.staff-rank {
+  color: #7d5a3b;
+  font-weight: 600;
+}
+
+.staff-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.staff-btn {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.staff-btn-edit {
+  background: #fff;
+  color: #5c3d2e;
+  border: 1.5px solid #e8ddd0;
+}
+
+.staff-btn-edit:hover {
+  background: #f8f2ec;
+  border-color: #7d5a3b;
+  color: #3d2817;
+}
+
+.staff-btn-delete {
+  background: #fee;
+  color: #c62828;
+  border: 1.5px solid #fcc;
+}
+
+.staff-btn-delete:hover {
+  background: #fdd;
+  border-color: #faa;
+}
+
+.staff-empty {
+  text-align: center;
+  padding: 60px 24px;
+  color: #999;
+}
+
+.staff-empty-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 20px;
+  color: #d1c4b8;
+}
+
+.staff-empty h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #5c3d2e;
+  margin: 0 0 8px 0;
+}
+
+.staff-count {
+  display: flex;
+  justify-content: flex-end;
+  padding: 16px 0 24px;
+  margin-top: 8px;
+}
+
+.staff-count-box {
+  background: #f8f2ec;
+  border: 1px solid #e8ddd0;
+  border-radius: 8px;
+  padding: 10px 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.staff-count-label {
+  font-size: 13px;
+  color: #7d5a3b;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.staff-count-value {
+  font-size: 15px;
+  color: #3d2817;
+  font-weight: 700;
+}
+
+/* Desk Badges */
+.desk-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.desk-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+/* Manager Badge */
+.desk-badge-manager {
+  background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+  color: #fff;
+  border: 1.5px solid #1a237e;
+  box-shadow: 0 2px 4px rgba(26, 35, 126, 0.2);
+}
+
+/* Operations Desk Badge */
+.desk-badge-operations {
+  background: linear-gradient(135deg, #0277bd 0%, #0288d1 100%);
+  color: #fff;
+  border: 1.5px solid #0277bd;
+  box-shadow: 0 2px 4px rgba(2, 119, 189, 0.2);
+}
+
+/* E-Booking Desk Badge */
+.desk-badge-ebooking {
+  background: linear-gradient(135deg, #00695c 0%, #00796b 100%);
+  color: #fff;
+  border: 1.5px solid #00695c;
+  box-shadow: 0 2px 4px rgba(0, 105, 92, 0.2);
+}
+
+/* Declaration Desk Badge */
+.desk-badge-declaration {
+  background: linear-gradient(135deg, #6a1b9a 0%, #7b1fa2 100%);
+  color: #fff;
+  border: 1.5px solid #6a1b9a;
+  box-shadow: 0 2px 4px rgba(106, 27, 154, 0.2);
+}
+
+/* Terminal Supervisor Badge */
+.desk-badge-terminal_supervisor,
+.desk-badge-terminal.supervisor {
+  background: linear-gradient(135deg, #d84315 0%, #e64a19 100%);
+  color: #fff;
+  border: 1.5px solid #d84315;
+  box-shadow: 0 2px 4px rgba(216, 67, 21, 0.2);
+}
+
+/* Evacuation Desk Badge */
+.desk-badge-evacuation {
+  background: linear-gradient(135deg, #f57c00 0%, #fb8c00 100%);
+  color: #fff;
+  border: 1.5px solid #f57c00;
+  box-shadow: 0 2px 4px rgba(245, 124, 0, 0.2);
+}
+
+/* Other/No Desk Badge */
+.desk-badge-other,
+.desk-badge-none {
+  background: #f5f5f5;
+  color: #757575;
+  border: 1.5px solid #e0e0e0;
+}
+
+/* Hover effects for badges */
+.desk-badge:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* ── Empty State ─────────────────────────────────────────────── */
+.sdt-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 60px 24px;
+    text-align: center;
+}
+
+.sdt-empty-icon svg {
+    width: 72px;
+    height: 72px;
+    color: rgba(164, 117, 81, .4);
+}
+
+.sdt-empty-title {
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--cocoa-dark);
+    margin: 0;
+}
+
+.sdt-empty-text {
+    font-size: 13.5px;
+    color: var(--text-muted);
+    max-width: 360px;
+    margin: 0;
+}

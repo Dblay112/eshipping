@@ -1,0 +1,242 @@
+/* ═══════════════════════════════════════════════════════════════
+   20FT STRAIGHT LOADING MOBILE — straight_loading/20_straight_loading.html
+   Mobile-specific styles
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Tablet and mobile layout (max-width 768px) */
+@media (max-width: 768px) {
+    .page-shell {
+        padding: 12px;
+    }
+
+    .form-card {
+        border-radius: 12px;
+        min-height: auto;
+    }
+
+    .card-body {
+        padding: 20px !important;
+    }
+
+    .form-title {
+        font-size: 1.2rem;
+        margin-bottom: 12px;
+    }
+
+    .produce-title {
+        font-size: 0.95rem;
+        margin-bottom: 20px;
+    }
+
+    /* Stack header grid vertically */
+    .header-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    /* Stack field labels vertically */
+    .header-col .field-row {
+        grid-template-columns: 1fr;
+        gap: 6px;
+        margin-bottom: 16px;
+    }
+
+    .caps-label {
+        font-size: 0.85rem;
+        margin-bottom: 4px;
+    }
+
+    /* Touch-friendly inputs */
+    .form-control,
+    .form-select {
+        min-height: 44px;
+        font-size: 16px; /* Prevents iOS zoom */
+        padding: 10px 14px;
+    }
+
+    /* Section titles */
+    .section-title {
+        font-size: 0.95rem;
+        margin-bottom: 12px;
+    }
+
+    /* Container table - horizontal scroll */
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin: 0 -20px;
+        padding: 0 20px;
+    }
+
+    .container-table {
+        min-width: 600px;
+    }
+
+    .container-table th,
+    .container-table td {
+        font-size: 13px;
+        padding: 8px 6px;
+    }
+
+    /* Buttons */
+    .add-container-btn,
+    .btn {
+        min-height: 44px;
+        font-size: 14px;
+        padding: 10px 14px;
+    }
+
+    /* Name row */
+    .name-row {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .add-btn,
+    .remove-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Extra small mobile (max-width 480px) */
+@media (max-width: 480px) {
+    .page-shell {
+        padding: 8px;
+    }
+
+    .card-body {
+        padding: 16px !important;
+    }
+
+    .form-title {
+        font-size: 1.1rem;
+    }
+
+    .produce-title {
+        font-size: 0.9rem;
+    }
+
+    .caps-label {
+        font-size: 0.8rem;
+    }
+
+    .container-table {
+        min-width: 500px;
+    }
+
+    .container-table th,
+    .container-table td {
+        font-size: 12px;
+        padding: 6px 4px;
+    }
+}
+
+/* Name chips grid (min-width 576px) */
+@media (min-width: 576px) {
+    .name-chips {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* Tablet layout (max-width 992px) */
+@media (max-width: 992px) {
+    .header-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .header-col .field-row {
+        grid-template-columns: 1fr;
+        gap: 6px;
+    }
+
+    .caps-label {
+        font-size: 12px;
+    }
+
+    .name-row {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .nav-search {
+        width: 100%;
+    }
+
+    .nav-item-form,
+    .nav-pill {
+        width: 100%;
+    }
+
+    /* Ensure form controls are touch-friendly */
+    .form-control,
+    .form-select {
+        min-height: 44px;
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+}
+
+/* Mobile layout (max-width 576px) */
+@media (max-width: 576px) {
+    .page-shell {
+        padding: 12px;
+    }
+
+    .form-title {
+        font-size: 1.1rem;
+    }
+
+    .produce-title {
+        font-size: 0.95rem;
+    }
+
+    .section-title {
+        font-size: 0.95rem;
+    }
+
+    /* Ensure all form controls are properly sized */
+    .form-control,
+    .form-select {
+        min-height: 44px;
+        font-size: 16px; /* Prevents zoom on iOS */
+        padding: 10px 12px;
+    }
+
+    /* Fix button sizing */
+    .btn {
+        min-height: 44px;
+        padding: 10px 16px;
+        font-size: 14px;
+    }
+
+    .add-btn,
+    .remove-btn {
+        min-height: 44px;
+        padding: 10px 14px;
+    }
+
+    /* Mobile table fixes - ensure all columns are visible and scrollable */
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+        display: block;
+        width: 100%;
+        position: relative;
+        margin-bottom: 1rem;
+        border: 2px solid #e6d5c3;
+        border-radius: 8px;
+    }
+
+    .container-table {
+        min-width: 800px;
+        display: table;
+        margin-bottom: 0;
+    }
+
+    .container-table th,
+    .container-table td {
+        padding: 10px 8px;
+        font-size: 13px;
+        vertical-align: middle;
+    }
+}

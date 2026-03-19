@@ -1,0 +1,157 @@
+/* ═══════════════════════════════════════════════════════════════
+   EVACUATION LIST MOBILE — evacuation/evacuation_list.html
+   Mobile-specific styles (max-width: 768px)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Mobile: Touch-friendly buttons */
+@media (max-width: 768px) {
+  /* Hide table on mobile, show card layout instead */
+  .sdt-table-wrap {
+    display: none;
+  }
+
+  /* Mobile card layout */
+  .sdt-mobile-cards {
+    display: block;
+  }
+
+  .sdt-mobile-card {
+    background: #fff;
+    border: 1px solid #e8ddd4;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+
+  .sdt-mobile-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .sdt-mobile-card-header:active {
+    background: #f8f2ec;
+  }
+
+  .sdt-mobile-card-sd {
+    font-size: 16px;
+    font-weight: 700;
+    color: #3d2817;
+  }
+
+  .sdt-mobile-card-details {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    padding: 0 16px;
+  }
+
+  .sdt-mobile-card.expanded .sdt-mobile-card-details {
+    max-height: 1000px;
+    padding: 0 16px 16px 16px;
+  }
+
+  .sdt-mobile-card-row {
+    display: flex;
+    padding: 8px 0;
+    gap: 12px;
+  }
+
+  .sdt-mobile-card-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #7d5a3b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    min-width: 90px;
+    flex-shrink: 0;
+  }
+
+  .sdt-mobile-card-value {
+    font-size: 13px;
+    color: #3d2817;
+    flex: 1;
+  }
+
+  .sdt-mobile-card-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #f0e8e0;
+  }
+
+  .sdt-mobile-card-actions .sdt-row-edit-btn {
+    flex: 1;
+    justify-content: center;
+    min-height: 44px;
+    font-size: 14px;
+  }
+
+  .sdt-row-edit-btn,
+  .sdt-download-btn {
+    min-height: 44px;
+    padding: 10px 14px;
+    font-size: 14px;
+  }
+
+  .sdt-shift-badge {
+    font-size: 10px !important;
+    padding: 4px 8px !important;
+    display: inline-block;
+  }
+
+  .sdt-download-btn {
+    font-size: 12px !important;
+    padding: 8px 12px !important;
+    white-space: nowrap;
+  }
+
+  /* Page header - stack on mobile */
+  .sdt-page-header-inner {
+    flex-direction: column !important;
+    gap: 16px !important;
+    align-items: flex-start !important;
+  }
+
+  .sdt-page-header-inner > div:last-child {
+    width: 100%;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .sdt-view-toggle {
+    width: 100%;
+  }
+
+  .sdt-btn-primary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Search input - prevent zoom on iOS */
+  .sdt-search-input {
+    font-size: 16px !important;
+  }
+
+  /* Calendar panel - full width on mobile */
+  .sdt-schedule-layout {
+    flex-direction: column !important;
+  }
+
+  .sdt-calendar-panel {
+    width: 100% !important;
+    margin-bottom: 20px;
+  }
+}
+
+/* Desktop: Hide mobile cards */
+@media (min-width: 769px) {
+  .sdt-mobile-cards {
+    display: none;
+  }
+}

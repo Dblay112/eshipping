@@ -1,0 +1,853 @@
+/* ═══════════════════════════════════════════════════════════════
+   SD DETAIL — sd/sd_detail.html
+   Self-contained CSS (no dependencies)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Borrowed from sd_base.css ───────────────────────────────── */
+.sdt-page {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 32px 24px 64px;
+}
+
+.sdt-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-decoration: none;
+    margin-bottom: 12px;
+    transition: color .2s;
+}
+
+.sdt-back-link svg {
+    width: 14px;
+    height: 14px;
+}
+
+.sdt-back-link:hover {
+    color: var(--cocoa-brown);
+}
+
+.sdt-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 18px;
+    min-height: 38px;
+    border-radius: 9px;
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 13.5px;
+    font-weight: 700;
+    letter-spacing: .8px;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all .2s;
+    white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+.sdt-btn svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+}
+
+.sdt-btn-primary {
+    background: linear-gradient(135deg, var(--cocoa-medium), var(--cocoa-dark));
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(61, 40, 23, .25);
+}
+
+.sdt-btn-primary:hover {
+    background: linear-gradient(135deg, var(--cocoa-brown), var(--cocoa-medium));
+    box-shadow: 0 4px 16px rgba(61, 40, 23, .35);
+    color: #fff;
+}
+
+.sdt-btn-ghost {
+    background: transparent;
+    color: var(--cocoa-brown);
+    border: 1.5px solid var(--cocoa-rim);
+}
+
+.sdt-btn-ghost:hover {
+    background: rgba(61, 40, 23, .06);
+    border-color: var(--cocoa-brown);
+    color: var(--cocoa-dark);
+}
+
+.sdt-btn-excel {
+    background: linear-gradient(135deg, #1a6b35, #217a3f);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(26, 107, 53, .25);
+}
+
+.sdt-btn-excel:hover {
+    background: linear-gradient(135deg, #217a3f, #1a6b35);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(26, 107, 53, .35);
+}
+
+.sdt-download-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 12px;
+    background: #fff;
+    border: 1.5px solid #c8a882;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #3d2817;
+    text-decoration: none;
+    transition: all .15s;
+    white-space: nowrap;
+}
+
+.sdt-download-btn:hover {
+    background: #fdf4ec;
+    border-color: #b0916e;
+    color: #3d2817;
+}
+
+.sdt-download-btn svg {
+    flex-shrink: 0;
+}
+
+.sdt-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    flex-shrink: 0;
+}
+
+.sdt-status-active {
+    background: rgba(234, 179, 8, .12);
+    color: #a16207;
+}
+
+.sdt-status-complete {
+    background: rgba(34, 197, 94, .12);
+    color: #15803d;
+}
+
+.sdt-status-lg {
+    font-size: 12.5px;
+    padding: 6px 14px;
+}
+
+/* ── Dark hero header ────────────────────────────────────────── */
+.sdt-detail-header {
+    background: linear-gradient(135deg, var(--cocoa-dark) 0%, var(--cocoa-medium) 100%);
+    margin: -32px -24px 0;
+    padding: 28px 24px;
+    position: relative;
+}
+
+.sdt-detail-header::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 32px;
+    background: var(--warm-white);
+    border-radius: 24px 24px 0 0;
+}
+
+.sdt-detail-header-inner {
+    max-width: 1300px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+}
+
+.sdt-detail-header .sdt-back-link {
+    color: rgba(255, 255, 255, .6);
+    margin-bottom: 14px;
+}
+
+.sdt-detail-header .sdt-back-link:hover {
+    color: rgba(255, 255, 255, .9);
+}
+
+.sdt-detail-title-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.sdt-detail-sd-number {
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 32px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    color: #fff;
+    margin: 0 0 6px;
+    word-break: break-all;
+}
+
+.sdt-detail-vessel {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, .75);
+}
+
+.sdt-detail-vessel svg {
+    width: 16px;
+    height: 16px;
+}
+
+.sdt-detail-eta {
+    font-size: 12px;
+    color: var(--cocoa-light);
+    margin-left: 6px;
+}
+
+.sdt-detail-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.sdt-detail-header .sdt-btn-ghost {
+    background: rgba(255, 255, 255, .1);
+    color: rgba(255, 255, 255, .85);
+    border-color: rgba(255, 255, 255, .2);
+}
+
+.sdt-detail-header .sdt-btn-ghost:hover {
+    background: rgba(255, 255, 255, .18);
+    color: #fff;
+}
+
+/* ── Two-column layout ───────────────────────────────────────── */
+.sdt-detail-layout {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 24px;
+    margin-top: 32px;
+}
+
+.sdt-detail-left,
+.sdt-detail-right {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* ── Cards ───────────────────────────────────────────────────── */
+.sdt-detail-card {
+    background: #fff;
+    border: 1.5px solid #ede3da;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(61, 40, 23, .05);
+}
+
+.sdt-detail-card-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: .8px;
+    text-transform: uppercase;
+    color: var(--cocoa-dark);
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1.5px solid #f0e8e0;
+}
+
+.sdt-detail-card-title svg {
+    width: 16px;
+    height: 16px;
+    color: var(--cocoa-brown);
+    flex-shrink: 0;
+}
+
+.sdt-count-badge {
+    background: rgba(164, 117, 81, .15);
+    color: var(--cocoa-brown);
+    border-radius: 100px;
+    padding: 2px 9px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-left: auto;
+}
+
+/* Inline excel button in card title */
+.sdt-excel-inline-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-left: auto;
+    padding: 4px 10px;
+    background: #1a6b35;
+    color: #fff;
+    border-radius: 7px;
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .8px;
+    text-decoration: none;
+    transition: background .2s;
+}
+
+.sdt-excel-inline-btn svg {
+    width: 12px;
+    height: 12px;
+}
+
+.sdt-excel-inline-btn:hover {
+    background: #217a3f;
+    color: #fff;
+}
+
+/* ── Info grid ───────────────────────────────────────────────── */
+.sdt-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 20px;
+}
+
+.sdt-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.sdt-info-label {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: .6px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+.sdt-info-value {
+    font-size: 13.5px;
+    color: var(--cocoa-dark);
+    font-weight: 500;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.sdt-mono {
+    font-family: monospace;
+    font-size: 13px;
+    background: rgba(61, 40, 23, .05);
+    padding: 2px 6px;
+    border-radius: 5px;
+    width: fit-content;
+}
+
+.sdt-allocation-text {
+    font-family: "Barlow", monospace;
+    font-size: 13px;
+    white-space: pre-wrap;
+    line-height: 1.8;
+    color: var(--cocoa-dark);
+    background: var(--warm-white);
+    padding: 14px;
+    border-radius: 10px;
+    margin: 0;
+}
+
+/* ── Contract allocation rows ────────────────────────────────── */
+.sdt-alloc-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sdt-alloc-row {
+    display: flex;
+    align-items: stretch;
+    gap: 12px;
+    background: var(--warm-white);
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #ede3da;
+}
+
+.sdt-alloc-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    min-width: 36px;
+    background: var(--cocoa-dark);
+    color: #fff;
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 18px;
+    font-weight: 900;
+}
+
+.sdt-alloc-body {
+    flex: 1;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.sdt-alloc-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.sdt-alloc-contract {
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--cocoa-dark);
+}
+
+.sdt-alloc-tonnage {
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--cocoa-brown);
+    white-space: nowrap;
+}
+
+.sdt-alloc-meta {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.sdt-alloc-meta span {
+    font-size: 11.5px;
+    color: var(--text-muted);
+}
+
+/* ── Container list ──────────────────────────────────────────── */
+.sdt-contract-section {
+    margin-bottom: 16px;
+}
+
+.sdt-contract-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 8px 12px;
+    background: linear-gradient(135deg, var(--cocoa-dark), var(--cocoa-medium));
+    border-radius: 10px 10px 0 0;
+}
+
+.sdt-contract-label {
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 20px;
+    font-weight: 900;
+    color: #fff;
+    width: 28px;
+    text-align: center;
+}
+
+.sdt-contract-name {
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 13px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: .5px;
+}
+
+.sdt-contract-mk {
+    font-size: 11.5px;
+    color: rgba(255, 255, 255, .7);
+}
+
+.sdt-contract-tonnage {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--cocoa-light);
+    margin-left: auto;
+}
+
+.sdt-contract-count {
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, .6);
+    white-space: nowrap;
+}
+
+.sdt-contract-unassigned {
+    background: rgba(61, 40, 23, .12);
+    border-radius: 10px 10px 0 0;
+}
+
+.sdt-contract-unassigned .sdt-contract-name {
+    color: var(--cocoa-dark);
+}
+
+.sdt-contract-unassigned .sdt-contract-count {
+    color: var(--text-muted);
+}
+
+.sdt-container-table-wrap {
+    overflow-x: auto;
+    border-radius: 0 0 10px 10px;
+    border: 1.5px solid #f0e8e0;
+    border-top: none;
+}
+
+.sdt-container-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.sdt-container-table th {
+    background: var(--warm-white);
+    padding: 9px 12px;
+    text-align: left;
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 10.5px;
+    font-weight: 800;
+    letter-spacing: .6px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    border-bottom: 1.5px solid #ede3da;
+    white-space: nowrap;
+}
+
+.sdt-container-table td {
+    padding: 9px 12px;
+    border-bottom: 1px solid #f5ede8;
+    color: var(--cocoa-dark);
+    vertical-align: middle;
+}
+
+.sdt-container-table tr:last-child td {
+    border-bottom: none;
+}
+
+.sdt-container-table tr:hover td {
+    background: rgba(61, 40, 23, .02);
+}
+
+.sdt-td-num {
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 600;
+    width: 28px;
+}
+
+.sdt-td-cno {
+    font-family: monospace;
+    font-size: 12px;
+}
+
+.sdt-balance-chip {
+    background: rgba(34, 197, 94, .1);
+    color: #15803d;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* Tally sync */
+.sdt-tally-sync-notice {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 11.5px;
+    color: var(--text-muted);
+    padding: 8px 0 14px;
+}
+
+.sdt-tally-sync-notice svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+}
+
+.sdt-tally-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #22c55e;
+    vertical-align: middle;
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, .25);
+}
+
+.sdt-from-tally-row {
+    background: rgba(34, 197, 94, .05) !important;
+}
+
+/* ── Clerks ──────────────────────────────────────────────────── */
+.sdt-clerks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sdt-clerk-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    background: var(--warm-white);
+    border-radius: 10px;
+}
+
+.sdt-clerk-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--cocoa-medium), var(--cocoa-light));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 14px;
+    font-weight: 800;
+    color: #fff;
+    flex-shrink: 0;
+}
+
+.sdt-clerk-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.sdt-clerk-name {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--cocoa-dark);
+}
+
+.sdt-clerk-meta {
+    display: flex;
+    gap: 10px;
+}
+
+.sdt-clerk-tally,
+.sdt-clerk-date {
+    font-size: 11.5px;
+    color: var(--text-muted);
+}
+
+/* ── Balance / loading summary ───────────────────────────────── */
+.sdt-balance-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.sdt-balance-item {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 12px;
+    background: var(--warm-white);
+    border-radius: 10px;
+}
+
+.sdt-balance-label {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: .6px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+.sdt-balance-val {
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--cocoa-dark);
+}
+
+.sdt-balance-closing {
+    background: rgba(34, 197, 94, .08);
+    grid-column: span 2;
+}
+
+.sdt-balance-closing .sdt-balance-val {
+    color: #15803d;
+}
+
+/* ── Meta card ───────────────────────────────────────────────── */
+.sdt-meta-card {
+    padding: 14px 20px;
+}
+
+.sdt-meta-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #f5ede8;
+    gap: 12px;
+}
+
+.sdt-meta-row:last-child {
+    border-bottom: none;
+}
+
+.sdt-meta-label {
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: .4px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+.sdt-meta-val {
+    font-size: 13px;
+    color: var(--cocoa-dark);
+    font-weight: 500;
+}
+
+.sdt-no-data {
+    font-size: 13.5px;
+    color: var(--text-muted);
+    font-style: italic;
+    margin: 0;
+}
+
+/* Hide mobile tallies view on desktop */
+.sdt-tallies-mobile {
+    display: none;
+}
+
+/* ── Related records sections ── */
+.sdt-related-item {
+    padding: 12px 16px;
+    border-bottom: 1px solid #f0e8e0;
+}
+
+.sdt-related-item:last-child {
+    border-bottom: none;
+}
+
+.sdt-related-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.sdt-related-header strong {
+    color: #3d2817;
+    font-size: 14px;
+}
+
+.sdt-related-date {
+    font-size: 12px;
+    color: #8b7355;
+}
+
+.sdt-related-line {
+    display: flex;
+    gap: 16px;
+    font-size: 13px;
+    color: #5c3d2e;
+    padding: 4px 0;
+    flex-wrap: wrap;
+}
+
+.sdt-related-link {
+    color: #7d5a3b;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.sdt-related-link:hover {
+    color: #3d2817;
+    text-decoration: underline;
+}
+
+.sdt-file-link {
+    color: #7d5a3b;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.sdt-file-link:hover {
+    text-decoration: underline;
+}
+
+.sdt-status-sm {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.sdt-status-pending_approval {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.sdt-status-approved {
+    background: #d4edda;
+    color: #155724;
+}
+
+.sdt-status-rejected {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.sdt-status-draft {
+    background: #e2e3e5;
+    color: #383d41;
+}
+
+/* ── Small download buttons for related records ── */
+.sdt-download-btn-sm {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    background: #fff;
+    border: 1.5px solid #c8a882;
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #3d2817;
+    text-decoration: none;
+    transition: all .15s;
+}
+
+.sdt-download-btn-sm:hover {
+    background: #fdf4ec;
+    border-color: #b0916e;
+    color: #3d2817;
+}
+
+.sdt-download-btn-sm svg {
+    flex-shrink: 0;
+}

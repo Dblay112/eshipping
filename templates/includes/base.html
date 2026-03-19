@@ -1,0 +1,560 @@
+{% load static %}
+{% load sd_permissions %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}CMC{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    {% if not hide_nav %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+    {% endif %}
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'css/mobile-optimization.css' %}">
+    <link rel="stylesheet" href="{% static 'css/calendar-mobile.css' %}">
+    <link rel="stylesheet" href="{% static 'css/expandable-rows-mobile.css' %}">
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body class="{% if hide_nav %}no-nav{% endif %}">
+
+    {% if request.user.is_authenticated and not hide_nav %}
+    <nav class="cmc-nav" id="cmcNav">
+        <div class="cmc-nav-inner">
+
+            <!-- Brand → Dashboard -->
+            <a class="cmc-brand" href="{% url 'dashboard' %}">
+                <img src="{% static 'images/cmclogo.png' %}" alt="CMC Logo" class="cmc-brand-logo">
+                <div class="cmc-brand-text">
+                    <span class="cmc-brand-name">CMC</span>
+                    <span class="cmc-brand-sub">Shipping Portal</span>
+                </div>
+            </a>
+
+            <!-- ── SD Search ── -->
+            <div class="cmc-search">
+                <div class="cmc-search-inner">
+                    <svg class="cmc-search-icon" viewBox="0 0 20 20" fill="none">
+                        <circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.6"/>
+                        <path d="M13 13l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                    </svg>
+                    <input
+                        type="text"
+                        id="sdSearchInput"
+                        class="cmc-search-input"
+                        placeholder="Search SD number…"
+                        autocomplete="off"
+                        data-url="{% url 'sd_search_json' %}"
+                    >
+                </div>
+                <div class="cmc-search-results" id="sdSearchResults"></div>
+            </div>
+
+            <div class="cmc-nav-right">
+
+                <!-- Dashboard home icon -->
+                <a class="cmc-home-btn" href="{% url 'dashboard' %}" title="Dashboard">
+                    <svg viewBox="0 0 20 20" fill="none">
+                        <path d="M3 9.5L10 3l7 6.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M5 8.5V16a1 1 0 0 0 1 1h3v-4h2v4h3a1 1 0 0 0 1-1V8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                </a>
+
+                <div class="cmc-nav-divider"></div>
+
+                <!-- ── OPERATIONS ── -->
+                <div class="cmc-dropdown-wrap" id="opsDropdownWrap">
+                    <button class="cmc-nav-btn cmc-dropdown-toggle" id="opsDropdownBtn" aria-expanded="false">
+                        OPERATIONS
+                        <svg class="cmc-chevron" viewBox="0 0 12 8" fill="none">
+                            <path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <div class="cmc-dropdown-menu cmc-dropdown-menu-wide" id="opsDropdownMenu" role="menu">
+                        <div class="cmc-dropdown-section-label">SD Records</div>
+                        <a class="cmc-dropdown-item" href="{% url 'operations_list' %}">
+                            <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="2" rx="1" fill="currentColor"/><rect x="2" y="7" width="12" height="2" rx="1" fill="currentColor"/><rect x="2" y="11" width="7" height="2" rx="1" fill="currentColor"/></svg>
+                            View SD Records
+                        </a>
+                        {% if request.user|is_operations_staff %}
+                        <a class="cmc-dropdown-item" href="{% url 'sd_create' %}">
+                            <svg viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                            Add SD Record
+                        </a>
+                        {% endif %}
+                        {% if request.user|is_operations_staff %}
+                        <div class="cmc-dropdown-divider"></div>
+                        <div class="cmc-dropdown-section-label">Tallies</div>
+                        <a class="cmc-dropdown-item" href="{% url 'all_approved_tallies' %}">
+                            <svg viewBox="0 0 16 16" fill="none"><path d="M3 8l3 3 7-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            All Approved Tallies
+                            {% if pending_recall_requests_count > 0 %}
+                            <span style="display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;background:#ef4444;color:#fff;border-radius:10px;font-size:11px;font-weight:700;margin-left:8px;">{{ pending_recall_requests_count }}</span>
+                            {% endif %}
+                        </a>
+                        {% endif %}
+                        <div class="cmc-dropdown-divider"></div>
+                        <div class="cmc-dropdown-section-label">Daily Port</div>
+                        <a class="cmc-dropdown-item" href="{% url 'daily_port_view' %}">
+                            <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M2 6h12M5 1v2M11 1v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                            View Daily Port
+                        </a>
+                        {% if request.user|is_operations_staff %}
+                        <a class="cmc-dropdown-item" href="{% url 'daily_port_create' %}">
+                            <svg viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                            Add Daily Port
+                        </a>
+                        {% endif %}
+                        <div class="cmc-dropdown-divider"></div>
+                        <div class="cmc-dropdown-section-label">Work Program</div>
+                        <a class="cmc-dropdown-item" href="{% url 'work_program_list' %}">
+                            <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M2 6h12M5 1v2M11 1v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M6 9h4M6 12h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                            View Work Program
+                        </a>
+                        {% if request.user|is_operations_staff %}
+                        <a class="cmc-dropdown-item" href="{% url 'work_program_create' %}">
+                            <svg viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                            Add Work Program
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="cmc-nav-divider"></div>
+
+                <!-- ── TALLY ── -->
+                <div class="cmc-dropdown-wrap" id="tallyDropdownWrap">
+                    <button class="cmc-nav-btn cmc-dropdown-toggle" id="tallyDropdownBtn" aria-expanded="false">
+                        TALLY
+                        <svg class="cmc-chevron" viewBox="0 0 12 8" fill="none">
+                            <path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <div class="cmc-dropdown-menu" id="tallyDropdownMenu" role="menu">
+                        <a class="cmc-dropdown-item" href="{% url 'new_tally' %}">
+                            <svg viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                            Create Tally
+                        </a>
+                        <a class="cmc-dropdown-item" href="{% url 'my_tallies' %}">
+                            <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="2" rx="1" fill="currentColor"/><rect x="2" y="7" width="12" height="2" rx="1" fill="currentColor"/><rect x="2" y="11" width="7" height="2" rx="1" fill="currentColor"/></svg>
+                            My Tallies
+                        </a>
+                        {% if request.user|is_supervisor %}
+                        <div class="cmc-dropdown-divider"></div>
+                        <a class="cmc-dropdown-item" href="{% url 'pending_tallies' %}">
+                            <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M8 5v4l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                            Pending Tallies
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="cmc-nav-divider"></div>
+
+                <!-- ── SCHEDULE ── -->
+                <div class="cmc-dropdown-wrap" id="schedDropdownWrap">
+                    <button class="cmc-nav-btn cmc-dropdown-toggle" id="schedDropdownBtn" aria-expanded="false">
+                        SCHEDULE
+                        <svg class="cmc-chevron" viewBox="0 0 12 8" fill="none">
+                            <path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <div class="cmc-dropdown-menu" id="schedDropdownMenu" role="menu">
+                        <a class="cmc-dropdown-item" href="{% url 'schedule_view' %}">
+                            <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M2 6h12M5 1v2M11 1v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                            View Schedule
+                        </a>
+                        <div class="cmc-dropdown-divider"></div>
+                        <div class="cmc-dropdown-section-label">Terminals</div>
+                        <a class="cmc-dropdown-item" href="{% url 'terminal_schedule_list' %}">
+                            <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="9" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="2" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="9" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/></svg>
+                            Terminal Schedule
+                        </a>
+                        {% if request.user|is_schedule_manager %}
+                        <div class="cmc-dropdown-divider"></div>
+                        <a class="cmc-dropdown-item" href="{% url 'schedule_create' %}">
+                            <svg viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                            Create Schedule
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="cmc-nav-divider"></div>
+
+                <!-- ── EBOOKING ── -->
+                <div class="cmc-dropdown-wrap" id="ebookDropdownWrap">
+                    <button class="cmc-nav-btn cmc-dropdown-toggle" id="ebookDropdownBtn" aria-expanded="false">
+                        EBOOKING
+                        <svg class="cmc-chevron" viewBox="0 0 12 8" fill="none">
+                            <path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <div class="cmc-dropdown-menu" id="ebookDropdownMenu" role="menu">
+                        <a class="cmc-dropdown-item" href="{% url 'booking_list' %}">
+                            <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="2" rx="1" fill="currentColor"/><rect x="2" y="7" width="12" height="2" rx="1" fill="currentColor"/><rect x="2" y="11" width="7" height="2" rx="1" fill="currentColor"/></svg>
+                            View Bookings
+                        </a>
+                        {% if request.user|has_assigned_sds %}
+                        <a class="cmc-dropdown-item" href="{% url 'assigned_sds_list' %}">
+                            <svg viewBox="0 0 16 16" fill="none"><path d="M8 2l2 4h4l-3 3 1 4-4-2-4 2 1-4-3-3h4l2-4z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+                            Assigned SDs
+                        </a>
+                        {% endif %}
+                        {% if request.user|is_ebooking_staff %}
+                        <a class="cmc-dropdown-item" href="{% url 'booking_create' %}">
+                            <svg viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                            Add Booking
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="cmc-nav-divider"></div>
+
+                <!-- ── DECLARATIONS ── -->
+                <div class="cmc-dropdown-wrap" id="declDropdownWrap">
+                    <button class="cmc-nav-btn cmc-dropdown-toggle" id="declDropdownBtn" aria-expanded="false">
+                        DECLARATIONS
+                        <svg class="cmc-chevron" viewBox="0 0 12 8" fill="none">
+                            <path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <div class="cmc-dropdown-menu" id="declDropdownMenu" role="menu">
+                        <a class="cmc-dropdown-item" href="{% url 'declaration_list' %}">
+                            <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="2" rx="1" fill="currentColor"/><rect x="2" y="7" width="12" height="2" rx="1" fill="currentColor"/><rect x="2" y="11" width="7" height="2" rx="1" fill="currentColor"/></svg>
+                            View Declarations
+                        </a>
+                        {% if request.user|is_declaration_staff %}
+                        <a class="cmc-dropdown-item" href="{% url 'declaration_create' %}">
+                            <svg viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                            Add Declaration
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="cmc-nav-divider"></div>
+
+                <!-- ── EVACUATION ── -->
+                <div class="cmc-dropdown-wrap" id="evacDropdownWrap">
+                    <button class="cmc-nav-btn cmc-dropdown-toggle" id="evacDropdownBtn" aria-expanded="false">
+                        EVACUATION
+                        <svg class="cmc-chevron" viewBox="0 0 12 8" fill="none">
+                            <path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <div class="cmc-dropdown-menu" id="evacDropdownMenu" role="menu">
+                        <a class="cmc-dropdown-item" href="{% url 'evacuation_list' %}">
+                            <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="2" rx="1" fill="currentColor"/><rect x="2" y="7" width="12" height="2" rx="1" fill="currentColor"/><rect x="2" y="11" width="7" height="2" rx="1" fill="currentColor"/></svg>
+                            View Evacuations
+                        </a>
+                        {% if request.user|is_evacuation_staff %}
+                        <a class="cmc-dropdown-item" href="{% url 'evacuation_create' %}">
+                            <svg viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                            Log Evacuation
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="cmc-nav-divider"></div>
+
+                <!-- User dropdown (far right) -->
+                <div class="cmc-user-dropdown" id="userDropdownWrap">
+                    <button class="cmc-user-pill cmc-user-trigger" id="userDropdownBtn" type="button" aria-expanded="false">
+                        <div class="cmc-user-avatar">
+                            {{ request.user.first_name|slice:":1"|upper }}
+                        </div>
+                        <span class="cmc-user-name">{{ request.user.first_name }}</span>
+                        <svg class="cmc-chevron" style="margin-left:2px;color:rgba(255,255,255,0.4)" viewBox="0 0 12 8" fill="none">
+                            <path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <div class="cmc-dropdown-menu cmc-user-menu" id="userDropdownMenu" role="menu" style="min-width:280px;">
+                        <!-- User Info Card -->
+                        <div style="padding:16px;background:linear-gradient(135deg, #3d2817 0%, #5c3d2e 100%);border-radius:8px 8px 0 0;margin:-8px -8px 0 -8px;">
+                            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+                                <div style="width:48px;height:48px;border-radius:50%;background:#f5ede5;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#3d2817;">
+                                    {{ request.user.first_name|slice:":1"|upper }}{{ request.user.last_name|slice:":1"|upper }}
+                                </div>
+                                <div style="flex:1;min-width:0;">
+                                    <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:2px;">{{ request.user.first_name }} {{ request.user.last_name }}</div>
+                                    <div style="font-size:12px;color:rgba(255,255,255,0.7);font-family:monospace;">ID: {{ request.user.staff_number }}</div>
+                                </div>
+                            </div>
+                            <div style="display:grid;gap:6px;">
+                                <div style="display:flex;align-items:center;gap:8px;font-size:12px;">
+                                    <svg viewBox="0 0 16 16" fill="none" width="14" height="14" style="opacity:0.7;flex-shrink:0;">
+                                        <rect x="2" y="3" width="12" height="10" rx="1.5" stroke="#f5ede5" stroke-width="1.5"/>
+                                        <path d="M2 6h12M5 3V1M11 3V1" stroke="#f5ede5" stroke-width="1.5" stroke-linecap="round"/>
+                                    </svg>
+                                    <span style="color:rgba(255,255,255,0.85);font-weight:600;">{{ request.user.rank }}</span>
+                                    {% if request.user.desk_roles.exists %}
+                                    {% for role in request.user.desk_roles.all %}
+                                    <span style="color:rgba(255,255,255,0.6);font-size:11px;">+ {{ role.get_desk_display }}</span>
+                                    {% endfor %}
+                                    {% endif %}
+                                </div>
+                                <div style="display:flex;align-items:center;gap:8px;font-size:12px;">
+                                    <svg viewBox="0 0 16 16" fill="none" width="14" height="14" style="opacity:0.7;flex-shrink:0;">
+                                        <path d="M8 14c3.3 0 6-2.7 6-6s-2.7-6-6-6-6 2.7-6 6 2.7 6 6 6z" stroke="#f5ede5" stroke-width="1.5"/>
+                                        <path d="M8 4v4l2 2" stroke="#f5ede5" stroke-width="1.5" stroke-linecap="round"/>
+                                    </svg>
+                                    <span style="color:rgba(255,255,255,0.85);font-weight:600;">{{ request.user.get_location_display }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cmc-dropdown-divider" style="margin:8px 0;"></div>
+                        <a class="cmc-dropdown-item" href="{% url 'dashboard' %}">
+                            <svg viewBox="0 0 20 20" fill="none"><path d="M3 9.5L10 3l7 6.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 8.5V16a1 1 0 0 0 1 1h3v-4h2v4h3a1 1 0 0 0 1-1V8.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                            Dashboard
+                        </a>
+                        <a class="cmc-dropdown-item" href="{% url 'staff_list' %}">
+                            <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M5 17v-1.5a3.5 3.5 0 013.5-3.5h3a3.5 3.5 0 013.5 3.5V17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                            Staff
+                        </a>
+                        <a class="cmc-dropdown-item" href="{% url 'change_password' %}">
+                            <svg viewBox="0 0 20 20" fill="none"><rect x="5" y="9" width="10" height="8" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M7 9V6a3 3 0 0 1 6 0v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="10" cy="13" r="1" fill="currentColor"/></svg>
+                            Change Password
+                        </a>
+                        <div class="cmc-dropdown-divider"></div>
+                        <form method="post" action="{% url 'logout' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="cmc-dropdown-item cmc-dropdown-logout">
+                                <svg viewBox="0 0 20 20" fill="none">
+                                    <path d="M13 10H3m10 0l-3-3m3 3l-3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M7 5V4a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                                </svg>
+                                Logout
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hamburger -->
+            <button class="cmc-hamburger" id="cmcHamburger" aria-label="Toggle menu" aria-expanded="false">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div class="cmc-mobile-menu" id="cmcMobileMenu">
+            <!-- Mobile Search -->
+            <div class="cmc-search-mobile">
+                <div class="cmc-search-inner">
+                    <svg class="cmc-search-icon" viewBox="0 0 20 20" fill="none">
+                        <circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.6"/>
+                        <path d="M13 13l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                    </svg>
+                    <input type="text" class="cmc-search-input" placeholder="Search SD…"
+                           onkeydown="if(event.key==='Enter'&&this.value.trim())window.location='/operations/?q='+encodeURIComponent(this.value.trim())">
+                </div>
+            </div>
+            <div class="cmc-mobile-links">
+                <a class="cmc-mobile-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}">
+                    <svg viewBox="0 0 20 20" fill="none" width="18" height="18" style="margin-right:8px;">
+                        <path d="M3 9.5L10 3l7 6.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M5 8.5V16a1 1 0 0 0 1 1h3v-4h2v4h3a1 1 0 0 0 1-1V8.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                    </svg>
+                    Dashboard
+                </a>
+
+                <!-- OPERATIONS Accordion -->
+                <div class="cmc-mobile-accordion {% if 'operations' in request.path or 'sd' in request.path or 'daily_port' in request.path or 'work_program' in request.path or 'all-approved-tallies' in request.path %}active{% endif %}">
+                    <button class="cmc-mobile-accordion-btn" data-target="mobileOps">
+                        OPERATIONS
+                        <svg class="cmc-mobile-chevron" viewBox="0 0 12 8" fill="none">
+                            <path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <div class="cmc-mobile-accordion-content" id="mobileOps">
+                        <a class="cmc-mobile-link" href="{% url 'operations_list' %}">View SD Records</a>
+                        {% if request.user|is_operations_staff %}
+                        <a class="cmc-mobile-link" href="{% url 'sd_create' %}">Add SD Record</a>
+                        <a class="cmc-mobile-link" href="{% url 'all_approved_tallies' %}">
+                            All Approved Tallies
+                            {% if pending_recall_requests_count > 0 %}
+                            <span style="display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;background:#ef4444;color:#fff;border-radius:10px;font-size:11px;font-weight:700;margin-left:8px;">{{ pending_recall_requests_count }}</span>
+                            {% endif %}
+                        </a>
+                        {% endif %}
+                        <a class="cmc-mobile-link" href="{% url 'daily_port_view' %}">View Daily Port</a>
+                        {% if request.user|is_operations_staff %}
+                        <a class="cmc-mobile-link" href="{% url 'daily_port_create' %}">Add Daily Port</a>
+                        {% endif %}
+                        <a class="cmc-mobile-link" href="{% url 'work_program_list' %}">View Work Program</a>
+                        {% if request.user|is_operations_staff %}
+                        <a class="cmc-mobile-link" href="{% url 'work_program_create' %}">Add Work Program</a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- TALLY Accordion -->
+                <div class="cmc-mobile-accordion {% if 'tally' in request.path %}active{% endif %}">
+                    <button class="cmc-mobile-accordion-btn" data-target="mobileTally">
+                        TALLY
+                        <svg class="cmc-mobile-chevron" viewBox="0 0 12 8" fill="none">
+                            <path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <div class="cmc-mobile-accordion-content" id="mobileTally">
+                        <a class="cmc-mobile-link" href="{% url 'new_tally' %}">Create Tally</a>
+                        <a class="cmc-mobile-link" href="{% url 'my_tallies' %}">My Tallies</a>
+                        {% if request.user|is_supervisor %}
+                        <a class="cmc-mobile-link" href="{% url 'pending_tallies' %}">Pending Tallies</a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- SCHEDULE Accordion -->
+                <div class="cmc-mobile-accordion {% if 'schedule' in request.path or 'terminal' in request.path %}active{% endif %}">
+                    <button class="cmc-mobile-accordion-btn" data-target="mobileSched">
+                        SCHEDULE
+                        <svg class="cmc-mobile-chevron" viewBox="0 0 12 8" fill="none">
+                            <path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <div class="cmc-mobile-accordion-content" id="mobileSched">
+                        <a class="cmc-mobile-link" href="{% url 'schedule_view' %}">View Schedule</a>
+                        <a class="cmc-mobile-link" href="{% url 'terminal_schedule_list' %}">Terminal Schedule</a>
+                        {% if request.user|is_schedule_manager %}
+                        <a class="cmc-mobile-link" href="{% url 'schedule_create' %}">Create Schedule</a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- EBOOKING Accordion -->
+                <div class="cmc-mobile-accordion {% if 'booking' in request.path or 'ebooking' in request.path %}active{% endif %}">
+                    <button class="cmc-mobile-accordion-btn" data-target="mobileEbook">
+                        EBOOKING
+                        <svg class="cmc-mobile-chevron" viewBox="0 0 12 8" fill="none">
+                            <path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <div class="cmc-mobile-accordion-content" id="mobileEbook">
+                        <a class="cmc-mobile-link" href="{% url 'booking_list' %}">View Bookings</a>
+                        {% if request.user|has_assigned_sds %}
+                        <a class="cmc-mobile-link" href="{% url 'assigned_sds_list' %}">Assigned SDs</a>
+                        {% endif %}
+                        {% if request.user|is_ebooking_staff %}
+                        <a class="cmc-mobile-link" href="{% url 'booking_create' %}">Add Booking</a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- DECLARATIONS Accordion -->
+                <div class="cmc-mobile-accordion {% if 'declaration' in request.path %}active{% endif %}">
+                    <button class="cmc-mobile-accordion-btn" data-target="mobileDecl">
+                        DECLARATIONS
+                        <svg class="cmc-mobile-chevron" viewBox="0 0 12 8" fill="none">
+                            <path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <div class="cmc-mobile-accordion-content" id="mobileDecl">
+                        <a class="cmc-mobile-link" href="{% url 'declaration_list' %}">View Declarations</a>
+                        {% if request.user|is_declaration_staff %}
+                        <a class="cmc-mobile-link" href="{% url 'declaration_create' %}">Add Declaration</a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- EVACUATION Accordion -->
+                <div class="cmc-mobile-accordion {% if 'evacuation' in request.path %}active{% endif %}">
+                    <button class="cmc-mobile-accordion-btn" data-target="mobileEvac">
+                        EVACUATION
+                        <svg class="cmc-mobile-chevron" viewBox="0 0 12 8" fill="none">
+                            <path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <div class="cmc-mobile-accordion-content" id="mobileEvac">
+                        <a class="cmc-mobile-link" href="{% url 'evacuation_list' %}">View Evacuations</a>
+                        {% if request.user|is_evacuation_staff %}
+                        <a class="cmc-mobile-link" href="{% url 'evacuation_create' %}">Log Evacuation</a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- USER / ACCOUNT Section -->
+                <div class="cmc-mobile-accordion" style="margin-top:16px;">
+                    <button class="cmc-mobile-accordion-btn" data-target="mobileUser">
+                        ACCOUNT
+                        <svg class="cmc-mobile-chevron" viewBox="0 0 12 8" fill="none">
+                            <path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <div class="cmc-mobile-accordion-content" id="mobileUser">
+                        <a class="cmc-mobile-link" href="{% url 'staff_list' %}">
+                            <svg viewBox="0 0 20 20" fill="none" width="16" height="16" style="margin-right:8px;">
+                                <circle cx="10" cy="7" r="3" stroke="currentColor" stroke-width="1.5"/>
+                                <path d="M5 17v-1.5a3.5 3.5 0 013.5-3.5h3a3.5 3.5 0 013.5 3.5V17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            </svg>
+                            Staff
+                        </a>
+                        <a class="cmc-mobile-link" href="{% url 'change_password' %}">
+                            <svg viewBox="0 0 20 20" fill="none" width="16" height="16" style="margin-right:8px;">
+                                <rect x="5" y="9" width="10" height="8" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+                                <path d="M7 9V6a3 3 0 0 1 6 0v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                <circle cx="10" cy="13" r="1" fill="currentColor"/>
+                            </svg>
+                            Change Password
+                        </a>
+                    </div>
+                </div>
+
+                <form method="post" action="{% url 'logout' %}" style="margin-top:12px;">
+                    {% csrf_token %}
+                    <button type="submit" class="cmc-mobile-link cmc-mobile-logout">Logout</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+    {% endif %}
+
+    {% if messages and request.user.is_authenticated and not hide_nav %}
+    <div class="container-fluid" style="padding-top:12px;padding-bottom:0;max-width:1400px;">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show mx-3" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <main class="page-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    {% if not hide_nav %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    {% endif %}
+
+    {% if request.user.is_authenticated and not hide_nav %}
+    <script src="{% static 'js/core/nav.js' %}"></script>
+    {% endif %}
+
+    <!-- Global uppercase input conversion -->
+    <script src="{% static 'js/core/uppercase-inputs.js' %}"></script>
+
+    <!-- Auto-prefix for SD and MK numbers -->
+    <script src="{% static 'js/core/auto-prefix.js' %}"></script>
+
+    <!-- Form helpers: auto-capitalization, auto-prefixing, form persistence -->
+    <script src="{% static 'js/core/form-helpers.js' %}"></script>
+
+    <!-- Form auto-save: prevents data loss from connection issues or errors -->
+    <script src="{% static 'js/core/form-autosave.js' %}"></script>
+
+    <!-- Client error capture: report JS runtime errors (production visibility) -->
+    <script src="{% static 'js/core/client-errors.js' %}"></script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+
+</html>

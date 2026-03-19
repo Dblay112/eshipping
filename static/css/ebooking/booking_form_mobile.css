@@ -1,0 +1,415 @@
+/* ═══════════════════════════════════════════════════════════════
+   Booking Form - Mobile Styles
+   (Contract/SD lines inside dynamic blocks)
+   ═══════════════════════════════════════════════════════════════ */
+
+@media (max-width: 600px) {
+  /* Ensure dynamically rendered SD/contract blocks don’t overflow on long text */
+  #sdBlocksContainer {
+    width: 100%;
+    overflow: hidden;
+  }
+
+  #sdBlocksContainer * {
+    min-width: 0;
+  }
+
+  /* SD Block styling */
+  .booking-sd-block {
+    margin-bottom: 16px;
+  }
+
+  .booking-sd-header {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+
+  .booking-sd-input {
+    width: 100%;
+  }
+
+  .booking-sd-input input {
+    font-size: 16px !important;
+    padding: 12px 14px;
+  }
+
+  .booking-sd-remove-wrap {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .booking-sd-remove {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Contract sections */
+  .booking-contracts-container {
+    width: 100%;
+  }
+
+  .booking-contract-section {
+    margin-bottom: 16px;
+  }
+
+  .booking-contract-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 12px;
+    font-size: 13px;
+  }
+
+  .bf-contract-header-info {
+    font-size: 12px;
+    width: 100%;
+  }
+
+  /* Booking rows - stack vertically */
+  .booking-row {
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px 12px;
+    margin-bottom: 12px;
+  }
+
+  .booking-row-field {
+    width: 100%;
+  }
+
+  .booking-row-field label {
+    font-size: 12px;
+    margin-bottom: 6px;
+  }
+
+  .booking-row-field input,
+  .booking-row-field .booking-row-input {
+    font-size: 16px !important;
+    padding: 12px 14px;
+    width: 100%;
+  }
+
+  /* File upload styling */
+  .bf-file-wrapper,
+  .bf-file-wrapper-relative {
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .bf-file-label,
+  .booking-file-btn {
+    width: 100%;
+    justify-content: center;
+    min-height: 44px;
+    padding: 12px;
+  }
+
+  .bf-file-name,
+  .bf-file-name-edit {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 14px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  /* Remove button */
+  .booking-row-remove {
+    width: 100%;
+    min-height: 44px;
+    justify-content: center;
+  }
+
+  /* Add row button */
+  .booking-add-row-btn {
+    width: 100%;
+    min-height: 44px;
+    justify-content: center;
+    font-size: 14px;
+  }
+
+  /* SD suggestions dropdown */
+  .bf-sd-suggestions {
+    max-height: 200px;
+    font-size: 14px;
+  }
+
+  .bf-sd-suggestion-item {
+    padding: 12px;
+    font-size: 14px;
+  }
+
+  /* Empty/error states */
+  .bf-empty-state,
+  .bf-error-state,
+  .bf-error-state-bold {
+    font-size: 14px;
+    padding: 16px;
+  }
+
+  /* Common file row styling (same pattern as evacuation mobile fix) */
+  #sdBlocksContainer .sdt-si-file-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    height: auto;
+  }
+
+  #sdBlocksContainer .sdt-si-file-btn {
+    width: 100%;
+    justify-content: center;
+    min-height: 44px;
+  }
+
+  #sdBlocksContainer .sdt-si-file-name {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: #faf6f2;
+    border: 1px dashed #e0d4ca;
+    white-space: normal;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    line-height: 1.25;
+  }
+
+  #sdBlocksContainer .sdt-si-file-name a,
+  #sdBlocksContainer .sdt-si-file-name span {
+    display: block;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+}
+
+/* Additional styles extracted from booking_form.css */
+
+/* Touch-friendly inputs (600px) */
+@media (max-width: 600px) {
+   .sdt-form-card .form-control,
+   .sdt-form-card .form-select,
+   .sdt-si-input,
+   .sdt-si-select {
+      min-height: 44px;
+      font-size: 16px;
+      padding: 10px 14px;
+   }
+
+   .sdt-si-select {
+      padding-right: 36px;
+   }
+
+   /* Make remove buttons larger and more visible on mobile */
+   .sdt-alloc-block-remove,
+   .sdt-remove-row-btn {
+      width: 32px;
+      height: 32px;
+      border-width: 2px;
+   }
+
+   .sdt-alloc-block-remove svg,
+   .sdt-remove-row-btn svg {
+      width: 16px;
+      height: 16px;
+   }
+}
+
+/* Booking SD header and rows (768px) */
+@media (max-width: 768px) {
+  .booking-sd-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .booking-sd-input {
+    width: 100%;
+  }
+
+  .booking-sd-remove-wrap {
+    flex-direction: row;
+    justify-content: flex-start;
+  }
+
+  .booking-sd-remove {
+    width: 44px;
+    height: 44px;
+  }
+
+  .booking-sd-remove svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .booking-row {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 12px;
+    background: #fdf7f3;
+    border-radius: 8px;
+    margin-bottom: 16px;
+  }
+
+  .booking-row-field label {
+    font-size: 12px;
+  }
+
+  .booking-row-input {
+    min-height: 44px;
+    font-size: 16px;
+    padding: 10px 12px;
+  }
+
+  .booking-row-remove {
+    width: 44px;
+    height: 44px;
+    align-self: center;
+  }
+
+  .booking-file-btn {
+    min-height: 44px;
+    font-size: 14px;
+  }
+
+  .booking-add-row-btn {
+    min-height: 44px;
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+
+  .booking-contract-header {
+    font-size: 12px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+}
+
+/* Tonnage tracking columns (800px) */
+@media (max-width: 800px) {
+
+   .sdt-tt-col-loaded,
+   .sdt-tt-col-balance {
+      flex: 0 0 160px;
+   }
+}
+
+/* Tonnage tracking table mobile (620px) */
+@media (max-width: 620px) {
+   .sdt-tt-thead {
+      display: none;
+   }
+
+   .sdt-tt-data-row,
+   .sdt-tt-tfoot {
+      flex-direction: column;
+      align-items: stretch;
+   }
+
+   .sdt-tt-td {
+      border-left: none !important;
+      border-top: 1px solid #ede3da;
+   }
+
+   .sdt-tt-col-loaded,
+   .sdt-tt-col-balance {
+      flex: unset;
+   }
+
+   .sdt-tt-tfoot .sdt-tt-col-loaded,
+   .sdt-tt-tfoot .sdt-tt-col-balance {
+      border-top-color: rgba(255, 255, 255, .12);
+   }
+}
+
+/* Allocation rows (860px) */
+@media (max-width: 860px) {
+   .sdt-alloc-row-inner:not(.sdt-alloc-row2) {
+      grid-template-columns: 60px 1fr 1fr 100px;
+   }
+
+   .sdt-alloc-buyer-cell {
+      grid-column: 1 / -1;
+   }
+
+   .sdt-alloc-row2 {
+      grid-template-columns: 1fr 1fr 90px 110px;
+   }
+
+   .sdt-alloc-excel-cell {
+      grid-column: 1 / -1;
+   }
+}
+
+/* Shipment info bands (700px) */
+@media (max-width: 700px) {
+   .sdt-si-band {
+      flex-direction: column;
+   }
+
+   .sdt-si-band-label {
+      width: 100%;
+      border-right: none;
+      border-bottom: 1px solid #f0e8e0;
+      padding: 10px 16px;
+   }
+
+   .sdt-si-fields {
+      padding: 14px 16px;
+   }
+
+   .sdt-si-field-sd,
+   .sdt-si-field-date,
+   .sdt-si-field-sm,
+   .sdt-si-field-xs {
+      flex: 1 1 140px;
+   }
+}
+
+/* Save draft bar and grids (600px) */
+@media (max-width: 600px) {
+   .sdt-save-draft-bar {
+      flex-direction: column;
+      align-items: flex-start;
+   }
+
+   .sdt-btn-save-draft {
+      width: 100%;
+      justify-content: center;
+   }
+
+   .sdt-tt-grid {
+      grid-template-columns: 1fr 1fr;
+   }
+
+   .sdt-form-group-sm {
+      flex: 1;
+      min-width: 140px;
+   }
+}
+
+/* Allocation rows compact (560px) */
+@media (max-width: 560px) {
+
+   .sdt-alloc-row-inner:not(.sdt-alloc-row2),
+   .sdt-alloc-row2 {
+      grid-template-columns: 1fr 1fr;
+   }
+
+   .sdt-alloc-buyer-cell,
+   .sdt-alloc-excel-cell {
+      grid-column: 1 / -1;
+   }
+}
+
+/* Single column grid (480px) */
+@media (max-width: 480px) {
+   .sdt-tt-grid {
+      grid-template-columns: 1fr;
+   }
+}
+

@@ -1,0 +1,462 @@
+{% extends "includes/base.html" %}
+{% load static %}
+{% load sd_permissions %}
+
+{% block title %}My Assigned SDs — CMC{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/ebooking/assigned_sds_list.css' %}">
+<link rel="stylesheet" href="{% static 'css/ebooking/assigned_sds_list_mobile.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="sdt-page">
+
+  <div class="sdt-page-header">
+    <div class="sdt-page-header-inner">
+      <div>
+        <h1 class="sdt-page-title">My Assigned SDs</h1>
+        <p class="sdt-page-sub">SDs assigned to you via schedule — {{ assigned_count }} SD{{ assigned_count|pluralize }}</p>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <a href="?show_all=true" class="sdt-btn sdt-btn-ghost">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          All SDs
+        </a>
+        {% if is_ebooking %}
+        <a href="{% url 'booking_create' %}" class="sdt-btn sdt-btn-primary">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          Add Booking
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="sdt-search-wrap">
+    <form method="get" class="sdt-search-form">
+      <div class="sdt-search-inner">
+        <svg class="sdt-search-icon" viewBox="0 0 20 20" fill="none">
+          <circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M13 13l3.5 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        <input
+          type="search"
+          name="q"
+          value="{{ q }}"
+          class="sdt-search-input"
+          placeholder="Search by SD number, vessel, agent, contract number…"
+          autocomplete="off"
+        />
+        {% if show_mine %}<input type="hidden" name="mine" value="true">{% endif %}
+        {% if selected_date %}<input type="hidden" name="date" value="{{ selected_date|date:'Y-m-d' }}">{% endif %}
+        {% if cal_year %}<input type="hidden" name="cal_year" value="{{ cal_year }}">{% endif %}
+        {% if cal_month %}<input type="hidden" name="cal_month" value="{{ cal_month }}">{% endif %}
+      </div>
+    </form>
+  </div>
+
+  {% if messages %}
+  <div class="sdt-messages">
+    {% for msg in messages %}
+    <div class="sdt-alert sdt-alert-{{ msg.tags }}">{{ msg }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="sdt-schedule-layout">
+
+    <!-- LEFT: Calendar Panel -->
+    <aside class="sdt-calendar-panel">
+      <div class="sdt-calendar-card">
+        <div class="sdt-cal-nav">
+          <a href="?{% if q %}q={{ q }}&{% endif %}{% if show_mine %}mine=true&{% endif %}cal_year={{ prev_month|date:'Y' }}&cal_month={{ prev_month|date:'n' }}" class="sdt-cal-nav-btn" title="Previous month">
+            <svg viewBox="0 0 12 20" fill="none"><path d="M10 2L2 10l8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <span class="sdt-cal-month-label">{{ cal_month_name }}</span>
+          <a href="?{% if q %}q={{ q }}&{% endif %}{% if show_mine %}mine=true&{% endif %}cal_year={{ next_month|date:'Y' }}&cal_month={{ next_month|date:'n' }}" class="sdt-cal-nav-btn" title="Next month">
+            <svg viewBox="0 0 12 20" fill="none"><path d="M2 2l8 8-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+        </div>
+
+        <div class="sdt-cal-grid">
+          <div class="sdt-cal-dow">Su</div>
+          <div class="sdt-cal-dow">Mo</div>
+          <div class="sdt-cal-dow">Tu</div>
+          <div class="sdt-cal-dow">We</div>
+          <div class="sdt-cal-dow">Th</div>
+          <div class="sdt-cal-dow">Fr</div>
+          <div class="sdt-cal-dow">Sa</div>
+
+          {% for week in cal_weeks %}
+            {% for day in week %}
+              {% if day == 0 %}
+                <div class="sdt-cal-day sdt-cal-empty"></div>
+              {% else %}
+                <a href="?{% if q %}q={{ q }}&{% endif %}{% if show_mine %}mine=true&{% endif %}date={{ cal_year }}-{{ cal_month|stringformat:'02d' }}-{{ day|stringformat:'02d' }}&cal_year={{ cal_year }}&cal_month={{ cal_month }}"
+                   class="sdt-cal-day{% if selected_date and cal_year == selected_date.year and cal_month == selected_date.month and day == selected_date.day %} selected{% endif %}{% if cal_year == today.year and cal_month == today.month and day == today.day %} today{% endif %}">
+                  {{ day }}
+                </a>
+              {% endif %}
+            {% endfor %}
+          {% endfor %}
+        </div>
+
+        <div class="sdt-cal-legend">
+          <span class="sdt-cal-dot-legend"></span> Booking exists
+        </div>
+      </div>
+
+      <a href="?{% if q %}q={{ q }}&{% endif %}{% if show_mine %}mine=true&{% endif %}cal_year={{ today|date:'Y' }}&cal_month={{ today|date:'n' }}" class="sdt-today-btn">
+        <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="4" width="14" height="14" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M3 8h14M7 2v4M13 2v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        Clear Date Filter
+      </a>
+    </aside>
+
+    <!-- RIGHT: Bookings Display -->
+    <div class="sdt-schedule-main">
+      {% if selected_date %}
+      <div class="sdt-schedule-date-bar">
+        <div class="sdt-schedule-date-info">
+          <span class="sdt-schedule-weekday">{{ selected_date|date:"l" }}</span>
+          <span class="sdt-schedule-fulldate">{{ selected_date|date:"j F Y" }}</span>
+        </div>
+      </div>
+      {% endif %}
+
+      {% if sd_groups %}
+      <div class="sdt-table-wrap">
+        <table class="sdt-records-table">
+          <thead>
+            <tr>
+              <th style="width:36px;"></th>
+              <th>SD NUMBER</th>
+              <th>VESSEL</th>
+              <th>AGENT</th>
+              <th style="text-align:right;">TOTAL BOOKED (MT)</th>
+              <th style="text-align:right;">SD TONNAGE (MT)</th>
+              <th style="text-align:right;">BALANCE (MT)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for sd in sd_groups %}
+            <!-- SD MAIN ROW -->
+            <tr class="sdt-main-row" data-pk="{{ forloop.counter }}">
+              <td style="text-align:center;">
+                <span class="sdt-expand-icon" id="expandIcon_{{ forloop.counter }}">
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+              </td>
+              <td class="sdt-td-sd" data-label="SD NUMBER">{{ sd.sd_number }}</td>
+              <td class="sdt-td-vessel" data-label="VESSEL">{{ sd.vessel|default:"—" }}</td>
+              <td data-label="AGENT">{{ sd.agent|default:"—" }}</td>
+              <td style="text-align:right;font-weight:700;color:#3d2817;" data-label="TOTAL BOOKED (MT)">{{ sd.total_booked|clean_decimal }}</td>
+              <td style="text-align:right;" data-label="SD TONNAGE (MT)">{{ sd.sd_tonnage|clean_decimal|default:"—" }}</td>
+              <td style="text-align:right;" data-label="BALANCE (MT)">
+                {% if sd.balance is not None %}
+                  <span class="sdt-balance-pill {% if sd.balance <= 0 %}zero{% else %}positive{% endif %}">
+                    {{ sd.balance|clean_decimal }} MT
+                  </span>
+                {% else %}—{% endif %}
+              </td>
+            </tr>
+
+            <!-- SD DETAIL / EXPAND ROW -->
+            <tr class="sdt-detail-row" id="detailRow_{{ forloop.counter }}">
+              <td colspan="7" style="padding:0;">
+                {% for ag in sd.allocation_groups %}
+                <!-- Contract sub-section -->
+                <div style="background:#f8f2ec;border-bottom:1px solid #e8ddd4;padding:8px 24px 4px;">
+                  <span style="font-size:11px;font-weight:700;color:#7d5a3b;text-transform:uppercase;letter-spacing:.5px;">
+                    Contract: {{ ag.contract_number|default:"—" }}
+                    {% if ag.mk_number %} &nbsp;·&nbsp; MK: {{ ag.mk_number }}{% endif %}
+                    {% if ag.allocation_label %} &nbsp;·&nbsp; Allocation: {{ ag.allocation_label }}{% endif %}
+                  </span>
+                  <span style="float:right;font-size:11px;color:#5c3d2e;">
+                    Allocated: <strong>{{ ag.allocated_tonnage|clean_decimal|default:"—" }} MT</strong>
+                    &nbsp;|&nbsp; Booked: <strong>{{ ag.total_booked|clean_decimal }} MT</strong>
+                    &nbsp;|&nbsp; Balance: <strong style="color:{% if ag.balance is not None and ag.balance <= 0 %}#2e7d32{% else %}#e65100{% endif %};">
+                      {{ ag.balance|clean_decimal|default:"—" }} MT
+                    </strong>
+                  </span>
+                </div>
+                <table style="width:100%;border-collapse:collapse;table-layout:fixed;">
+                  <thead>
+                    <tr style="background:#f0e8e0;font-size:11px;color:#7d5a3b;">
+                      <th style="padding:6px 12px;font-weight:700;width:140px;">BOOKING NO.</th>
+                      <th style="padding:6px 12px;font-weight:700;width:140px;">BILL NO.</th>
+                      <th style="padding:6px 12px;font-weight:700;text-align:right;width:80px;">TONNAGE</th>
+                      <th style="padding:6px 12px;font-weight:700;width:90px;">FILE</th>
+                      {% if sd.is_assigned_officer or is_ebooking %}
+                      <th style="padding:6px 12px;font-weight:700;width:180px;">CORRECTIONS</th>
+                      {% endif %}
+                      <th style="padding:6px 12px;font-weight:700;width:120px;">CREATED</th>
+                      <th style="padding:6px 12px;font-weight:700;width:120px;">UPDATED</th>
+                      {% if can_manage %}<th style="padding:6px 12px;font-weight:700;width:140px;">ACTIONS</th>{% endif %}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for b in ag.bookings %}
+                    <tr style="border-bottom:1px solid #f0e8e0;font-size:12px;background:{% if forloop.counter|divisibleby:2 %}#fdf7f3{% else %}#fff{% endif %};">
+                      <td style="padding:6px 12px;font-weight:600;color:#3d2817;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="{{ b.booking_number }}">{{ b.booking_number }}</td>
+                      <td style="padding:6px 12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="{{ b.bill_number }}">{{ b.bill_number|default:"—" }}</td>
+                      <td style="padding:6px 12px;text-align:right;font-weight:700;">{{ b.tonnage_booked|clean_decimal }}</td>
+                      <td style="padding:6px 12px;">
+                        {% if b.bill_pdf %}
+                        <a href="{{ b.bill_pdf.url }}" download class="sdt-download-btn" title="Download bill PDF" style="font-size:11px;padding:3px 8px;">
+                          <svg viewBox="0 0 16 16" fill="none" width="12" height="12">
+                            <path d="M8 2v8M5 7l3 3 3-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M2 12h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                          </svg>
+                          PDF
+                        </a>
+                        {% else %}<span style="color:#bbb;font-size:11px;">—</span>{% endif %}
+                      </td>
+                      {% if sd.is_assigned_officer or is_ebooking %}
+                      <td style="padding:6px 12px;">
+                        <div style="display:flex;flex-direction:column;gap:4px;">
+                          {% if sd.is_assigned_officer %}
+                            <a href="{% url 'booking_add_correction' b.detail_id %}"
+                               class="sdt-correction-btn"
+                               title="Add correction request"
+                               style="display:inline-flex;align-items:center;justify-content:center;gap:3px;padding:3px 6px;background:#fff3e0;border:1.5px solid #ffb74d;border-radius:4px;color:#e65100;font-size:10px;font-weight:600;text-decoration:none;transition:all 0.15s ease;">
+                              <svg viewBox="0 0 16 16" fill="none" width="10" height="10">
+                                <path d="M11 2l3 3L5 14H2v-3L11 2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                              </svg>
+                              Request
+                            </a>
+                          {% endif %}
+                          {% if b.correction_count > 0 %}
+                          <a href="{% url 'booking_correction_history' b.detail_id %}"
+                             class="sdt-correction-badge"
+                             title="{% if b.has_unviewed_corrections %}View correction history (unviewed){% else %}View correction history (viewed){% endif %}"
+                             style="display:inline-flex;align-items:center;justify-content:center;gap:3px;padding:3px 6px;{% if b.has_unviewed_corrections %}background:#e3f2fd;border:1.5px solid #64b5f6;color:#1565c0;{% else %}background:#e8f5e9;border:1.5px solid #81c784;color:#2e7d32;{% endif %}border-radius:4px;font-size:10px;font-weight:700;text-decoration:none;transition:all 0.15s ease;">
+                            {% if b.has_unviewed_corrections %}
+                            <svg viewBox="0 0 16 16" fill="none" width="10" height="10">
+                              <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/>
+                              <path d="M8 4v4l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            </svg>
+                            {% else %}
+                            <svg viewBox="0 0 16 16" fill="none" width="10" height="10">
+                              <path d="M13 4L6 11 3 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            {% endif %}
+                            {{ b.correction_count }}
+                          </a>
+                          {% elif not sd.is_assigned_officer %}
+                          <span style="color:#bbb;font-size:10px;">—</span>
+                          {% endif %}
+                        </div>
+                      </td>
+                      {% endif %}
+                      <td style="padding:6px 12px;font-size:10px;" title="{% if b.created_by %}{{ b.created_by.first_name }} {{ b.created_by.last_name }} - {% endif %}{{ b.created_at|date:'d M Y, g:i A' }}">
+                        {% if b.created_by %}
+                          <div style="font-weight:600;color:#5c3d2e;">{{ b.created_by.first_name|slice:":1" }}. {{ b.created_by.last_name }}</div>
+                          <div style="color:#888;">{{ b.created_at|date:"d M Y" }}</div>
+                        {% else %}
+                          <span style="color:#888;">{{ b.created_at|date:"d M Y" }}</span>
+                        {% endif %}
+                      </td>
+                      <td style="padding:6px 12px;font-size:10px;" title="{% if b.updated_by %}{{ b.updated_by.first_name }} {{ b.updated_by.last_name }} - {% endif %}{{ b.updated_at|date:'d M Y, g:i A' }}">
+                        {% if b.updated_by %}
+                          <div style="font-weight:600;color:#5c3d2e;">{{ b.updated_by.first_name|slice:":1" }}. {{ b.updated_by.last_name }}</div>
+                          <div style="color:#888;">{{ b.updated_at|date:"d M Y" }}</div>
+                        {% else %}
+                          <span style="color:#888;">{{ b.updated_at|date:"d M Y" }}</span>
+                        {% endif %}
+                      </td>
+                      {% if can_manage %}
+                      <td style="padding:6px 12px;">
+                        <div style="display:flex;gap:4px;">
+                          <a href="{% url 'booking_edit' b.pk %}" class="sdt-row-edit-btn" style="padding:3px 8px;font-size:10px;">
+                            <svg viewBox="0 0 14 14" fill="none" width="10" height="10"><path d="M9.5 1.5l3 3L4 13H1v-3L9.5 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            Edit
+                          </a>
+                          <a href="{% url 'booking_delete' b.pk %}" class="sdt-row-edit-btn" style="padding:3px 8px;font-size:10px;background:#fee;border-color:#fcc;color:#c00;">
+                            <svg viewBox="0 0 14 14" fill="none" width="10" height="10"><path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                            Delete
+                          </a>
+                        </div>
+                      </td>
+                      {% endif %}
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="7" style="padding:12px 24px;color:#aaa;font-size:12px;">No bookings recorded for this contract yet.</td></tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+                {% endfor %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Mobile Card Layout -->
+      <div class="sdt-mobile-cards">
+        {% for sd in sd_groups %}
+        <div class="sdt-mobile-card">
+          <div class="sdt-mobile-card-header">
+            <div>
+              <div class="sdt-mobile-card-sd">{{ sd.sd_number }}</div>
+              <div class="sdt-mobile-card-agent">{{ sd.agent|default:"—" }}</div>
+            </div>
+            <span class="sdt-balance-pill {% if sd.balance is not None and sd.balance <= 0 %}zero{% else %}positive{% endif %}" style="font-size:10px;padding:4px 8px;">
+              {% if sd.balance is not None %}{{ sd.balance|clean_decimal }} MT{% else %}—{% endif %}
+            </span>
+          </div>
+
+          <div class="sdt-mobile-card-details">
+            <div class="sdt-mobile-card-row">
+              <div class="sdt-mobile-card-label">Vessel</div>
+              <div class="sdt-mobile-card-value">{{ sd.vessel|default:"—" }}</div>
+            </div>
+
+            <div class="sdt-mobile-card-row">
+              <div class="sdt-mobile-card-label">Total Booked</div>
+              <div class="sdt-mobile-card-value">{{ sd.total_booked|clean_decimal }} MT</div>
+            </div>
+
+            <div class="sdt-mobile-card-row">
+              <div class="sdt-mobile-card-label">SD Tonnage</div>
+              <div class="sdt-mobile-card-value">{{ sd.sd_tonnage|clean_decimal|default:"—" }} MT</div>
+            </div>
+
+            {% for ag in sd.allocation_groups %}
+            <div style="background:#f8f2ec;padding:12px;margin:12px 0;border-radius:6px;">
+              <div style="font-size:11px;font-weight:700;color:#7d5a3b;margin-bottom:8px;">
+                Contract: {{ ag.contract_number|default:"—" }}
+                {% if ag.mk_number %}<br>MK: {{ ag.mk_number }}{% endif %}
+              </div>
+              <div style="font-size:11px;color:#5c3d2e;margin-bottom:8px;">
+                Allocated: <strong>{{ ag.allocated_tonnage|clean_decimal|default:"—" }} MT</strong> |
+                Booked: <strong>{{ ag.total_booked|clean_decimal }} MT</strong> |
+                Balance: <strong style="color:{% if ag.balance is not None and ag.balance <= 0 %}#2e7d32{% else %}#e65100{% endif %};">{{ ag.balance|clean_decimal|default:"—" }} MT</strong>
+              </div>
+
+              {% for b in ag.bookings %}
+              <div style="background:#fff;padding:10px;margin:8px 0;border-radius:4px;border:1px solid #e8ddd4;">
+                <div style="font-weight:600;color:#3d2817;margin-bottom:6px;">{{ b.booking_number }}</div>
+                <div style="font-size:12px;color:#5c3d2e;">
+                  Bill: {{ b.bill_number|default:"—" }}<br>
+                  Tonnage: <strong>{{ b.tonnage_booked|clean_decimal }} MT</strong>
+                </div>
+                {% if b.bill_pdf %}
+                <a href="{{ b.bill_pdf.url }}" download class="sdt-download-btn" style="margin-top:8px;display:inline-flex;">
+                  <svg viewBox="0 0 16 16" fill="none" width="14" height="14">
+                    <path d="M8 2v8M5 7l3 3 3-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M2 12h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                  </svg>
+                  Download
+                </a>
+                {% endif %}
+                {% if sd.is_assigned_officer or is_ebooking %}
+                <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px;">
+                  {% if sd.is_assigned_officer %}
+                  <a href="{% url 'booking_add_correction' b.detail_id %}" class="sdt-correction-btn" style="display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 14px;background:#fff3e0;border:1.5px solid #ffb74d;border-radius:6px;color:#e65100;font-size:14px;font-weight:600;text-decoration:none;">
+                    <svg viewBox="0 0 16 16" fill="none" width="14" height="14">
+                      <path d="M11 2l3 3L5 14H2v-3L11 2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Request Correction
+                  </a>
+                  {% endif %}
+                  {% if b.correction_count > 0 %}
+                  <a href="{% url 'booking_correction_history' b.detail_id %}" class="sdt-correction-badge" style="display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 14px;{% if b.has_unviewed_corrections %}background:#e3f2fd;border:1.5px solid #64b5f6;color:#1565c0;{% else %}background:#e8f5e9;border:1.5px solid #81c784;color:#2e7d32;{% endif %}border-radius:6px;font-size:14px;font-weight:700;text-decoration:none;">
+                    {% if b.has_unviewed_corrections %}
+                    <svg viewBox="0 0 16 16" fill="none" width="14" height="14">
+                      <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/>
+                      <path d="M8 4v4l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                    {% else %}
+                    <svg viewBox="0 0 16 16" fill="none" width="14" height="14">
+                      <path d="M13 4L6 11 3 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    {% endif %}
+                    {{ b.correction_count }} Correction{{ b.correction_count|pluralize }}
+                  </a>
+                  {% endif %}
+                </div>
+                {% endif %}
+                {% if can_manage %}
+                <div style="display:flex;gap:6px;margin-top:8px;">
+                  <a href="{% url 'booking_edit' b.pk %}" class="sdt-row-edit-btn" style="flex:1;">
+                    <svg viewBox="0 0 14 14" fill="none" width="11" height="11"><path d="M9.5 1.5l3 3L4 13H1v-3L9.5 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Edit
+                  </a>
+                  <a href="{% url 'booking_delete' b.pk %}" class="sdt-row-edit-btn" style="flex:1;background:#fee;border-color:#fcc;color:#c00;">
+                    <svg viewBox="0 0 14 14" fill="none" width="11" height="11"><path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                    Delete
+                  </a>
+                </div>
+                {% endif %}
+              </div>
+              {% empty %}
+              <div style="color:#aaa;font-size:12px;padding:8px;">No bookings for this contract</div>
+              {% endfor %}
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      {% else %}
+      <div class="sdt-empty-state">
+        <div class="sdt-empty-icon">
+          <svg viewBox="0 0 64 64" fill="none">
+            <rect x="8" y="12" width="48" height="44" rx="4" stroke="currentColor" stroke-width="2.5"/>
+            <path d="M8 22h48M22 12V8M42 12V8M24 34h16M24 42h10" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3 class="sdt-empty-title">No Bookings Found</h3>
+        <p class="sdt-empty-text">{% if selected_date %}No bookings were created on {{ selected_date|date:"j F Y" }}.{% else %}No booking records match your search.{% endif %}</p>
+        {% if is_ebooking %}
+        <a href="{% url 'booking_create' %}" class="sdt-btn sdt-btn-primary">
+          Add Booking
+        </a>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      <!-- Pagination -->
+      {% if page_obj.has_other_pages %}
+      <div class="sdt-pagination" style="display:flex;justify-content:center;gap:6px;padding:20px 0;">
+        {% if page_obj.has_previous %}
+        <a href="?{% if selected_date %}date={{ selected_date.isoformat }}&{% endif %}{% if q %}q={{ q }}&{% endif %}{% if show_mine %}mine=true&{% endif %}page={{ page_obj.previous_page_number }}" class="sdt-btn sdt-btn-ghost" style="font-size:12px;padding:5px 12px;">← Prev</a>
+        {% endif %}
+        <span style="display:flex;align-items:center;gap:4px;font-size:13px;color:#5c3d2e;">
+          Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+        </span>
+        {% if page_obj.has_next %}
+        <a href="?{% if selected_date %}date={{ selected_date.isoformat }}&{% endif %}{% if q %}q={{ q }}&{% endif %}{% if show_mine %}mine=true&{% endif %}page={{ page_obj.next_page_number }}" class="sdt-btn sdt-btn-ghost" style="font-size:12px;padding:5px 12px;">Next →</a>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      <!-- Total Count Display -->
+      {% if page_obj %}
+      <div style="display:flex;justify-content:flex-end;padding:16px 0 24px;margin-top:8px;">
+        <div style="background:#f8f2ec;border:1px solid #e8ddd0;border-radius:8px;padding:10px 20px;display:inline-flex;align-items:center;gap:10px;">
+          <span style="font-size:13px;color:#7d5a3b;font-weight:600;letter-spacing:0.3px;">TOTAL SDs:</span>
+          <span style="font-size:15px;color:#3d2817;font-weight:700;">{{ page_obj.paginator.count }}</span>
+        </div>
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+window.ASSIGNED_SDS_LIST_CONFIG = {
+  bookingDates: {{ booking_dates|safe }},
+  calYear: {{ cal_year }},
+  calMonth: {{ cal_month }},
+};
+</script>
+<script src="{% static 'js/features/ebooking/assigned-sds-list.js' %}"></script>
+{% endblock %}

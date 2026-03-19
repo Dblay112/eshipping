@@ -1,0 +1,445 @@
+{% extends "includes/base.html" %}
+{% load static %}
+{% load sd_permissions %}
+
+{% block title %}DECLARATIONS — CMC{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/declaration/declaration_list.css' %}">
+<link rel="stylesheet" href="{% static 'css/declaration/declaration_list_mobile.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="sdt-page">
+
+  <div class="sdt-page-header">
+    <div class="sdt-page-header-inner">
+      <div>
+        <h1 class="sdt-page-title">Declarations</h1>
+        <p class="sdt-page-sub">Track customs declaration records per SD and contract</p>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div class="sdt-view-toggle">
+          <a href="?mine=false{% if q %}&q={{ q }}{% endif %}{% if selected_date %}&date={{ selected_date|date:'Y-m-d' }}&cal_year={{ cal_year }}&cal_month={{ cal_month }}{% endif %}" class="sdt-toggle-btn {% if not show_mine %}active{% endif %}">All Records</a>
+          <a href="?mine=true{% if q %}&q={{ q }}{% endif %}{% if selected_date %}&date={{ selected_date|date:'Y-m-d' }}&cal_year={{ cal_year }}&cal_month={{ cal_month }}{% endif %}" class="sdt-toggle-btn {% if show_mine %}active{% endif %}">My Records</a>
+        </div>
+        {% if can_manage %}
+        <a href="{% url 'declaration_create' %}?date={{ today|date:'Y-m-d' }}" class="sdt-btn sdt-btn-primary">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          Add Declaration
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="sdt-search-wrap">
+    <form method="get" class="sdt-search-form">
+      <div class="sdt-search-inner">
+        <svg class="sdt-search-icon" viewBox="0 0 20 20" fill="none">
+          <circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M13 13l3.5 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        <input
+          type="search"
+          name="q"
+          value="{{ q }}"
+          class="sdt-search-input"
+          placeholder="Search by SD number, agent, declaration number, contract…"
+          autocomplete="off"
+        />
+        {% if show_mine %}<input type="hidden" name="mine" value="true">{% endif %}
+        {% if selected_date %}<input type="hidden" name="date" value="{{ selected_date|date:'Y-m-d' }}">{% endif %}
+        {% if cal_year %}<input type="hidden" name="cal_year" value="{{ cal_year }}">{% endif %}
+        {% if cal_month %}<input type="hidden" name="cal_month" value="{{ cal_month }}">{% endif %}
+      </div>
+    </form>
+  </div>
+
+  <div class="sdt-schedule-layout">
+
+    <!-- LEFT: Calendar Panel -->
+    <aside class="sdt-calendar-panel">
+      <div class="sdt-calendar-card">
+        <div class="sdt-cal-nav">
+          <a href="?{% if selected_date %}date={{ selected_date|date:'Y-m-d' }}&{% endif %}cal_year={{ prev_month|date:'Y' }}&cal_month={{ prev_month|date:'n' }}{% if show_mine %}&mine=true{% endif %}{% if q %}&q={{ q }}{% endif %}" class="sdt-cal-nav-btn" title="Previous month">
+            <svg viewBox="0 0 12 20" fill="none"><path d="M10 2L2 10l8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <span class="sdt-cal-month-label">{{ cal_month_name }}</span>
+          <a href="?{% if selected_date %}date={{ selected_date|date:'Y-m-d' }}&{% endif %}cal_year={{ next_month|date:'Y' }}&cal_month={{ next_month|date:'n' }}{% if show_mine %}&mine=true{% endif %}{% if q %}&q={{ q }}{% endif %}" class="sdt-cal-nav-btn" title="Next month">
+            <svg viewBox="0 0 12 20" fill="none"><path d="M2 2l8 8-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+        </div>
+
+        <div class="sdt-cal-grid">
+          <div class="sdt-cal-dow">Su</div>
+          <div class="sdt-cal-dow">Mo</div>
+          <div class="sdt-cal-dow">Tu</div>
+          <div class="sdt-cal-dow">We</div>
+          <div class="sdt-cal-dow">Th</div>
+          <div class="sdt-cal-dow">Fr</div>
+          <div class="sdt-cal-dow">Sa</div>
+
+          {% for week in cal_weeks %}
+            {% for day in week %}
+              {% if day == 0 %}
+                <div class="sdt-cal-day sdt-cal-empty"></div>
+              {% else %}
+                <a href="?date={{ cal_year }}-{{ cal_month|stringformat:'02d' }}-{{ day|stringformat:'02d' }}&cal_year={{ cal_year }}&cal_month={{ cal_month }}{% if show_mine %}&mine=true{% endif %}{% if q %}&q={{ q }}{% endif %}"
+                   class="sdt-cal-day{% if selected_date and cal_year == selected_date.year and cal_month == selected_date.month and day == selected_date.day %} selected{% endif %}{% if cal_year == today.year and cal_month == today.month and day == today.day %} today{% endif %}">
+                  {{ day }}
+                </a>
+              {% endif %}
+            {% endfor %}
+          {% endfor %}
+        </div>
+
+        <div class="sdt-cal-legend">
+          <span class="sdt-cal-dot-legend"></span> Declaration exists
+        </div>
+      </div>
+
+      <a href="?{% if q %}q={{ q }}&{% endif %}{% if show_mine %}mine=true&{% endif %}cal_year={{ today|date:'Y' }}&cal_month={{ today|date:'n' }}" class="sdt-today-btn">
+        <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="4" width="14" height="14" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M3 8h14M7 2v4M13 2v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        Clear Date Filter
+      </a>
+    </aside>
+
+    <!-- RIGHT: Declarations Display -->
+    <div class="sdt-schedule-main">
+      {% if selected_date %}
+      <div class="sdt-schedule-date-bar">
+        <div class="sdt-schedule-date-info">
+          <span class="sdt-schedule-weekday">{{ selected_date|date:"l" }}</span>
+          <span class="sdt-schedule-fulldate">{{ selected_date|date:"j F Y" }}</span>
+        </div>
+      </div>
+      {% endif %}
+
+      {% if sd_groups %}
+      <div class="sdt-table-wrap">
+        <table class="sdt-records-table">
+          <thead>
+            <tr>
+              <th class="sdt-th" style="width:36px;"></th>
+              <th class="sdt-th">SD NUMBER</th>
+              <th class="sdt-th">AGENT</th>
+              <th class="sdt-th">FILES</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for sd in sd_groups %}
+            <!-- SD MAIN ROW -->
+            <tr class="sdt-main-row" data-pk="sd{{ forloop.counter }}">
+              <td class="sdt-td" style="text-align:center;">
+                <span class="sdt-expand-icon" id="expandIcon_sd{{ forloop.counter }}">
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+              </td>
+              <td class="sdt-td sdt-td-sd" data-label="SD NUMBER">{{ sd.sd_number }}</td>
+              <td class="sdt-td sdt-td-agent" data-label="AGENT">{{ sd.agent|default:"—" }}</td>
+              <td class="sdt-td" data-label="FILES">
+                <span style="font-size:12px;color:#7d5a3b;font-weight:600;">{{ sd.file_count }} file{{ sd.file_count|pluralize }}</span>
+              </td>
+            </tr>
+
+            <!-- SD DETAIL / EXPAND ROW -->
+            <tr class="sdt-detail-row" id="detailRow_sd{{ forloop.counter }}">
+              <td colspan="4" style="padding:0;">
+                <table class="sdt-contract-table">
+                  <thead>
+                    <tr>
+                      <th>CONTRACT LINE</th>
+                      <th style="text-align:right;">TONNAGE DECLARED (MT)</th>
+                      <th>DECLARATION NO.</th>
+                      <th>FILE</th>
+                      <th>CREATED BY</th>
+                      <th>LAST UPDATED</th>
+                      {% if can_manage %}<th style="width:180px;">ACTIONS</th>{% endif %}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for d in sd.declarations %}
+                    <tr>
+                      <td style="font-weight:600;color:#5c3d2e;">
+                        {% if d.allocation %}
+                          {{ d.allocation.allocation_label }} — {{ d.allocation.contract_number }}
+                        {% else %}
+                          {{ d.contract_number|default:"—" }}
+                        {% endif %}
+                      </td>
+                      <td style="text-align:right;font-weight:700;color:#3d2817;">{{ d.tonnage|clean_decimal }}</td>
+                      <td style="font-family:monospace;font-size:12px;">{{ d.declaration_number }}</td>
+                      <td>
+                        {% if d.declaration_pdf %}
+                        <a href="{{ d.declaration_pdf.url }}" download class="sdt-download-btn" title="Download declaration PDF">
+                          <svg viewBox="0 0 16 16" fill="none" width="14" height="14">
+                            <path d="M8 2v8M5 7l3 3 3-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M2 12h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                          </svg>
+                          Download
+                        </a>
+                        {% else %}<span style="color:#bbb;font-size:12px;">No file</span>{% endif %}
+                      </td>
+                      <td style="font-size:11px;">
+                        {% if d.created_by %}
+                          {{ d.created_by.first_name }} {{ d.created_by.last_name }}<br>
+                          <span style="color:#888;">{{ d.created_at|date:"d M Y, g:i A" }}</span>
+                        {% else %}
+                          <span style="color:#888;">{{ d.created_at|date:"d M Y, g:i A" }}</span>
+                        {% endif %}
+                      </td>
+                      <td style="font-size:11px;">
+                        {% if d.updated_by %}
+                          {{ d.updated_by.first_name }} {{ d.updated_by.last_name }}<br>
+                          <span style="color:#888;">{{ d.updated_at|date:"d M Y, g:i A" }}</span>
+                        {% elif d.created_by %}
+                          {{ d.created_by.first_name }} {{ d.created_by.last_name }}<br>
+                          <span style="color:#888;">{{ d.updated_at|date:"d M Y, g:i A" }}</span>
+                        {% else %}
+                          <span style="color:#888;">{{ d.updated_at|date:"d M Y, g:i A" }}</span>
+                        {% endif %}
+                      </td>
+                      {% if can_manage %}
+                      <td>
+                        <div style="display:flex;gap:6px;">
+                          <a href="{% url 'declaration_edit' d.pk %}" class="sdt-row-edit-btn">
+                            <svg viewBox="0 0 14 14" fill="none" width="11" height="11"><path d="M9.5 1.5l3 3L4 13H1v-3L9.5 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            Edit
+                          </a>
+                          <a href="{% url 'declaration_delete' d.pk %}" class="sdt-row-edit-btn" style="background:#fee;border-color:#fcc;color:#c00;">
+                            <svg viewBox="0 0 14 14" fill="none" width="11" height="11"><path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                            Delete
+                          </a>
+                        </div>
+                      </td>
+                      {% endif %}
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="{% if can_manage %}7{% else %}6{% endif %}" style="padding:12px 24px;color:#aaa;font-size:12px;">No declarations recorded for this SD yet.</td></tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Mobile Card Layout -->
+      <div class="sdt-mobile-cards">
+        {% for sd in sd_groups %}
+        <div class="sdt-mobile-card">
+          <div class="sdt-mobile-card-header">
+            <div>
+              <div class="sdt-mobile-card-sd">{{ sd.sd_number }}</div>
+              <div class="sdt-mobile-card-agent">{{ sd.agent|default:"—" }}</div>
+            </div>
+            <span style="font-size:12px;color:#7d5a3b;font-weight:600;">{{ sd.file_count }} file{{ sd.file_count|pluralize }}</span>
+          </div>
+
+          <div class="sdt-mobile-card-details">
+            {% for d in sd.declarations %}
+            <div style="background:#f8f2ec;padding:12px;margin:12px 0;border-radius:6px;">
+              <div style="font-weight:600;color:#5c3d2e;margin-bottom:8px;">
+                {% if d.allocation %}
+                  {{ d.allocation.allocation_label }} — {{ d.allocation.contract_number }}
+                {% else %}
+                  {{ d.contract_number|default:"—" }}
+                {% endif %}
+              </div>
+
+              <div class="sdt-mobile-card-row">
+                <div class="sdt-mobile-card-label">Tonnage</div>
+                <div class="sdt-mobile-card-value" style="font-weight:700;">{{ d.tonnage|clean_decimal }} MT</div>
+              </div>
+
+              <div class="sdt-mobile-card-row">
+                <div class="sdt-mobile-card-label">Declaration No.</div>
+                <div class="sdt-mobile-card-value" style="font-family:monospace;font-size:12px;">{{ d.declaration_number }}</div>
+              </div>
+
+              <div class="sdt-mobile-card-row">
+                <div class="sdt-mobile-card-label">File</div>
+                <div class="sdt-mobile-card-value">
+                  {% if d.declaration_pdf %}
+                  <a href="{{ d.declaration_pdf.url }}" download class="sdt-download-btn">
+                    <svg viewBox="0 0 16 16" fill="none" width="14" height="14">
+                      <path d="M8 2v8M5 7l3 3 3-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M2 12h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                    </svg>
+                    Download
+                  </a>
+                  {% else %}<span style="color:#bbb;font-size:12px;">No file</span>{% endif %}
+                </div>
+              </div>
+
+              <div class="sdt-mobile-card-row">
+                <div class="sdt-mobile-card-label">Created By</div>
+                <div class="sdt-mobile-card-value" style="font-size:11px;">
+                  {% if d.created_by %}
+                    {{ d.created_by.first_name }} {{ d.created_by.last_name }}<br>
+                    <span style="color:#888;">{{ d.created_at|date:"d M Y, g:i A" }}</span>
+                  {% else %}
+                    <span style="color:#888;">{{ d.created_at|date:"d M Y, g:i A" }}</span>
+                  {% endif %}
+                </div>
+              </div>
+
+              {% if can_manage %}
+              <div class="sdt-mobile-card-actions">
+                <a href="{% url 'declaration_edit' d.pk %}" class="sdt-row-edit-btn">
+                  <svg viewBox="0 0 14 14" fill="none" width="11" height="11"><path d="M9.5 1.5l3 3L4 13H1v-3L9.5 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  Edit
+                </a>
+                <a href="{% url 'declaration_delete' d.pk %}" class="sdt-row-edit-btn" style="background:#fee;border-color:#fcc;color:#c00;">
+                  <svg viewBox="0 0 14 14" fill="none" width="11" height="11"><path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                  Delete
+                </a>
+              </div>
+              {% endif %}
+            </div>
+            {% empty %}
+            <div style="color:#aaa;font-size:12px;padding:12px;">No declarations for this SD</div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      {% else %}
+      <div class="sdt-empty-state">
+        <div class="sdt-empty-icon">
+          <svg viewBox="0 0 64 64" fill="none">
+            <rect x="8" y="10" width="48" height="44" rx="4" stroke="currentColor" stroke-width="2.5"/>
+            <path d="M8 22h48M20 10v12M44 10v12M16 34h12M16 42h20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3 class="sdt-empty-title">
+          {% if selected_date %}
+            No Declarations for {{ selected_date|date:"j F Y" }}
+          {% elif q %}
+            No Declarations Found
+          {% else %}
+            No Declarations Yet
+          {% endif %}
+        </h3>
+        <p class="sdt-empty-text">
+          {% if q %}
+            No declarations match your search "{{ q }}". Try a different search term.
+          {% elif selected_date %}
+            {% if can_manage %}<a href="{% url 'declaration_create' %}?date={{ selected_date|date:'Y-m-d' }}">Add the first declaration for this date.</a>
+            {% else %}No declaration records have been created for this date yet.{% endif %}
+          {% else %}
+            {% if can_manage %}<a href="{% url 'declaration_create' %}">Create the first declaration.</a>
+            {% else %}No declaration records have been created yet.{% endif %}
+          {% endif %}
+        </p>
+      </div>
+      {% endif %}
+
+      <!-- Pagination -->
+      {% if page_obj.has_other_pages %}
+      <div class="sdt-pagination" style="display:flex;justify-content:center;gap:6px;padding:20px 0;">
+        {% if page_obj.has_previous %}
+        <a href="?{% if selected_date %}date={{ selected_date.isoformat }}&{% endif %}{% if q %}q={{ q }}&{% endif %}{% if show_mine %}mine=true&{% endif %}page={{ page_obj.previous_page_number }}" class="sdt-btn sdt-btn-ghost" style="font-size:12px;padding:5px 12px;">← Prev</a>
+        {% endif %}
+        <span style="display:flex;align-items:center;gap:4px;font-size:13px;color:#5c3d2e;">
+          Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+        </span>
+        {% if page_obj.has_next %}
+        <a href="?{% if selected_date %}date={{ selected_date.isoformat }}&{% endif %}{% if q %}q={{ q }}&{% endif %}{% if show_mine %}mine=true&{% endif %}page={{ page_obj.next_page_number }}" class="sdt-btn sdt-btn-ghost" style="font-size:12px;padding:5px 12px;">Next →</a>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      <!-- Total Count Display -->
+      {% if page_obj %}
+      <div style="display:flex;justify-content:flex-end;padding:16px 0 24px;margin-top:8px;">
+        <div style="background:#f8f2ec;border:1px solid #e8ddd0;border-radius:8px;padding:10px 20px;display:inline-flex;align-items:center;gap:10px;">
+          <span style="font-size:13px;color:#7d5a3b;font-weight:600;letter-spacing:0.3px;">TOTAL SDs:</span>
+          <span style="font-size:15px;color:#3d2817;font-weight:700;">{{ page_obj.paginator.count }}</span>
+        </div>
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+const toggleRow = (id) => {
+  const detailRow  = document.getElementById('detailRow_' + id);
+  const mainRow    = document.querySelector('[data-pk="' + id + '"]');
+  if (!detailRow) return;
+  const isOpen = detailRow.classList.contains('open');
+  document.querySelectorAll('.sdt-detail-row.open').forEach(r => { r.classList.remove('open'); });
+  document.querySelectorAll('.sdt-main-row.sdt-row-open').forEach(r => { r.classList.remove('sdt-row-open'); });
+  if (!isOpen) {
+    detailRow.classList.add('open');
+    mainRow.classList.add('sdt-row-open');
+  }
+};
+
+// Mobile card expand/collapse functionality
+document.querySelectorAll('.sdt-mobile-card-header').forEach(header => {
+  header.addEventListener('click', function(e) {
+    const card = this.closest('.sdt-mobile-card');
+    card.classList.toggle('expanded');
+  });
+});
+
+// Add click/touch support - ENTIRE ROW is clickable
+(function() {
+  document.querySelectorAll('.sdt-main-row').forEach(row => {
+    const pk = row.getAttribute('data-pk');
+    if (!pk) return;
+
+    // Make row look clickable
+    row.style.cursor = 'pointer';
+
+    // Click event for desktop
+    row.addEventListener('click', (e) => {
+      // Don't toggle if clicking on a link, button, or input
+      if (e.target.closest('a') || e.target.closest('button') || e.target.closest('input')) {
+        return;
+      }
+      e.preventDefault();
+      toggleRow(pk);
+    });
+
+    // Touch event for mobile
+    row.addEventListener('touchend', (e) => {
+      // Don't toggle if touching a link, button, or input
+      if (e.target.closest('a') || e.target.closest('button') || e.target.closest('input')) {
+        return;
+      }
+      e.preventDefault();
+      toggleRow(pk);
+    });
+  });
+})();
+
+// Mark days that have declarations with a dot indicator
+(function() {
+  const declarationDates = {{ declaration_dates|safe }};
+  const calYear = {{ cal_year }};
+  const calMonth = {{ cal_month }};
+
+  document.querySelectorAll('.sdt-cal-day:not(.sdt-cal-empty)').forEach(el => {
+    const day = parseInt(el.textContent.trim());
+    const mm = String(calMonth).padStart(2, '0');
+    const dd = String(day).padStart(2, '0');
+    const iso = `${calYear}-${mm}-${dd}`;
+    if (declarationDates.includes(iso)) {
+      const dot = document.createElement('span');
+      dot.className = 'sdt-cal-dot';
+      el.appendChild(dot);
+    }
+  });
+})();
+</script>
+{% endblock %}

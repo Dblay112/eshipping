@@ -1,0 +1,156 @@
+/**
+ * Global Calendar Mobile Optimization
+ * Applied to all pages with calendar navigation
+ * Ensures consistent 44px touch targets and proper mobile rendering
+ */
+
+@media (max-width: 768px) {
+  /* Calendar layout - stack vertically on mobile */
+  .sdt-schedule-layout {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+  }
+
+  /* Calendar panel - prevent overflow */
+  .sdt-calendar-panel {
+    position: static !important;
+    order: -1;
+    max-width: 100% !important;
+    overflow: hidden !important;
+  }
+
+  .sdt-calendar-card {
+    padding: 16px !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Calendar grid - constrain width */
+  .sdt-cal-grid {
+    gap: 4px !important;
+    max-width: 100% !important;
+    display: grid !important;
+    grid-template-columns: repeat(7, 1fr) !important;
+  }
+
+  /* Calendar navigation */
+  .sdt-cal-nav {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
+    max-width: 100% !important;
+  }
+
+  /* Calendar navigation buttons - 44px touch targets */
+  .sdt-cal-nav-btn {
+    width: 44px !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    min-width: 44px !important;
+    flex-shrink: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+  }
+
+  .sdt-cal-nav-btn svg {
+    width: 14px;
+    height: 20px;
+  }
+
+  /* Month label - allow text to wrap if needed */
+  .sdt-cal-month-label {
+    font-size: 15px !important;
+    flex: 1 !important;
+    text-align: center !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  /* Calendar day cells - 44px touch targets */
+  .sdt-cal-day {
+    min-height: 44px !important;
+    min-width: 0 !important;
+    width: 100% !important;
+    height: 44px !important;
+    font-size: 14px !important;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+  }
+
+  .sdt-cal-day.sdt-cal-empty {
+    min-height: 44px !important;
+    height: 44px !important;
+  }
+
+  /* Day of week labels */
+  .sdt-cal-dow {
+    font-size: 11px !important;
+    padding: 8px 4px !important;
+    text-align: center !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Today button */
+  .sdt-today-btn {
+    width: 100% !important;
+    min-height: 44px !important;
+    justify-content: center !important;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+  }
+
+  /* Calendar legend */
+  .sdt-cal-legend {
+    font-size: 12px !important;
+    padding: 8px 0 !important;
+  }
+
+  /* Date bar on main content */
+  .sdt-schedule-date-bar {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+  }
+
+  /* View toggle buttons */
+  .sdt-view-toggle {
+    width: 100% !important;
+  }
+
+  .sdt-toggle-btn {
+    flex: 1 !important;
+    min-height: 44px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    touch-action: manipulation;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Extra small screens - tighter spacing */
+  .sdt-calendar-card {
+    padding: 12px !important;
+  }
+
+  .sdt-cal-grid {
+    gap: 2px !important;
+  }
+
+  .sdt-cal-day {
+    font-size: 13px !important;
+  }
+
+  .sdt-cal-dow {
+    font-size: 10px !important;
+  }
+}

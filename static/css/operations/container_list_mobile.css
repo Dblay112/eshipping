@@ -1,0 +1,106 @@
+/* ═══════════════════════════════════════════════════════════════
+   Container List Page - Mobile Styles
+   ═══════════════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+    .container-list-page {
+        padding: 1rem;
+    }
+
+    .page-header {
+        padding: 1.5rem;
+    }
+
+    .page-header h1 {
+        font-size: 1.5rem;
+    }
+
+    .page-header .sd-info {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .upload-section,
+    .uploads-list {
+        padding: 1rem;
+    }
+
+    .uploads-table {
+        font-size: 0.875rem;
+    }
+
+    .uploads-table th,
+    .uploads-table td {
+        padding: 0.75rem 0.5rem;
+    }
+
+    /* Stack form fields vertically */
+    .col-md-4,
+    .col-md-8,
+    .col-md-12 {
+        width: 100%;
+    }
+
+    /* Touch-friendly buttons */
+    .btn-primary,
+    .btn-danger,
+    .btn-download {
+        min-height: 44px;
+        padding: 0.75rem 1rem;
+    }
+}
+
+@media (max-width: 600px) {
+    /* Hide table, show card layout on very small screens */
+    .uploads-table thead {
+        display: none;
+    }
+
+    .uploads-table,
+    .uploads-table tbody,
+    .uploads-table tr,
+    .uploads-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .uploads-table tr {
+        margin-bottom: 1rem;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 1rem;
+    }
+
+    .uploads-table td {
+        border: none;
+        padding: 0.5rem 0;
+        text-align: left;
+    }
+
+    .uploads-table td:before {
+        content: attr(data-label);
+        font-weight: 600;
+        display: inline-block;
+        margin-right: 0.5rem;
+    }
+}
+
+/* ── Empty State (Mobile) ────────────────────────────────────── */
+@media (max-width: 768px) {
+  .sdt-empty-state {
+    padding: 40px 20px;
+  }
+
+  .sdt-empty-icon svg {
+    width: 64px;
+    height: 64px;
+  }
+
+  .sdt-empty-title {
+    font-size: 18px;
+  }
+
+  .sdt-empty-text {
+    font-size: 13px;
+  }
+}

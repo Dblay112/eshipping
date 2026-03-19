@@ -1,0 +1,160 @@
+{# OPERATIONS DESK DASHBOARD #}
+<p class="dash-section-label">Operations Overview</p>
+<div class="dash-stats dash-stats-4" style="margin-bottom:28px;">
+    <div class="stat-card">
+        <div class="stat-icon stat-icon-brown">
+            <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="4" width="14" height="2" rx="1" fill="currentColor"/><rect x="3" y="9" width="14" height="2" rx="1" fill="currentColor"/><rect x="3" y="14" width="9" height="2" rx="1" fill="currentColor"/></svg>
+        </div>
+        <div class="stat-info">
+            <div class="stat-value">{{ sd_total }}</div>
+            <div class="stat-label">Total SD Records</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon stat-icon-blue">
+            <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.6"/><path d="M10 6v5l3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </div>
+        <div class="stat-info">
+            <div class="stat-value">{{ sd_today }}</div>
+            <div class="stat-label">SDs Created Today</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon stat-icon-purple">
+            <svg viewBox="0 0 20 20" fill="none"><path d="M3 6h14M3 10h14M3 14h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </div>
+        <div class="stat-info">
+            <div class="stat-value">{{ work_program_month }}</div>
+            <div class="stat-label">Work Programs (Month)</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon stat-icon-green">
+            <svg viewBox="0 0 20 20" fill="none"><rect x="4" y="4" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M4 8h12" stroke="currentColor" stroke-width="1.6"/></svg>
+        </div>
+        <div class="stat-info">
+            <div class="stat-value">{{ daily_port_month }}</div>
+            <div class="stat-label">Daily Ports (Month)</div>
+        </div>
+    </div>
+</div>
+
+<div class="dash-grid">
+    <div>
+        <div class="dash-panel">
+            <div class="dash-panel-header">
+                <h3 class="dash-panel-title">
+                    <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="2" rx="1" fill="currentColor"/><rect x="2" y="7" width="12" height="2" rx="1" fill="currentColor"/><rect x="2" y="11" width="7" height="2" rx="1" fill="currentColor"/></svg>
+                    Recent SD Records
+                </h3>
+                <a class="dash-panel-link" href="{% url 'operations_list' %}">View All</a>
+            </div>
+            {% if recent_sds %}
+                {% for sd in recent_sds %}
+                <a class="dash-record" href="{% url 'sd_detail' sd.pk %}">
+                    <div class="dash-record-dot dot-neutral"></div>
+                    <div class="dash-record-main">
+                        <div class="dash-record-title">{{ sd.sd_number }} — {{ sd.vessel_name }}</div>
+                        <div class="dash-record-sub">{{ sd.agent }} • {{ sd.tonnage }} MT • {{ sd.created_at|date:"M d, Y" }}</div>
+                    </div>
+                </a>
+                {% endfor %}
+            {% else %}
+                <div class="dash-empty">No SD records yet.</div>
+            {% endif %}
+        </div>
+
+        <div class="dash-panel" style="margin-top:20px;">
+            <div class="dash-panel-header">
+                <h3 class="dash-panel-title">
+                    <svg viewBox="0 0 16 16" fill="none"><path d="M3 6h10M3 10h10M3 14h7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                    Recent Work Programs
+                </h3>
+                <a class="dash-panel-link" href="{% url 'work_program_list' %}">View All</a>
+            </div>
+            {% if recent_work_programs %}
+                {% for wp in recent_work_programs %}
+                <a class="dash-record" href="{{ wp.pdf_file.url }}" target="_blank">
+                    <div class="dash-record-dot dot-neutral"></div>
+                    <div class="dash-record-main">
+                        <div class="dash-record-title">Work Program — {{ wp.date|date:"M d, Y" }}</div>
+                        <div class="dash-record-sub">Created {{ wp.created_at|date:"M d, Y" }}</div>
+                    </div>
+                </a>
+                {% endfor %}
+            {% else %}
+                <div class="dash-empty">No work programs yet.</div>
+            {% endif %}
+        </div>
+
+        <div class="dash-panel" style="margin-top:20px;">
+            <div class="dash-panel-header">
+                <h3 class="dash-panel-title">
+                    <svg viewBox="0 0 16 16" fill="none"><rect x="4" y="3" width="8" height="10" rx="1" stroke="currentColor" stroke-width="1.6"/><path d="M6 6h4M6 8h4M6 10h3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                    My Recent Tallies
+                </h3>
+                <a class="dash-panel-link" href="{% url 'my_tallies' %}">View All</a>
+            </div>
+            {% if recent_my_tallies %}
+                {% for tally in recent_my_tallies %}
+                <a class="dash-record" href="{% url 'tally_view' tally.pk %}">
+                    <div class="dash-record-dot {% if tally.status == 'DRAFT' %}dot-draft{% elif tally.status == 'PENDING_APPROVAL' %}dot-pending{% elif tally.status == 'APPROVED' %}dot-approved{% elif tally.status == 'REJECTED' %}dot-rejected{% endif %}"></div>
+                    <div class="dash-record-main">
+                        <div class="dash-record-title">{{ tally.tally_number }} — {{ tally.sd_number }}</div>
+                        <div class="dash-record-sub">{{ tally.vessel }} • {{ tally.loading_date|date:"M d, Y" }}</div>
+                    </div>
+                    <span class="dash-record-badge {% if tally.status == 'DRAFT' %}badge-draft{% elif tally.status == 'PENDING_APPROVAL' %}badge-pending{% elif tally.status == 'APPROVED' %}badge-approved{% elif tally.status == 'REJECTED' %}badge-rejected{% endif %}">
+                        {% if tally.status == 'DRAFT' %}Draft{% elif tally.status == 'PENDING_APPROVAL' %}Pending{% elif tally.status == 'APPROVED' %}Approved{% elif tally.status == 'REJECTED' %}Rejected{% endif %}
+                    </span>
+                </a>
+                {% endfor %}
+            {% else %}
+                <div class="dash-empty">No tallies yet.</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="dash-actions">
+        <div class="dash-action-group">
+            <div class="dash-action-group-title">SD Records</div>
+            <a class="dash-action-btn action-primary" href="{% url 'operations_list' %}">
+                <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="2" rx="1" fill="currentColor"/><rect x="2" y="7" width="12" height="2" rx="1" fill="currentColor"/><rect x="2" y="11" width="7" height="2" rx="1" fill="currentColor"/></svg>
+                View All SD Records
+            </a>
+            {% if is_manager_or_super or 'OPERATIONS' in all_desks %}
+            <a class="dash-action-btn" href="{% url 'sd_create' %}">
+                <svg viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                Add New SD Record
+            </a>
+            {% endif %}
+        </div>
+
+        <div class="dash-action-group">
+            <div class="dash-action-group-title">Work Programs</div>
+            <a class="dash-action-btn action-primary" href="{% url 'work_program_list' %}">
+                <svg viewBox="0 0 16 16" fill="none"><path d="M3 6h10M3 10h10M3 14h7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                View Work Programs
+            </a>
+            {% if is_manager_or_super or 'OPERATIONS' in all_desks %}
+            <a class="dash-action-btn" href="{% url 'work_program_create' %}">
+                <svg viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                Add Work Program
+            </a>
+            {% endif %}
+        </div>
+
+        <div class="dash-action-group">
+            <div class="dash-action-group-title">Daily Port</div>
+            <a class="dash-action-btn action-primary" href="{% url 'daily_port_view' %}">
+                <svg viewBox="0 0 16 16" fill="none"><rect x="4" y="4" width="8" height="8" rx="1" stroke="currentColor" stroke-width="1.6"/><path d="M4 7h8" stroke="currentColor" stroke-width="1.6"/></svg>
+                View Daily Ports
+            </a>
+            {% if is_manager_or_super or 'OPERATIONS' in all_desks %}
+            <a class="dash-action-btn" href="{% url 'daily_port_create' %}">
+                <svg viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                Add Daily Port
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>

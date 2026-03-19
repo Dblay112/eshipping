@@ -1,0 +1,96 @@
+{% extends "includes/base.html" %}
+{% load static %}
+
+{% block title %}{% if booking_data_json %}Edit Bookings{% else %}Create Bookings{% endif %} — CMC{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/ebooking/booking_form.css' %}">
+<link rel="stylesheet" href="{% static 'css/ebooking/booking_form_mobile.css' %}">
+<link rel="stylesheet" href="{% static 'css/custom-datepicker.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="sdt-page sdt-form-page">
+
+  <div class="sdt-form-header">
+    <a href="{% url 'booking_list' %}" class="sdt-back-link">
+      <svg viewBox="0 0 20 20" fill="none"><path d="M13 4l-6 6 6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back to Bookings
+    </a>
+    <h1 class="sdt-page-title">{% if booking_data_json %}Edit Bookings{% else %}Create Bookings{% endif %}</h1>
+    <p class="sdt-page-sub">E-Booking Desk — Bill of Lading Tracking</p>
+  </div>
+
+  {% if messages %}
+  <div class="sdt-messages">
+    {% for msg in messages %}
+    <div class="sdt-alert sdt-alert-{{ msg.tags }}">{{ msg }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <form method="post" enctype="multipart/form-data" id="bookingForm" class="sdt-form-wrap">
+    {% csrf_token %}
+
+    <!-- Booking Setup (match declaration SD selection layout) -->
+    <div class="sdt-shipment-card">
+      <div class="sdt-si-header">
+        <div class="sdt-si-header-icon">
+          <svg viewBox="0 0 24 24" fill="none" width="20" height="20">
+            <path d="M4 6h16M4 10h16M4 14h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div style="flex:1;">
+          <div class="sdt-si-header-title">SD Lines</div>
+          <div class="sdt-si-header-sub">Add SD numbers and create bookings per contract</div>
+        </div>
+        <button type="button" class="sdt-alloc-add-header-btn" id="addSdBtn">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          Add SD
+        </button>
+      </div>
+
+      <div class="sdt-si-band">
+        <div class="sdt-si-band-label"><span>Booking</span></div>
+        <div class="sdt-si-fields">
+          <div class="sdt-si-field sdt-si-field-date">
+            <label class="sdt-si-label">Booking Date <span class="sdt-required">*</span></label>
+            <input type="text" name="booking_date" id="id_booking_date" class="sdt-si-input" placeholder="YYYY-MM-DD" value="{{ today }}" data-datepicker readonly required>
+          </div>
+        </div>
+      </div>
+
+      <div class="sdt-si-band sdt-si-band-last">
+        <div class="sdt-si-band-label"><span>SD Lines</span></div>
+        <div class="sdt-si-fields">
+          <div id="sdBlocksContainer" style="width:100%;"></div>
+        </div>
+      </div>
+    </div>
+
+
+
+    <!-- Submit buttons -->
+    <div class="sdt-form-actions">
+      <a href="{% url 'booking_list' %}" class="sdt-btn sdt-btn-ghost">Cancel</a>
+      <button type="submit" class="sdt-btn sdt-btn-primary">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M13 4L6 11 3 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        {% if booking_data_json %}Update Bookings{% else %}Create Bookings{% endif %}
+      </button>
+    </div>
+
+  </form>
+
+</div>
+
+<script>
+window.BOOKING_FORM_CONFIG = {
+  bookingDataUrl: "{% url 'booking_data_json' %}",
+  bookingEditUrlTemplate: "{% url 'booking_edit' 0 %}",
+  sdSearchUrl: "/api/sd-search/",
+  bookingData: {% if booking_data_json %}JSON.parse("{{ booking_data_json|escapejs }}"){% else %}null{% endif %},
+};
+</script>
+<script src="{% static 'js/features/ebooking/booking-form.js' %}"></script>
+<script src="{% static 'js/ui/custom-datepicker.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,223 @@
+/* ═══════════════════════════════════════════════════════════════
+   BOOKING LIST MOBILE — ebooking/booking_list.html
+   Mobile-specific styles (max-width: 768px)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Mobile: Horizontal scroll for nested booking tables */
+@media (max-width: 768px) {
+  /* Hide table on mobile */
+  .sdt-table-wrap {
+    display: none;
+  }
+
+  /* Mobile card layout */
+  .sdt-mobile-cards {
+    display: block;
+  }
+
+  .sdt-mobile-card {
+    background: #fff;
+    border: 1px solid #e8ddd4;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+
+  .sdt-mobile-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .sdt-mobile-card-header:active {
+    background: #f8f2ec;
+  }
+
+  .sdt-mobile-card-sd {
+    font-size: 16px;
+    font-weight: 700;
+    color: #3d2817;
+  }
+
+  .sdt-mobile-card-agent {
+    font-size: 13px;
+    color: #7d5a3b;
+    font-weight: 600;
+  }
+
+  .sdt-mobile-card-details {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    padding: 0 16px;
+  }
+
+  .sdt-mobile-card.expanded .sdt-mobile-card-details {
+    max-height: 5000px;
+    padding: 0 16px 16px 16px;
+  }
+
+  .sdt-mobile-card-row {
+    display: flex;
+    padding: 8px 0;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .sdt-mobile-card-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #7d5a3b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    min-width: 90px;
+    flex-shrink: 0;
+  }
+
+  .sdt-mobile-card-value {
+    font-size: 13px;
+    color: #3d2817;
+    flex: 1;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+
+  /* Contract sections in mobile cards */
+  .sdt-mobile-card-details > div {
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f0e8e0;
+  }
+
+  .sdt-mobile-card-details > div:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  /* Contract header styling */
+  .sdt-mobile-card-details h4,
+  .sdt-mobile-card-details strong {
+    font-size: 14px;
+    color: #3d2817;
+    margin-bottom: 8px;
+    display: block;
+    word-break: break-word;
+  }
+
+  /* Booking details within contracts */
+  .sdt-mobile-card-details p {
+    font-size: 13px;
+    line-height: 1.6;
+    margin: 4px 0;
+    word-break: break-word;
+  }
+
+  .sdt-mobile-card-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #f0e8e0;
+    flex-wrap: wrap;
+  }
+
+  .sdt-mobile-card-actions .sdt-row-edit-btn,
+  .sdt-mobile-card-actions .sdt-btn {
+    flex: 1;
+    min-width: calc(50% - 4px);
+    justify-content: center;
+    min-height: 44px;
+    font-size: 14px;
+  }
+
+  .sdt-mobile-card-actions .sdt-btn-ghost {
+    flex: 1;
+    min-width: calc(50% - 4px);
+  }
+
+  .sdt-row-edit-btn,
+  .sdt-correction-btn,
+  .sdt-correction-badge,
+  .sdt-download-btn {
+    min-height: 44px;
+    padding: 10px 14px;
+    font-size: 14px;
+  }
+
+  /* Download links */
+  .sdt-mobile-card-value a {
+    word-break: break-all;
+    display: inline-block;
+  }
+
+  .sdt-search-select {
+    min-width: 100% !important;
+    margin-left: 0;
+    margin-top: 8px;
+    font-size: 16px !important;
+  }
+
+  .sdt-search-inner {
+    flex-wrap: wrap;
+  }
+
+  .sdt-search-input {
+    font-size: 16px !important;
+  }
+
+  /* Page header - stack on mobile */
+  .sdt-page-header-inner {
+    flex-direction: column !important;
+    gap: 16px !important;
+    align-items: flex-start !important;
+  }
+
+  .sdt-page-header-inner > div:last-child {
+    width: 100%;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .sdt-view-toggle {
+    width: 100%;
+  }
+
+  .sdt-btn-primary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Calendar panel - full width on mobile */
+  .sdt-schedule-layout {
+    flex-direction: column !important;
+  }
+
+  .sdt-calendar-panel {
+    width: 100% !important;
+    margin-bottom: 20px;
+  }
+
+  /* Ensure long text doesn't break layout */
+  .sdt-mobile-card * {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  /* Balance display */
+  .sdt-mobile-card-value .bf-balance-display {
+    font-weight: 600;
+  }
+}
+
+/* Desktop: Hide mobile cards */
+@media (min-width: 769px) {
+  .sdt-mobile-cards {
+    display: none;
+  }
+}

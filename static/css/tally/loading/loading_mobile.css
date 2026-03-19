@@ -1,0 +1,26 @@
+/* ═══════════════════════════════════════════════════════════════
+   LOADING MOBILE — loading/loading.html
+   Mobile-specific styles
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Module grid and title responsive (max-width 860px) */
+@media (max-width: 860px) {
+    .loading-title {
+        font-size: 28px
+    }
+}
+
+/* Module grid single column (max-width 640px) */
+@media (max-width: 640px) {
+    .module-grid {
+        grid-template-columns: 1fr
+    }
+
+    .loading-card {
+        padding: 22px 16px
+    }
+
+    .loading-shell {
+        padding: 28px 14px 32px
+    }
+}

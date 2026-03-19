@@ -1,0 +1,406 @@
+{% extends "includes/base.html" %}
+{% load static %}
+{% load sd_permissions %}
+
+{% block title %}Operations — SD Records | CMC{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/operations/operations_list.css' %}">
+<link rel="stylesheet" href="{% static 'css/operations/operations_list_mobile.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="sdt-page">
+
+  <div class="sdt-page-header">
+    <div class="sdt-page-header-inner">
+      <div>
+        <h1 class="sdt-page-title">SD Records</h1>
+        <p class="sdt-page-sub">Search and browse all shipping declaration records</p>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div class="sdt-view-toggle">
+          <a href="?mine=false{% if q %}&q={{ q }}{% endif %}{% if page_obj.number > 1 %}&page={{ page_obj.number }}{% endif %}" class="sdt-toggle-btn {% if not show_mine %}active{% endif %}">All Records</a>
+          <a href="?mine=true{% if q %}&q={{ q }}{% endif %}{% if page_obj.number > 1 %}&page={{ page_obj.number }}{% endif %}" class="sdt-toggle-btn {% if show_mine %}active{% endif %}">My Records</a>
+        </div>
+        {% if is_operations %}
+        <a href="{% url 'sd_create' %}" class="sdt-btn sdt-btn-primary">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          Add SD Record
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="sdt-search-wrap">
+    <form method="get" class="sdt-search-form">
+      <div class="sdt-search-inner">
+        <svg class="sdt-search-icon" viewBox="0 0 20 20" fill="none">
+          <circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M13 13l3.5 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        <input
+          type="search"
+          name="q"
+          value="{{ q }}"
+          class="sdt-search-input"
+          placeholder="Search by SD number, vessel, buyer, MK No., SI Ref…"
+          autocomplete="off"
+        />
+        <button type="submit" class="sdt-search-btn">Search</button>
+      </div>
+    </form>
+  </div>
+
+  {% if q %}
+  <p class="sdt-results-label">
+    {% if page_obj %}Showing {{ page_obj.paginator.count }} result{{ page_obj.paginator.count|pluralize }} for <strong>"{{ q }}"</strong>
+    {% else %}No results for <strong>"{{ q }}"</strong>{% endif %}
+  </p>
+  {% endif %}
+
+  {% if page_obj and page_obj.object_list %}
+  <div class="sdt-table-wrap">
+    <table class="sdt-records-table">
+      <thead>
+        <tr>
+          <th></th><!-- expand toggle -->
+          <th>SD</th>
+          <th>Vessel</th>
+          <th>Tonnage</th>
+          <th>Destination</th>
+          <th>Loaded</th>
+          <th>Balance</th>
+          <th>Crop Year</th>
+          <th>Buyer</th>
+          <th>Document</th>
+          <th>Status</th>
+          {% if is_operations %}<th></th>{% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for sd in sds %}
+        <!-- MAIN ROW -->
+        <tr class="sdt-main-row" data-pk="{{ sd.pk }}">
+          <td style="width:36px;text-align:center;">
+            <span class="sdt-expand-icon" id="expandIcon_{{ sd.pk }}">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </td>
+          <td class="sdt-td-sd" data-label="SD">{{ sd.sd_number }}</td>
+          <td class="sdt-td-vessel" data-label="VESSEL">
+            {{ sd.vessel_name }}
+            {% if sd.eta %}<small>ETA {{ sd.eta|date:"d M Y" }}</small>{% endif %}
+          </td>
+          <td class="sdt-td-tonnage" data-label="TONNAGE">{{ sd.tonnage|clean_decimal }} MT</td>
+          <td class="sdt-td-dest" data-label="DESTINATION">{{ sd.port_of_discharge|default:"—" }}</td>
+          <td class="sdt-td-loaded" data-label="LOADED">
+            {% if sd.tonnage_loaded %}{{ sd.tonnage_loaded|clean_decimal }} MT{% else %}<span style="color:#d1d5db;">—</span>{% endif %}
+          </td>
+          <td class="sdt-td-balance" data-label="BALANCE">
+            {% if sd.is_complete %}
+              <span class="sdt-balance-pill zero">0 MT</span>
+            {% elif sd.tonnage_loaded %}
+              <span class="sdt-balance-pill positive">{{ sd.balance_remaining|clean_decimal }} MT</span>
+            {% else %}
+              <span class="sdt-balance-pill positive">{{ sd.tonnage|clean_decimal }} MT</span>
+            {% endif %}
+          </td>
+          <td class="sdt-td-crop" data-label="CROP YEAR">{{ sd.crop_year|default:"—" }}</td>
+          <td class="sdt-td-buyer" data-label="BUYER">{{ sd.buyer }}</td>
+          <td class="sdt-td-file" data-label="DOCUMENT" onclick="event.stopPropagation()">
+            {% if sd.sd_document %}
+            <a href="{{ sd.sd_document.url }}" download class="sdt-download-btn" title="Download SD document">
+              <svg viewBox="0 0 16 16" fill="none" width="14" height="14">
+                <path d="M8 2v8M5 7l3 3 3-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 12h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+              </svg>
+              Download
+            </a>
+            {% else %}
+            <span style="color:#bbb;font-size:12px;">No file</span>
+            {% endif %}
+          </td>
+          <td class="sdt-td-status" data-label="STATUS">
+            {% if sd.is_complete %}
+            <span class="sdt-status-badge sdt-status-complete">✓ FINISHED</span>
+            {% else %}
+            <span class="sdt-status-badge sdt-status-pending" style="background:#fee;color:#c00;border-color:#fcc;">ACTIVE</span>
+            {% endif %}
+          </td>
+          {% if is_operations %}
+          <td class="sdt-td-actions" data-label="ACTIONS" onclick="event.stopPropagation()">
+            <a href="{% url 'sd_edit' sd.pk %}" class="sdt-row-edit-btn">
+              <svg viewBox="0 0 14 14" fill="none" width="11" height="11"><path d="M9.5 1.5l3 3L4 13H1v-3L9.5 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Edit
+            </a>
+            <a href="{% url 'sd_record_delete' sd.pk %}" class="sdt-row-edit-btn" style="margin-left:6px;background:#fee;border-color:#fcc;color:#c00;">
+              <svg viewBox="0 0 14 14" fill="none" width="11" height="11"><path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              Delete
+            </a>
+          </td>
+          {% endif %}
+        </tr>
+
+        <!-- DETAIL / EXPAND ROW -->
+        <tr class="sdt-detail-row" id="detailRow_{{ sd.pk }}">
+          <td colspan="{% if is_operations %}12{% else %}11{% endif %}">
+
+            <!-- Core info grid -->
+            <div class="sdt-detail-inner">
+              {% if sd.si_ref %}
+              <div class="sdt-di-block"><div class="sdt-di-label">Document Ref.</div><div class="sdt-di-val mono">{{ sd.si_ref }}</div></div>
+              {% endif %}
+              <div class="sdt-di-block"><div class="sdt-di-label">Vessel</div><div class="sdt-di-val">{{ sd.vessel_name }}</div></div>
+              <div class="sdt-di-block"><div class="sdt-di-label">Port of Loading</div><div class="sdt-di-val">{{ sd.port_of_loading }}</div></div>
+              {% if sd.shipment_period %}
+              <div class="sdt-di-block"><div class="sdt-di-label">Shipment Period</div><div class="sdt-di-val">{{ sd.shipment_period }}</div></div>
+              {% endif %}
+              {% if sd.opening_balance %}
+              <div class="sdt-di-block"><div class="sdt-di-label">Opening Balance</div><div class="sdt-di-val">{{ sd.opening_balance|clean_decimal }} MT</div></div>
+              {% endif %}
+              {% if sd.closing_balance is not None %}
+              <div class="sdt-di-block"><div class="sdt-di-label">Closing Balance</div><div class="sdt-di-val">{{ sd.closing_balance|clean_decimal }} MT</div></div>
+              {% endif %}
+              <div class="sdt-di-block"><div class="sdt-di-label">Agent</div><div class="sdt-di-val">{{ sd.agent }}</div></div>
+              {% if sd.schedule_assigned_officer %}
+              <div class="sdt-di-block"><div class="sdt-di-label">Officer Assigned</div><div class="sdt-di-val">{{ sd.schedule_assigned_officer.first_name }} {{ sd.schedule_assigned_officer.last_name }} ({{ sd.schedule_assigned_officer.staff_number }})</div></div>
+              {% endif %}
+              {% if sd.date_of_entry %}
+              <div class="sdt-di-block"><div class="sdt-di-label">Date of Entry</div><div class="sdt-di-val">{{ sd.date_of_entry|date:"d M Y" }}</div></div>
+              {% endif %}
+              <div class="sdt-di-block"><div class="sdt-di-label">Created By</div><div class="sdt-di-val">{% if sd.created_by %}{{ sd.created_by.first_name }} {{ sd.created_by.last_name }}{% else %}—{% endif %}</div></div>
+              {% if sd.updated_by %}
+              <div class="sdt-di-block"><div class="sdt-di-label">Last Updated By</div><div class="sdt-di-val">{{ sd.updated_by.first_name }} {{ sd.updated_by.last_name }}</div></div>
+              {% else %}
+              <div class="sdt-di-block"><div class="sdt-di-label">Last Updated</div><div class="sdt-di-val">—</div></div>
+              {% endif %}
+
+              <!-- Module Status Indicators -->
+              <div class="sdt-di-block"><div class="sdt-di-label">EBOOKING</div><div class="sdt-di-val">{% if sd.has_bookings %}<span style="color:#2e7d32;font-weight:600;">✓ YES</span>{% else %}<span style="color:#c62828;">✗ NO</span>{% endif %}</div></div>
+              <div class="sdt-di-block"><div class="sdt-di-label">DECLARATION</div><div class="sdt-di-val">{% if sd.has_declarations %}<span style="color:#2e7d32;font-weight:600;">✓ YES</span>{% else %}<span style="color:#c62828;">✗ NO</span>{% endif %}</div></div>
+              <div class="sdt-di-block"><div class="sdt-di-label">EVACUATION</div><div class="sdt-di-val">{% if sd.has_evacuations %}<span style="color:#2e7d32;font-weight:600;">✓ YES</span>{% else %}<span style="color:#c62828;">✗ NO</span>{% endif %}</div></div>
+              <div class="sdt-di-block"><div class="sdt-di-label">TALLY</div><div class="sdt-di-val">{% if sd.has_tallies %}<span style="color:#2e7d32;font-weight:600;">✓ YES</span>{% else %}<span style="color:#c62828;">✗ NO</span>{% endif %}</div></div>
+            </div>
+
+            <!-- Contract Allocations table -->
+            {% if sd.allocations.exists %}
+            <div class="sdt-detail-section-title">Contract Allocations</div>
+            <div class="sdt-detail-allocs">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Label</th>
+                    <th>Contract No.</th>
+                    <th>MK No.</th>
+                    <th>Tonnage</th>
+                    <th>Buyer</th>
+                    <th>Cocoa Type</th>
+                    <th>Loading Type</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for alloc in sd.allocations.all %}
+                  <tr>
+                    <td>{% if alloc.allocation_label %}<strong>{{ alloc.allocation_label }}</strong>{% else %}—{% endif %}</td>
+                    <td style="font-family:monospace;">{{ alloc.contract_number }}</td>
+                    <td style="font-family:monospace;">{{ alloc.mk_number }}</td>
+                    <td><strong>{{ alloc.allocated_tonnage|clean_decimal }} MT</strong></td>
+                    <td>{{ alloc.buyer|default:"—" }}</td>
+                    <td>{{ alloc.cocoa_type|default:"—" }}</td>
+                    <td>{{ alloc.notes|default:"—" }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% endif %}
+
+            <!-- Clerks -->
+            {% if sd.clerks.exists %}
+            <div class="sdt-detail-section-title">Clerks / Tally Officers</div>
+            <div class="sdt-detail-inner" style="padding-top:0;">
+              {% for clerk in sd.clerks.all %}
+              <div class="sdt-di-block">
+                <div class="sdt-di-label">{{ clerk.date_worked|date:"d M Y"|default:"—" }}{% if clerk.tally_reference %} · {{ clerk.tally_reference }}{% endif %}</div>
+                <div class="sdt-di-val">{{ clerk.officer_name }}</div>
+              </div>
+              {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- View Full Detail link -->
+            <div style="padding:4px 24px 8px;display:flex;align-items:center;gap:12px;">
+              <a href="{% url 'sd_detail' sd.pk %}" class="sdt-btn sdt-btn-ghost" style="font-size:12px;padding:5px 14px;" onclick="event.stopPropagation()">
+                <svg viewBox="0 0 16 16" fill="none" width="13" height="13"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M8 5v3l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                Full Detail View
+              </a>
+              <a href="{% url 'sd_export_excel' sd.pk %}" class="sdt-btn sdt-btn-excel" style="font-size:12px;padding:5px 14px;" onclick="event.stopPropagation()">
+                <svg viewBox="0 0 16 16" fill="none" width="12" height="12"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M5 6l2 2-2 2M9 10h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                Export Excel
+              </a>
+            </div>
+
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Mobile Card Layout -->
+  <div class="sdt-mobile-cards">
+    {% for sd in sds %}
+    <div class="sdt-mobile-card">
+      <div class="sdt-mobile-card-header">
+        <div>
+          <div class="sdt-mobile-card-sd">{{ sd.sd_number }}</div>
+          <div class="sdt-mobile-card-vessel">{{ sd.vessel_name }}</div>
+        </div>
+        {% if sd.is_complete %}
+        <span class="sdt-status-badge sdt-status-complete" style="font-size:10px;padding:4px 8px;">✓ FINISHED</span>
+        {% else %}
+        <span class="sdt-status-badge sdt-status-pending" style="background:#fee;color:#c00;border-color:#fcc;font-size:10px;padding:4px 8px;">ACTIVE</span>
+        {% endif %}
+      </div>
+
+      <div class="sdt-mobile-card-details">
+        <div class="sdt-mobile-card-row">
+          <div class="sdt-mobile-card-label">Tonnage</div>
+          <div class="sdt-mobile-card-value">{{ sd.tonnage|clean_decimal }} MT</div>
+        </div>
+
+        <div class="sdt-mobile-card-row">
+          <div class="sdt-mobile-card-label">Destination</div>
+          <div class="sdt-mobile-card-value">{{ sd.port_of_discharge|default:"—" }}</div>
+        </div>
+
+        <div class="sdt-mobile-card-row">
+          <div class="sdt-mobile-card-label">Loaded</div>
+          <div class="sdt-mobile-card-value">
+            {% if sd.tonnage_loaded %}{{ sd.tonnage_loaded|clean_decimal }} MT{% else %}—{% endif %}
+          </div>
+        </div>
+
+        <div class="sdt-mobile-card-row">
+          <div class="sdt-mobile-card-label">Balance</div>
+          <div class="sdt-mobile-card-value">
+            {% if sd.is_complete %}
+              <span class="sdt-balance-pill zero">0 MT</span>
+            {% elif sd.tonnage_loaded %}
+              <span class="sdt-balance-pill positive">{{ sd.balance_remaining|clean_decimal }} MT</span>
+            {% else %}
+              <span class="sdt-balance-pill positive">{{ sd.tonnage|clean_decimal }} MT</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="sdt-mobile-card-row">
+          <div class="sdt-mobile-card-label">Crop Year</div>
+          <div class="sdt-mobile-card-value">{{ sd.crop_year|default:"—" }}</div>
+        </div>
+
+        <div class="sdt-mobile-card-row">
+          <div class="sdt-mobile-card-label">Buyer</div>
+          <div class="sdt-mobile-card-value">{{ sd.buyer }}</div>
+        </div>
+
+        <div class="sdt-mobile-card-row">
+          <div class="sdt-mobile-card-label">Document</div>
+          <div class="sdt-mobile-card-value">
+            {% if sd.sd_document %}
+            <a href="{{ sd.sd_document.url }}" download class="sdt-download-btn" title="Download SD document">
+              <svg viewBox="0 0 16 16" fill="none" width="14" height="14">
+                <path d="M8 2v8M5 7l3 3 3-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 12h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+              </svg>
+              Download
+            </a>
+            {% else %}<span style="color:#bbb;font-size:12px;">No file</span>{% endif %}
+          </div>
+        </div>
+
+        {% if is_operations %}
+        <div class="sdt-mobile-card-actions">
+          <a href="{% url 'sd_detail' sd.pk %}" class="sdt-btn sdt-btn-ghost">
+            <svg viewBox="0 0 16 16" fill="none" width="13" height="13"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M8 5v3l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            View
+          </a>
+          <a href="{% url 'sd_edit' sd.pk %}" class="sdt-row-edit-btn">
+            <svg viewBox="0 0 14 14" fill="none" width="11" height="11"><path d="M9.5 1.5l3 3L4 13H1v-3L9.5 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Edit
+          </a>
+          <a href="{% url 'sd_record_delete' sd.pk %}" class="sdt-row-edit-btn" style="background:#fee;border-color:#fcc;color:#c00;">
+            <svg viewBox="0 0 14 14" fill="none" width="11" height="11"><path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            Delete
+          </a>
+        </div>
+        {% else %}
+        <div class="sdt-mobile-card-actions">
+          <a href="{% url 'sd_detail' sd.pk %}" class="sdt-btn sdt-btn-ghost" style="width:100%;">
+            <svg viewBox="0 0 16 16" fill="none" width="13" height="13"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M8 5v3l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            View Full Details
+          </a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Pagination -->
+  {% if page_obj.has_other_pages %}
+  <div class="sdt-pagination" style="display:flex;justify-content:center;gap:6px;padding:20px 0;">
+    {% if page_obj.has_previous %}
+    <a href="?{% if q %}q={{ q }}&{% endif %}page={{ page_obj.previous_page_number }}" class="sdt-btn sdt-btn-ghost" style="font-size:12px;padding:5px 12px;">← Prev</a>
+    {% endif %}
+    <span style="display:flex;align-items:center;gap:4px;font-size:13px;color:#5c3d2e;">
+      Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+    </span>
+    {% if page_obj.has_next %}
+    <a href="?{% if q %}q={{ q }}&{% endif %}page={{ page_obj.next_page_number }}" class="sdt-btn sdt-btn-ghost" style="font-size:12px;padding:5px 12px;">Next →</a>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {% else %}
+  <div class="sdt-empty-state">
+    <div class="sdt-empty-icon">
+      <svg viewBox="0 0 64 64" fill="none">
+        <path d="M8 20h48M8 30h48M8 40h32" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+        <rect x="8" y="10" width="48" height="44" rx="4" stroke="currentColor" stroke-width="2.5"/>
+        <circle cx="48" cy="48" r="8" fill="none" stroke="currentColor" stroke-width="2"/>
+        <path d="M53 53l4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <h3 class="sdt-empty-title">
+      {% if q %}No SD Records Found{% else %}No SD Records Yet{% endif %}
+    </h3>
+    <p class="sdt-empty-text">
+      {% if q %}Try a different search term.{% elif is_operations %}Get started by adding your first SD record.{% else %}No SD records have been added yet.{% endif %}
+    </p>
+    {% if is_operations and not q %}
+    <a href="{% url 'sd_create' %}" class="sdt-btn sdt-btn-primary">Add First SD Record</a>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <!-- Total Count Display -->
+  {% if page_obj %}
+  <div style="display:flex;justify-content:flex-end;padding:16px 0 24px;margin-top:8px;">
+    <div style="background:#f8f2ec;border:1px solid #e8ddd0;border-radius:8px;padding:10px 20px;display:inline-flex;align-items:center;gap:10px;">
+      <span style="font-size:13px;color:#7d5a3b;font-weight:600;letter-spacing:0.3px;">TOTAL SDs:</span>
+      <span style="font-size:15px;color:#3d2817;font-weight:700;">{{ page_obj.paginator.count }}</span>
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/features/operations/operations-list.js' %}"></script>
+{% endblock %}

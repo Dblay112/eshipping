@@ -1,0 +1,152 @@
+/* ═══════════════════════════════════════════════════════════════
+   Evacuation Detail Page Styles
+   Self-contained CSS (copied from sd_base.css + evacuation.css)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Page shell ─────────────────────────────────────────────── */
+.sdt-page {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 32px 24px 64px;
+}
+
+/* ── Back link ───────────────────────────────────────────────── */
+.sdt-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-decoration: none;
+    margin-bottom: 12px;
+    transition: color .2s;
+}
+
+.sdt-back-link svg {
+    width: 14px;
+    height: 14px;
+}
+
+.sdt-back-link:hover {
+    color: var(--cocoa-brown);
+}
+
+/* ── Buttons ─────────────────────────────────────────────────── */
+.sdt-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 18px;
+    min-height: 38px;
+    border-radius: 9px;
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 13.5px;
+    font-weight: 700;
+    letter-spacing: .8px;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all .2s;
+    white-space: nowrap;
+}
+
+.sdt-btn svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+}
+
+.sdt-btn-ghost {
+    background: transparent;
+    color: var(--cocoa-brown);
+    border: 1.5px solid var(--cocoa-rim);
+}
+
+.sdt-btn-ghost:hover {
+    background: rgba(61, 40, 23, .06);
+    border-color: var(--cocoa-brown);
+    color: var(--cocoa-dark);
+}
+
+.sdt-btn-excel {
+    background: linear-gradient(135deg, #1a6b35, #217a3f);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(26, 107, 53, .25);
+}
+
+.sdt-btn-excel:hover {
+    background: linear-gradient(135deg, #217a3f, #1a6b35);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(26, 107, 53, .35);
+}
+
+/* ── Download button ─────────────────────────────────────────── */
+.sdt-download-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 12px;
+    background: #fff;
+    border: 1.5px solid #c8a882;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #3d2817;
+    text-decoration: none;
+    transition: all .15s;
+    white-space: nowrap;
+}
+
+.sdt-download-btn:hover {
+    background: #fdf4ec;
+    border-color: #b0916e;
+    color: #3d2817;
+}
+
+.sdt-download-btn svg {
+    flex-shrink: 0;
+}
+
+/* ── Detail page header ──────────────────────────────────────── */
+.sdt-detail-header {
+    background: linear-gradient(135deg, #f8f2ec 0%, #faf7f2 100%);
+    border-bottom: 2px solid #e8ddd0;
+    margin: -32px -24px 32px;
+    padding: 24px 24px 20px;
+}
+
+.sdt-detail-header-inner {
+    max-width: 1300px;
+    margin: 0 auto;
+}
+
+.sdt-detail-title-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.sdt-detail-sd-number {
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: var(--cocoa-dark);
+    margin: 0 0 6px;
+    text-transform: uppercase;
+}
+
+.sdt-detail-vessel {
+    font-size: 13.5px;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.sdt-detail-header-actions {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+}

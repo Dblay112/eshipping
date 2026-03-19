@@ -1,0 +1,115 @@
+{% extends "includes/base.html" %}
+{% load static %}
+{% load sd_permissions %}
+
+{% block title %}Dashboard — CMC Shipping Portal{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard/dashboard.css' %}">
+<link rel="stylesheet" href="{% static 'css/dashboard/dashboard_mobile.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="dash-page">
+
+    {# ── WELCOME BANNER ──────────────────────────────────────────── #}
+    <div class="dash-welcome">
+        <div class="dash-welcome-left">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;margin-right:16px;">
+                <div class="dash-welcome-avatar">
+                    {{ request.user.first_name|slice:":1"|upper }}
+                </div>
+                <div style="font-size:13px;font-weight:600;color:#8a6a52;text-transform:uppercase;letter-spacing:0.3px;">
+                    {{ request.user.get_location_display }}
+                </div>
+            </div>
+            <div class="dash-welcome-text">
+                <h2>Good {% if now.hour < 12 %}morning{% elif now.hour < 17 %}afternoon{% else %}evening{% endif %}, {{ request.user.first_name }}.</h2>
+                <div style="font-size:14px;font-weight:600;color:#fff;margin-top:4px;">
+                    {% if all_desks|length == 1 and 'OTHER' in all_desks %}
+                        Shipping Staff
+                    {% else %}
+                        {% for desk_code in all_desks %}
+                            {% if desk_code == 'MANAGER' %}Manager
+                            {% elif desk_code == 'OPERATIONS' %}Operations Desk
+                            {% elif desk_code == 'EBOOKING' %}E-Booking Desk
+                            {% elif desk_code == 'DECLARATION' %}Declaration Desk
+                            {% elif desk_code == 'TERMINAL_SUPERVISOR' %}Terminal Supervisor
+                            {% elif desk_code == 'EVACUATION' %}Evacuation Desk
+                            {% endif %}{% if not forloop.last %} • {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="dash-welcome-right">
+            <div class="dash-date">{{ today|date:"l, j N Y" }}</div>
+            <span class="dash-desk-badge">{{ request.user.rank }}</span>
+        </div>
+    </div>
+
+    {# ── TERMINAL SUPERVISOR ALERT ────────────────────────────────── #}
+    {% if pending_for_me and pending_for_me > 0 %}
+    <a class="dash-alert-banner" href="{% url 'pending_tallies' %}">
+        <div class="dash-alert-icon">
+            <svg viewBox="0 0 20 20" fill="none"><path d="M10 3a7 7 0 1 0 0 14A7 7 0 0 0 10 3z" stroke="currentColor" stroke-width="1.6"/><path d="M10 7v4l2.5 2.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </div>
+        <div class="dash-alert-text">
+            <strong>Tallies Awaiting Your Approval</strong>
+            <span>Click to review and approve or reject pending tally submissions</span>
+        </div>
+        <div class="dash-alert-count">{{ pending_for_me }}</div>
+    </a>
+    {% endif %}
+
+    {# ══════════════════════════════════════════════════════════════ #}
+    {# DESK-SPECIFIC DASHBOARDS                                        #}
+    {# ══════════════════════════════════════════════════════════════ #}
+
+    {# TERMINAL SUPERVISOR #}
+    {% if pending_for_me is not None %}
+        {% include 'dashboard/partials/dashboard_supervisor.html' %}
+    {% endif %}
+
+    {# OPERATIONS DESK #}
+    {% if is_manager_or_super or 'OPERATIONS' in all_desks %}
+        {% if sd_total is not None %}
+            {% include 'dashboard/partials/dashboard_operations.html' %}
+        {% endif %}
+    {% endif %}
+
+    {# EBOOKING DESK #}
+    {% if is_manager_or_super or 'EBOOKING' in all_desks %}
+        {% if booking_total is not None %}
+            {% include 'dashboard/partials/dashboard_ebooking.html' %}
+        {% endif %}
+    {% endif %}
+
+    {# DECLARATION DESK #}
+    {% if is_manager_or_super or 'DECLARATION' in all_desks %}
+        {% if declaration_total is not None %}
+            {% include 'dashboard/partials/dashboard_declaration.html' %}
+        {% endif %}
+    {% endif %}
+
+    {# EVACUATION DESK #}
+    {% if is_manager_or_super or 'EVACUATION' in all_desks %}
+        {% if evacuation_total is not None %}
+            {% include 'dashboard/partials/dashboard_evacuation.html' %}
+        {% endif %}
+    {% endif %}
+
+    {# OTHER DESK - ASSIGNED OFFICER #}
+    {% if 'OTHER' in all_desks and is_assigned_officer %}
+        {% include 'dashboard/partials/dashboard_other_officer.html' %}
+    {% endif %}
+
+    {# OTHER DESK - TALLY CLERK (not assigned officer) #}
+    {% if 'OTHER' in all_desks and not is_assigned_officer and not is_manager_or_super %}
+        {% if my_tallies_total is not None %}
+            {% include 'dashboard/partials/dashboard_other_clerk.html' %}
+        {% endif %}
+    {% endif %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,574 @@
+/**
+ * Mobile Optimization for Expandable Rows
+ * Fixes overflow issues in detail sections across all pages
+ * CRITICAL: Ensures all content fits within mobile viewport
+ */
+
+@media (max-width: 768px) {
+
+  /* ============================================
+     PREVENT PAGE-LEVEL OVERFLOW
+     ============================================ */
+  body {
+    overflow-x: hidden !important;
+  }
+
+  .sdt-page {
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+  }
+
+  /* ============================================
+     TABLE WRAPPERS - CONSTRAIN WIDTH
+     ============================================ */
+  .sdt-table-wrap {
+    max-width: 100vw !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .sdt-records-table {
+    min-width: 600px !important;
+    max-width: none !important;
+  }
+
+  /* ============================================
+     DETAIL ROW CONTAINERS
+     ============================================ */
+  .sdt-detail-row {
+    max-width: 100vw !important;
+  }
+
+  .sdt-detail-row > td {
+    padding: 0 !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    max-width: 100vw !important;
+    display: block !important;
+  }
+
+  /* ============================================
+     SD RECORDS - CONTRACT ALLOCATIONS TABLE
+     ============================================ */
+  .sdt-detail-allocs {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    max-width: 100% !important;
+    padding: 0 12px !important;
+  }
+
+  .sdt-detail-allocs table {
+    min-width: 600px !important;
+    width: auto !important;
+    max-width: none !important;
+  }
+
+  /* ============================================
+     DETAIL INNER GRIDS - STACK VERTICALLY
+     ============================================ */
+  .sdt-detail-inner {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+    padding: 16px 12px !important;
+    max-width: 100% !important;
+  }
+
+  .sdt-di-block {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 4px !important;
+    max-width: 100% !important;
+  }
+
+  .sdt-di-label {
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    color: #7d5a3b !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+  }
+
+  .sdt-di-val {
+    font-size: 14px !important;
+    color: #3d2817 !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+
+  /* ============================================
+     BOOKING - CONTRACT TABLES - STICKY ACTIONS
+     ============================================ */
+  /* Make Actions column sticky on mobile so Edit/Delete always visible */
+  .sdt-detail-row table thead th:last-child,
+  .sdt-detail-row table tbody td:last-child {
+    position: sticky !important;
+    right: 0 !important;
+    background: #fff !important;
+    box-shadow: -2px 0 4px rgba(0, 0, 0, 0.08) !important;
+    z-index: 2 !important;
+  }
+
+  .sdt-detail-row table thead th:last-child {
+    background: #f8f2ec !important;
+  }
+
+  /* ============================================
+     BOOKING - CONTRACT TABLES
+     ============================================ */
+  /* Ensure booking detail rows don't overflow */
+  .sdt-detail-row > td {
+    padding: 0 !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    max-width: 100vw !important;
+    display: block !important;
+  }
+
+  /* Contract section headers - allow wrapping on mobile */
+  .sdt-detail-row > td > div[style*="background:#f8f2ec"] {
+    padding: 8px 12px !important;
+    display: block !important;
+    overflow-x: auto !important;
+    white-space: nowrap !important;
+  }
+
+  /* Contract allocation info - make scrollable */
+  .sdt-detail-row > td > div[style*="background:#f8f2ec"] span {
+    display: inline-block !important;
+    font-size: 10px !important;
+  }
+
+  /* Tables inside detail rows */
+  .sdt-detail-row table {
+    min-width: 800px !important;
+    width: auto !important;
+    max-width: none !important;
+    display: table !important;
+  }
+
+  .sdt-contract-table {
+    min-width: 700px !important;
+    width: auto !important;
+    max-width: none !important;
+  }
+
+  .sdt-detail-row .sdt-contract-table {
+    margin: 0 !important;
+  }
+
+  /* ============================================
+     DECLARATION - CONTRACT DETAILS
+     ============================================ */
+  .sdt-detail-row table {
+    min-width: 600px !important;
+    width: auto !important;
+    max-width: none !important;
+  }
+
+  /* ============================================
+     EVACUATION - SD LINES
+     ============================================ */
+  .sdt-evac-detail-table {
+    min-width: 500px !important;
+    width: auto !important;
+    max-width: none !important;
+  }
+
+  /* ============================================
+     TALLY PAGES - DETAIL SECTIONS
+     ============================================ */
+  .tally-detail-section {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    max-width: 100% !important;
+  }
+
+  .tally-detail-section table {
+    min-width: 500px !important;
+    width: auto !important;
+  }
+
+  /* ============================================
+     SCHEDULE - ALLOCATION DETAILS
+     ============================================ */
+  .sdt-schedule-detail-inner {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    max-width: 100% !important;
+  }
+
+  /* ============================================
+     TERMINAL SCHEDULE - SUPERVISOR TABLE
+     ============================================ */
+  .terminal-schedule-table {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    display: block !important;
+    max-width: 100% !important;
+  }
+
+  .terminal-schedule-table table {
+    min-width: 500px !important;
+    width: auto !important;
+  }
+
+  /* ============================================
+     BUTTONS IN DETAIL ROWS - STACK VERTICALLY
+     ============================================ */
+  .sdt-detail-row .sdt-btn,
+  .sdt-detail-row .sdt-row-edit-btn {
+    min-height: 44px !important;
+    padding: 10px 14px !important;
+    font-size: 13px !important;
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  /* Button containers */
+  .sdt-detail-row td > div {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    padding: 12px !important;
+  }
+
+  /* ============================================
+     SECTION TITLES
+     ============================================ */
+  .sdt-detail-section-title {
+    font-size: 13px !important;
+    padding: 12px 12px 8px !important;
+  }
+
+  /* ============================================
+     TABLE CELLS - RESPONSIVE SIZING
+     ============================================ */
+  .sdt-detail-row td {
+    white-space: nowrap !important;
+    padding: 8px 12px !important;
+    font-size: 13px !important;
+  }
+
+  .sdt-detail-row th {
+    white-space: nowrap !important;
+    padding: 8px 12px !important;
+    font-size: 11px !important;
+  }
+
+  /* ============================================
+     EXPAND/COLLAPSE ICONS - TOUCH TARGETS
+     ============================================ */
+  .sdt-expand-icon {
+    min-width: 44px !important;
+    min-height: 44px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  /* ============================================
+     MAIN ROW TOUCH TARGETS
+     ============================================ */
+  .sdt-main-row td {
+    padding: 12px 8px !important;
+    font-size: 14px !important;
+  }
+
+  .sdt-main-row {
+    min-height: 60px !important;
+  }
+
+  /* ============================================
+     ACTIONS COLUMN - ALWAYS VISIBLE
+     ============================================ */
+  .sdt-records-table th:last-child,
+  .sdt-records-table td:last-child {
+    position: sticky !important;
+    right: 0 !important;
+    background: #fff !important;
+    box-shadow: -2px 0 4px rgba(0, 0, 0, 0.05) !important;
+    z-index: 2 !important;
+  }
+
+  .sdt-records-table thead th:last-child {
+    background: #f0e8e0 !important;
+  }
+
+  /* Stack action buttons vertically */
+  .sdt-records-table td:last-child > div {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+  }
+
+  .sdt-records-table td:last-child .sdt-btn,
+  .sdt-records-table td:last-child .sdt-row-edit-btn {
+    width: 100% !important;
+    justify-content: center !important;
+    min-height: 44px !important;
+  }
+
+  /* ============================================
+     NESTED CONTENT PADDING
+     ============================================ */
+  .sdt-detail-row .sdt-si-fields {
+    padding: 12px !important;
+    max-width: 100% !important;
+  }
+
+  .sdt-detail-row .sdt-si-band {
+    margin-bottom: 12px !important;
+    max-width: 100% !important;
+  }
+
+  /* ============================================
+     SCROLL INDICATORS
+     ============================================ */
+  .sdt-detail-allocs::after,
+  .sdt-table-wrap::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 30px;
+    background: linear-gradient(to left, rgba(248, 242, 236, 0.9), transparent);
+    pointer-events: none;
+    z-index: 1;
+  }
+}
+
+/* ============================================
+   VERY SMALL SCREENS (< 480px)
+   ============================================ */
+@media (max-width: 480px) {
+
+  .sdt-detail-inner {
+    padding: 12px 8px !important;
+    gap: 10px !important;
+  }
+
+  .sdt-detail-allocs {
+    padding: 0 8px !important;
+  }
+
+  .sdt-di-label {
+    font-size: 10px !important;
+  }
+
+  .sdt-di-val {
+    font-size: 13px !important;
+  }
+
+  .sdt-detail-row td {
+    padding: 6px 8px !important;
+    font-size: 12px !important;
+  }
+
+  .sdt-detail-row th {
+    padding: 6px 8px !important;
+    font-size: 10px !important;
+  }
+
+  .sdt-main-row td {
+    padding: 10px 6px !important;
+    font-size: 13px !important;
+  }
+
+  .sdt-records-table {
+    min-width: 500px !important;
+  }
+
+  .sdt-contract-table {
+    min-width: 600px !important;
+  }
+}
+
+
+  /* ============================================
+     DECLARATION - CONTRACT DETAILS
+     ============================================ */
+  .sdt-detail-row table {
+    min-width: 700px !important;
+    width: auto !important;
+  }
+
+  /* ============================================
+     EVACUATION - SD LINES
+     ============================================ */
+  .sdt-evac-detail-table {
+    min-width: 600px !important;
+    width: auto !important;
+  }
+
+  /* ============================================
+     TALLY PAGES - DETAIL SECTIONS
+     ============================================ */
+  .tally-detail-section {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    max-width: 100% !important;
+  }
+
+  .tally-detail-section table {
+    min-width: 600px !important;
+    width: auto !important;
+  }
+
+  /* ============================================
+     SCHEDULE - ALLOCATION DETAILS
+     ============================================ */
+  .sdt-schedule-detail-inner {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    max-width: 100% !important;
+  }
+
+  /* ============================================
+     TERMINAL SCHEDULE - SUPERVISOR TABLE
+     ============================================ */
+  .terminal-schedule-table {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    display: block !important;
+  }
+
+  .terminal-schedule-table table {
+    min-width: 500px !important;
+    width: auto !important;
+  }
+
+  /* ============================================
+     SCROLL INDICATORS
+     ============================================ */
+  .sdt-detail-allocs::after,
+  .sdt-detail-row > td::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 30px;
+    background: linear-gradient(to left, rgba(248, 242, 236, 0.9), transparent);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* ============================================
+     BUTTONS IN DETAIL ROWS
+     ============================================ */
+  .sdt-detail-row .sdt-btn {
+    min-height: 44px !important;
+    padding: 10px 14px !important;
+    font-size: 13px !important;
+  }
+
+  /* ============================================
+     SECTION TITLES
+     ============================================ */
+  .sdt-detail-section-title {
+    font-size: 13px !important;
+    padding: 12px 12px 8px !important;
+  }
+
+  /* ============================================
+     TABLE CELLS - PREVENT OVERFLOW
+     ============================================ */
+  .sdt-detail-row td {
+    white-space: nowrap !important;
+    padding: 8px 12px !important;
+    font-size: 13px !important;
+  }
+
+  .sdt-detail-row th {
+    white-space: nowrap !important;
+    padding: 8px 12px !important;
+    font-size: 11px !important;
+  }
+
+  /* ============================================
+     EXPAND/COLLAPSE ICONS
+     ============================================ */
+  .sdt-expand-icon {
+    min-width: 44px !important;
+    min-height: 44px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  /* ============================================
+     MAIN ROW TOUCH TARGETS
+     ============================================ */
+  .sdt-main-row td {
+    padding: 12px 8px !important;
+    font-size: 14px !important;
+  }
+
+  .sdt-main-row {
+    min-height: 60px !important;
+  }
+
+  /* ============================================
+     PREVENT HORIZONTAL PAGE SCROLL
+     ============================================ */
+  .sdt-table-wrap {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    max-width: 100vw !important;
+  }
+
+  .sdt-records-table {
+    min-width: 600px !important;
+  }
+
+  /* ============================================
+     NESTED CONTENT PADDING
+     ============================================ */
+  .sdt-detail-row .sdt-si-fields {
+    padding: 12px !important;
+  }
+
+  .sdt-detail-row .sdt-si-band {
+    margin-bottom: 12px !important;
+  }
+}
+
+/* ============================================
+   VERY SMALL SCREENS (< 480px)
+   ============================================ */
+@media (max-width: 480px) {
+
+  .sdt-detail-inner {
+    padding: 12px 8px !important;
+    gap: 10px !important;
+  }
+
+  .sdt-detail-allocs {
+    padding: 0 8px !important;
+  }
+
+  .sdt-di-label {
+    font-size: 10px !important;
+  }
+
+  .sdt-di-val {
+    font-size: 13px !important;
+  }
+
+  .sdt-detail-row td {
+    padding: 6px 8px !important;
+    font-size: 12px !important;
+  }
+
+  .sdt-detail-row th {
+    padding: 6px 8px !important;
+    font-size: 10px !important;
+  }
+
+  .sdt-main-row td {
+    padding: 10px 6px !important;
+    font-size: 13px !important;
+  }
+}

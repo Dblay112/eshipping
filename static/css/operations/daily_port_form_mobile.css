@@ -1,0 +1,114 @@
+/* ═══════════════════════════════════════════════════════════════
+   Daily Port Form - Mobile Styles
+   ═══════════════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+    .sdt-page {
+        padding: 20px 16px 48px;
+    }
+
+    .sdt-form-page {
+        max-width: 100%;
+    }
+
+    .sdt-page-title {
+        font-size: 24px;
+    }
+
+    .sdt-page-sub {
+        font-size: 13px;
+    }
+
+    /* Back link icon */
+    .sdt-back-link svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    /* Form card title icon */
+    .sdt-form-card-title svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    /* Button icons */
+    .sdt-btn svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    /* Form actions - stack buttons */
+    .sdt-form-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .sdt-btn {
+        width: 100%;
+        justify-content: center;
+        min-height: 44px;
+        font-size: 14px;
+    }
+
+    /* Form rows - stack on mobile */
+    .sdt-form-row {
+        flex-direction: column;
+    }
+
+    .sdt-form-group {
+        width: 100%;
+        min-width: 100%;
+    }
+
+    /* File input - better mobile sizing */
+    input[type="file"] {
+        font-size: 16px;
+        padding: 10px 12px;
+    }
+
+    input[type="file"]::file-selector-button {
+        padding: 8px 14px;
+        font-size: 14px;
+    }
+
+    /* Band layout - stack on mobile */
+    .sdt-si-band {
+        flex-direction: column;
+    }
+
+    .sdt-si-band-label {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #f0e8e0;
+        padding: 10px 16px;
+    }
+
+    .sdt-si-fields {
+        padding: 14px 16px;
+    }
+
+    .sdt-si-field {
+        width: 100%;
+    }
+
+    /* Input fields - prevent zoom on iOS */
+    .sdt-si-input {
+        font-size: 16px;
+        min-height: 44px;
+    }
+}
+
+@media (max-width: 480px) {
+    .sdt-page-title {
+        font-size: 20px;
+    }
+
+    .sdt-form-card-title {
+        font-size: 13px;
+    }
+
+    .sdt-form-card-title svg {
+        width: 16px;
+        height: 16px;
+    }
+}

@@ -1,0 +1,282 @@
+{% extends "includes/base.html" %}
+{% load static %}
+
+{% block title %}Add Staff Member — CMC{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/accounts/staff_form.css' %}">
+<link rel="stylesheet" href="{% static 'css/accounts/staff_form_mobile.css' %}">
+<link rel="stylesheet" href="{% static 'css/custom-datepicker.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="sdt-page sdt-form-page">
+
+  <div class="sdt-form-header">
+    <a href="{% url 'staff_list' %}" class="sdt-back-link">
+      <svg viewBox="0 0 20 20" fill="none"><path d="M13 4l-6 6 6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back to Staff List
+    </a>
+    <h1 class="sdt-page-title">Add New Staff Member</h1>
+    <p class="sdt-page-sub">Manager Panel — Add staff and assign to desks</p>
+  </div>
+
+  {% if messages %}
+  <div class="sdt-messages">
+    {% for message in messages %}
+    <div class="sdt-alert sdt-alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <form method="post" class="sdt-form-wrap">
+    {% csrf_token %}
+
+    <!-- Staff Information -->
+    <div class="sdt-shipment-card">
+      <div class="sdt-si-header">
+        <div class="sdt-si-header-icon">
+          <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/><path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <div>
+          <div class="sdt-si-header-title">Staff Information</div>
+          <div class="sdt-si-header-sub">Basic details and identification</div>
+        </div>
+      </div>
+
+      <div class="sdt-si-band">
+        <div class="sdt-si-band-label">
+          <span>Personal Details</span>
+        </div>
+        <div class="sdt-si-fields">
+          <div class="sdt-si-field" style="flex:1; min-width:180px;">
+            <label class="sdt-si-label">First Name <span class="sdt-required">*</span></label>
+            {{ form.first_name }}
+            {% if form.first_name.errors %}<p class="sdt-form-error">{{ form.first_name.errors.0 }}</p>{% endif %}
+          </div>
+
+          <div class="sdt-si-field" style="flex:1; min-width:180px;">
+            <label class="sdt-si-label">Last Name <span class="sdt-required">*</span></label>
+            {{ form.last_name }}
+            {% if form.last_name.errors %}<p class="sdt-form-error">{{ form.last_name.errors.0 }}</p>{% endif %}
+          </div>
+
+          <div class="sdt-si-field" style="max-width:150px;">
+            <label class="sdt-si-label">Staff Number (ID) <span class="sdt-required">*</span></label>
+            {{ form.staff_number }}
+            {% if form.staff_number.errors %}<p class="sdt-form-error">{{ form.staff_number.errors.0 }}</p>{% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="sdt-si-band">
+        <div class="sdt-si-band-label">
+          <span>Contact & Work Details</span>
+        </div>
+        <div class="sdt-si-fields">
+          <div class="sdt-si-field" style="flex:1; min-width:200px;">
+            <label class="sdt-si-label">Email Address <span class="sdt-required">*</span></label>
+            {{ form.email }}
+            {% if form.email.errors %}<p class="sdt-form-error">{{ form.email.errors.0 }}</p>{% endif %}
+          </div>
+
+          <div class="sdt-si-field" style="flex:1; min-width:200px;">
+            <label class="sdt-si-label">Rank/Position <span class="sdt-required">*</span></label>
+            {{ form.rank }}
+            {% if form.rank.errors %}<p class="sdt-form-error">{{ form.rank.errors.0 }}</p>{% endif %}
+          </div>
+
+          <div class="sdt-si-field" style="max-width:200px;">
+            <label class="sdt-si-label">Date Employed</label>
+            <input type="text" name="date_employed" id="id_date_employed" class="sdt-si-input" placeholder="YYYY-MM-DD" data-datepicker data-max-date="today" readonly>
+            {% if form.date_employed.errors %}<p class="sdt-form-error">{{ form.date_employed.errors.0 }}</p>{% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="sdt-si-band">
+        <div class="sdt-si-band-label">
+          <span>Assignment & Location</span>
+        </div>
+        <div class="sdt-si-fields">
+          <div class="sdt-si-field" style="flex:1; min-width:200px; max-width:300px;">
+            <label class="sdt-si-label">Desk Assignment</label>
+            <p class="sdt-form-help" style="margin-bottom:8px;">Select primary desk or 'Other' for staff not assigned to any specific desk</p>
+            <div class="sdt-si-select-wrap">
+              {{ form.primary_desk }}
+              <svg class="sdt-si-select-arrow" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            {% if form.primary_desk.errors %}<p class="sdt-form-error">{{ form.primary_desk.errors.0 }}</p>{% endif %}
+          </div>
+        </div>
+
+        <div class="sdt-si-fields" style="margin-top:16px;">
+          <div class="sdt-si-field" style="flex:1; min-width:100%;">
+            <label class="sdt-si-label">Additional Desk Assignments</label>
+            <p class="sdt-form-help" style="margin-bottom:12px;">Select any additional desks this staff member will work on. Terminal supervisors are assigned via Terminal Schedule page.</p>
+            <div class="additional-desk-grid">
+              <label class="additional-desk-item">
+                <input type="checkbox" name="additional_desks" value="MANAGER" id="id_additional_desks_0">
+                <span class="additional-desk-label">Manager</span>
+              </label>
+              <label class="additional-desk-item">
+                <input type="checkbox" name="additional_desks" value="OPERATIONS" id="id_additional_desks_1">
+                <span class="additional-desk-label">Operations Desk</span>
+              </label>
+              <label class="additional-desk-item">
+                <input type="checkbox" name="additional_desks" value="EBOOKING" id="id_additional_desks_2">
+                <span class="additional-desk-label">E-Booking Desk</span>
+              </label>
+              <label class="additional-desk-item">
+                <input type="checkbox" name="additional_desks" value="DECLARATION" id="id_additional_desks_3">
+                <span class="additional-desk-label">Declaration Desk</span>
+              </label>
+              <label class="additional-desk-item">
+                <input type="checkbox" name="additional_desks" value="EVACUATION" id="id_additional_desks_4">
+                <span class="additional-desk-label">Evacuation Desk</span>
+              </label>
+              <label class="additional-desk-item">
+                <input type="checkbox" name="additional_desks" value="OTHER" id="id_additional_desks_5">
+                <span class="additional-desk-label">Other</span>
+              </label>
+            </div>
+            {% if form.additional_desks.errors %}<p class="sdt-form-error">{{ form.additional_desks.errors.0 }}</p>{% endif %}
+          </div>
+        </div>
+
+        <div class="sdt-si-fields" style="margin-top:16px;">
+          <div class="sdt-si-field" style="max-width:200px;">
+            <label class="sdt-si-label">Location <span class="sdt-required">*</span></label>
+            {{ form.location }}
+            {% if form.location.errors %}<p class="sdt-form-error">{{ form.location.errors.0 }}</p>{% endif %}
+          </div>
+
+          <div class="sdt-si-field" style="max-width:200px;">
+            <label class="sdt-si-label">Employment Type <span class="sdt-required">*</span></label>
+            {{ form.employment_type }}
+            {% if form.employment_type.errors %}<p class="sdt-form-error">{{ form.employment_type.errors.0 }}</p>{% endif %}
+          </div>
+        </div>
+      </div>
+
+      {% if request.user.is_superuser %}
+      <div class="sdt-si-band">
+        <div class="sdt-si-band-label">
+          <span>Permissions</span>
+        </div>
+        <div style="padding:16px 20px;">
+          <div class="form-check" style="margin-top:12px;padding:12px;background:#ffebee;border-radius:8px;border:1px solid #ef9a9a;">
+            {{ form.is_superuser }}
+            <label class="form-check-label" for="id_is_superuser" style="color:#c62828;font-size:14px;font-weight:700;">
+              ⚠️ Assign as Administrator
+            </label>
+            <p class="sdt-form-help" style="margin:4px 0 0 24px;color:#c62828;">⚠️ Administrators have full access to all system features including staff management</p>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Password Section -->
+    <div class="sdt-shipment-card">
+      <div class="sdt-si-header">
+        <div class="sdt-si-header-icon">
+          <svg viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 11V7a4 4 0 018 0v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <div>
+          <div class="sdt-si-header-title">Temporary Password</div>
+          <div class="sdt-si-header-sub">Staff will be required to change this on first login</div>
+        </div>
+      </div>
+
+      <div class="sdt-si-band sdt-si-band-last">
+        <div class="sdt-si-band-label">
+          <span>Set Password</span>
+        </div>
+        <div class="sdt-si-fields" style="align-items:flex-start;">
+          <div class="sdt-si-field" style="flex:1; min-width:200px;">
+            <label class="sdt-si-label">Temporary Password <span class="sdt-required">*</span></label>
+            {{ form.password }}
+            <div style="min-height:20px;">
+              {% if form.password.errors %}<p class="sdt-form-error">{{ form.password.errors.0 }}</p>{% endif %}
+            </div>
+          </div>
+
+          <div class="sdt-si-field" style="flex:1; min-width:200px;">
+            <label class="sdt-si-label">Confirm Password <span class="sdt-required">*</span></label>
+            {{ form.confirm_password }}
+            <div style="min-height:20px;">
+              {% if form.confirm_password.errors %}<p class="sdt-form-error">{{ form.confirm_password.errors.0 }}</p>{% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="sdt-form-actions">
+      <a href="{% url 'staff_list' %}" class="sdt-btn sdt-btn-ghost">Cancel</a>
+      <button type="submit" class="sdt-btn sdt-btn-primary">
+        <svg viewBox="0 0 16 16" fill="none" width="14" height="14">
+          <path d="M13 4L6 11 3 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Add Staff Member
+      </button>
+    </div>
+
+  </form>
+
+</div>
+
+<script>
+// Hide primary desk option from additional desks checkboxes
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('Script loaded');
+
+  const primaryDeskSelect = document.getElementById('id_primary_desk');
+  const additionalDeskItems = document.querySelectorAll('.additional-desk-item');
+
+  console.log('Primary desk select:', primaryDeskSelect);
+  console.log('Additional desk items:', additionalDeskItems.length);
+
+  if (!primaryDeskSelect) {
+    console.error('Primary desk select not found');
+    return;
+  }
+
+  function updateAdditionalDesks() {
+    const selectedPrimary = primaryDeskSelect.value;
+    console.log('Selected primary desk:', selectedPrimary);
+
+    additionalDeskItems.forEach(item => {
+      const checkbox = item.querySelector('input[type="checkbox"]');
+      if (!checkbox) return;
+
+      const deskValue = checkbox.value;
+      console.log('Checking desk:', deskValue, 'against selected:', selectedPrimary);
+
+      if (deskValue === selectedPrimary && selectedPrimary !== '') {
+        // Hide this option and uncheck it
+        console.log('Hiding:', deskValue);
+        item.style.display = 'none';
+        checkbox.checked = false;
+      } else {
+        // Show this option
+        item.style.display = 'flex';
+      }
+    });
+  }
+
+  // Run on page load
+  updateAdditionalDesks();
+
+  // Run when primary desk changes
+  primaryDeskSelect.addEventListener('change', function() {
+    console.log('Primary desk changed');
+    updateAdditionalDesks();
+  });
+});
+</script>
+
+<script src="{% static 'js/ui/custom-datepicker.js' %}"></script>
+{% endblock %}

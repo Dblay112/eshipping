@@ -1,0 +1,185 @@
+.container-list-page {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+}
+
+.page-header {
+    background: linear-gradient(135deg, #3d2817 0%, #5c3d2e 100%);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    color: #fff;
+}
+
+.page-header h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.page-header .sd-info {
+    display: flex;
+    gap: 2rem;
+    margin-top: 1rem;
+    font-size: 0.95rem;
+    opacity: 0.9;
+}
+
+.upload-section {
+    background: #fff;
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.upload-section h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #3d2817;
+    margin-bottom: 1.5rem;
+}
+
+.uploads-list {
+    background: #fff;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.uploads-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.uploads-table thead {
+    background: #f5ede5;
+}
+
+.uploads-table th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: #3d2817;
+    border-bottom: 2px solid #d4c4b0;
+}
+
+.uploads-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.uploads-table tbody tr:hover {
+    background: #fafafa;
+}
+
+.btn-primary {
+    background: #3d2817;
+    color: #fff;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-primary:hover {
+    background: #5c3d2e;
+    transform: translateY(-1px);
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+.btn-download {
+    background: #28a745;
+    color: #fff;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 0.875rem;
+    display: inline-block;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: #999;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #3d2817;
+    text-decoration: none;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+.back-link:hover {
+    color: #5c3d2e;
+}
+/* ═══════════════════════════════════════════════════════════════
+   CONTAINER LIST — container_list.css
+   Depends on: sd_tracker/sd_base.css (load that first)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Upload table ──────────────────────────────────────────────── */
+.cl-table th {
+    text-transform: uppercase;
+    font-weight: 800;
+    font-size: 0.78rem;
+    letter-spacing: 0.05em;
+    color: #3d2817;
+    background: #f4ece6;
+    white-space: nowrap;
+}
+
+.cl-table td {
+    vertical-align: middle;
+    font-size: 0.88rem;
+}
+
+/* File download button */
+.cl-download-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+
+/* ── Upload form card ──────────────────────────────────────────── */
+.cl-upload-card .form-label {
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #3d2817;
+}
+
+.cl-upload-card .form-control,
+.cl-upload-card .form-select {
+    border: 1.5px solid #ddd0c4;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+.cl-upload-card .form-control:focus,
+.cl-upload-card .form-select:focus {
+    border-color: #7d5a3b;
+    box-shadow: 0 0 0 3px rgba(125, 90, 59, 0.12);
+}

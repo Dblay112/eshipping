@@ -1,0 +1,106 @@
+{% extends "includes/base.html" %}
+{% load static %}
+
+{% block title %}{{ action }} Terminal — CMC{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/operations/terminal_schedule_form.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="sdt-page sdt-form-page">
+
+  <div class="sdt-form-header">
+    <a href="{% url 'terminal_schedule_list' %}" class="sdt-back-link">
+      <svg viewBox="0 0 20 20" fill="none"><path d="M13 4l-6 6 6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back to Terminal Schedule
+    </a>
+    <h1 class="sdt-page-title">{{ action }} Terminal</h1>
+    <p class="sdt-page-sub">Configure terminal name and assign supervisors by staff number</p>
+  </div>
+
+  {% if messages %}
+  <div class="sdt-messages">
+    {% for message in messages %}
+    <div class="sdt-alert sdt-alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="sdt-form-card">
+    <form method="post" id="terminalForm">
+      {% csrf_token %}
+
+      <!-- Terminal Name & Location -->
+      <div class="sdt-form-section">
+        <div class="sdt-form-section-title">Terminal Details</div>
+        {{ form.location }}
+        <div class="sdt-field-grid">
+          <div class="sdt-field-group sdt-field-half">
+            <label class="sdt-label">TERMINAL NAME <span class="sdt-required">*</span></label>
+            {{ form.name }}
+            {% if form.name.errors %}<div class="sdt-field-error">{{ form.name.errors.0 }}</div>{% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Supervisors -->
+      <div class="sdt-form-section">
+        <div class="sdt-form-section-title">Assigned Supervisors</div>
+
+        <!-- Hidden multi-select (Django processes this) -->
+        <div style="display:none;">{{ form.supervisors }}</div>
+        {% if form.supervisors.errors %}
+        <div class="sdt-field-error">{{ form.supervisors.errors.0 }}</div>
+        {% endif %}
+
+        <!-- Chip display of selected supervisors -->
+        <div class="sup-chips" id="supChips"></div>
+
+        <!-- Search input -->
+        <div class="sup-search-wrap">
+          <input type="text" id="supSearch" placeholder="Type staff number or name to search and add…" autocomplete="off">
+          <div class="sup-dropdown" id="supDropdown"></div>
+        </div>
+        <p class="sup-hint">Search for a staff member and click their name to add them as a supervisor. Click × on a chip to remove.</p>
+      </div>
+
+      {% if action == 'Edit' and terminal %}
+      <!-- Audit Trail (only shown when editing) -->
+      <div class="sdt-form-section" style="background: #fefaf5; border-color: #e8dcc8; padding: 16px; border-radius: 8px; margin-top: 20px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+          <svg viewBox="0 0 20 20" fill="none" width="16" height="16"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.8"/><path d="M10 6v4l2 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <span style="font-size:13px;font-weight:700;color:#6b5a47;">Record History</span>
+        </div>
+        <div style="display:grid;gap:12px;font-size:13px;">
+          {% if terminal.created_by %}
+          <div>
+            <div style="font-size:11px;font-weight:700;color:#8a6a52;text-transform:uppercase;margin-bottom:4px;">Created by</div>
+            <div style="color:#3d2817;">{{ terminal.created_by.first_name }} {{ terminal.created_by.last_name }} on {{ terminal.created_at|date:"d M Y, g:i A" }}</div>
+          </div>
+          {% endif %}
+          {% if terminal.updated_by %}
+          <div>
+            <div style="font-size:11px;font-weight:700;color:#8a6a52;text-transform:uppercase;margin-bottom:4px;">Last updated by</div>
+            <div style="color:#3d2817;">{{ terminal.updated_by.first_name }} {{ terminal.updated_by.last_name }} on {{ terminal.updated_at|date:"d M Y, g:i A" }}</div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="sdt-form-actions">
+        <button type="submit" class="sdt-btn sdt-btn-primary">
+          {{ action }} Terminal
+        </button>
+        <a href="{% url 'terminal_schedule_list' %}" class="sdt-btn sdt-btn-ghost">Cancel</a>
+      </div>
+    </form>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/features/schedule/terminal-schedule-form.js' %}"></script>
+{% endblock %}

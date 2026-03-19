@@ -1,0 +1,48 @@
+/* ═══════════════════════════════════════════════════════════════
+   STRAIGHT LOADING OPTIONS MOBILE — straight_loading/straight_loading_options.html
+   Mobile-specific styles
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Module grid and title responsive (max-width 860px) */
+@media (max-width: 860px) {
+    .loading-title {
+        font-size: 28px
+    }
+
+    .module-grid {
+        grid-template-columns: repeat(2, 1fr)
+    }
+
+    .module-tile-img {
+        height: 110px
+    }
+}
+
+/* Module grid single column (max-width 560px) */
+@media (max-width: 560px) {
+    .module-grid {
+        grid-template-columns: 1fr
+    }
+
+    .loading-card {
+        padding: 22px 16px
+    }
+
+    .loading-shell {
+        padding: 28px 14px 32px
+    }
+
+    .card-header {
+        flex-direction: column;
+        align-items: center
+    }
+
+    .back-btn {
+        position: static;
+        margin-top: 10px
+    }
+
+    .module-tile-img {
+        height: 160px
+    }
+}

@@ -1,0 +1,92 @@
+/* ═══════════════════════════════════════════════════════════════
+   Tally Confirm Delete Page Styles
+   Self-contained CSS (copied from sd_base.css)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Page shell ─────────────────────────────────────────────── */
+.sdt-page {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 32px 24px 64px;
+}
+
+.sdt-form-page {
+    max-width: 1060px;
+}
+
+/* ── Page header ─────────────────────────────────────────────── */
+.sdt-page-header {
+    margin-bottom: 32px;
+}
+
+.sdt-page-header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.sdt-page-title {
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: var(--cocoa-dark);
+    margin: 0 0 4px;
+    text-transform: uppercase;
+}
+
+.sdt-page-sub {
+    font-size: 13.5px;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────── */
+.sdt-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 18px;
+    min-height: 38px;
+    border-radius: 9px;
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 13.5px;
+    font-weight: 700;
+    letter-spacing: .8px;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all .2s;
+    white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+.sdt-btn svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+}
+
+.sdt-btn-ghost {
+    background: transparent;
+    color: var(--cocoa-brown);
+    border: 1.5px solid var(--cocoa-rim);
+}
+
+.sdt-btn-ghost:hover {
+    background: rgba(61, 40, 23, .06);
+    border-color: var(--cocoa-brown);
+    color: var(--cocoa-dark);
+}
+
+/* ── Form card (placeholder - template uses inline styles) ──── */
+.sdt-form-card {
+    background: #fff;
+    border: 1.5px solid #e8ddd0;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(61, 40, 23, .08);
+}

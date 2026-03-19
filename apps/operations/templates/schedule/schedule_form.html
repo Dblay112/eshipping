@@ -1,0 +1,194 @@
+{% extends "includes/base.html" %}
+{% load static %}
+
+{% block title %}{{ action }} Schedule — CMC{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/operations/schedule_form.css' %}">
+<link rel="stylesheet" href="{% static 'css/operations/schedule_form_mobile.css' %}">
+<link rel="stylesheet" href="{% static 'css/custom-datepicker.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="sdt-page sdt-form-page">
+
+  <div class="sdt-form-header">
+    <a href="{% url 'schedule_view' %}" class="sdt-back-link">
+      <svg viewBox="0 0 20 20" fill="none"><path d="M13 4l-6 6 6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back to Schedule
+    </a>
+    <h1 class="sdt-page-title">{{ action }} Daily Schedule</h1>
+    <p class="sdt-page-sub">Set the SDs to be loaded and assign staff</p>
+  </div>
+
+  {% if messages %}
+  <div class="sdt-messages">
+    {% for message in messages %}
+    <div class="sdt-alert sdt-alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <form method="post" class="sdt-form-wrap">
+    {% csrf_token %}
+
+    <datalist id="sch-officer-suggest">
+      {% for opt in formset.forms.0.assigned_officer.field.queryset %}
+        <option value="{{ opt.staff_number }} — {{ opt.first_name }} {{ opt.last_name }}{% if opt.rank %} ({{ opt.rank }}){% endif %}" data-user-id="{{ opt.pk }}"></option>
+      {% endfor %}
+    </datalist>
+
+    <!-- Schedule Date -->
+    <div class="sdt-shipment-card">
+      <div class="sdt-si-band sdt-si-band-last">
+        <div class="sdt-si-band-label"><span>Date</span></div>
+        <div class="sdt-si-fields">
+          <div class="sdt-si-field sdt-si-field-date">
+            <label class="sdt-si-label">Schedule Date <span class="sdt-required">*</span></label>
+            {% if action == 'Edit' %}
+              <input type="text" class="sdt-si-input" value="{{ schedule.date|date:'Y-m-d' }}" readonly style="background:#f5f5f5;cursor:not-allowed;">
+              <input type="hidden" name="date" value="{{ schedule.date|date:'Y-m-d' }}">
+              <p style="font-size:11px;color:#8a6a52;margin-top:4px;">Original schedule date (cannot be changed)</p>
+            {% else %}
+              <input type="text" name="date" id="id_date" class="sdt-si-input" placeholder="YYYY-MM-DD" value="{{ form.date.value|default:'' }}" data-datepicker readonly required>
+            {% endif %}
+            {% if form.date.errors %}<p class="sdt-form-error">{{ form.date.errors.0 }}</p>{% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Schedule Header -->
+    <div class="sdt-form-card">
+      <div class="sdt-form-card-title">
+        <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="4" width="14" height="14" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M3 8h14M7 2v4M13 2v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        Schedule Details
+      </div>
+      <div class="sdt-form-row">
+        <div class="sdt-form-group sdt-form-group-wide">
+          <label class="sdt-form-label">Notes</label>
+          {{ form.notes }}
+        </div>
+      </div>
+    </div>
+
+    <!-- SD Entries -->
+    <div class="sdt-form-card">
+      <div class="sdt-form-card-title">
+        <svg viewBox="0 0 20 20" fill="none"><path d="M4 6h12M4 10h12M4 14h7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        SD Entries
+        <span class="sdt-entries-count" id="entryCount"></span>
+      </div>
+
+      {{ formset.management_form }}
+
+      <div class="sdt-entries-form-list" id="entriesList">
+        {% for entry_form in formset %}
+        <div class="sdt-entry-form-row" data-form-idx="{{ forloop.counter0 }}">
+          <div class="sdt-entry-form-number">{{ forloop.counter }}</div>
+
+          <div class="sdt-entry-form-fields">
+            <div class="sdt-form-row">
+              <div class="sdt-form-group">
+                <label class="sdt-form-label">SD Number *</label>
+                {{ entry_form.sd_number }}
+                {% if entry_form.sd_number.errors %}<p class="sdt-form-error">{{ entry_form.sd_number.errors.0 }}</p>{% endif %}
+              </div>
+              <div class="sdt-form-group">
+                <label class="sdt-form-label">Agent *</label>
+                {{ entry_form.agent }}
+                {% if entry_form.agent.errors %}<p class="sdt-form-error">{{ entry_form.agent.errors.0 }}</p>{% endif %}
+              </div>
+              <div class="sdt-form-group sdt-form-group-sm">
+                <label class="sdt-form-label">Tonnage (MT) *</label>
+                {{ entry_form.tonnage }}
+                {% if entry_form.tonnage.errors %}<p class="sdt-form-error">{{ entry_form.tonnage.errors.0 }}</p>{% endif %}
+              </div>
+              <div class="sdt-form-group sch-officer-field">
+                <label class="sdt-form-label">Assigned Staff</label>
+
+                <div class="sch-officer-input-wrap">
+                  <input
+                    type="text"
+                    class="sch-officer-input"
+                    placeholder="Type Staff ID or Name…"
+                    autocomplete="off"
+                    list="sch-officer-suggest"
+                    data-officer-input
+                  />
+                  <div class="sch-officer-hint">Pick from suggestions to assign.</div>
+                </div>
+
+                <div class="sch-officer-select-wrap" aria-hidden="true">
+                  {{ entry_form.assigned_officer }}
+                </div>
+              </div>
+              <div class="sdt-form-group sdt-form-group-wide">
+                <label class="sdt-form-label">Notes</label>
+                {{ entry_form.notes }}
+              </div>
+            </div>
+          </div>
+
+          {% if not forloop.first %}
+          <div class="sdt-entry-form-remove">
+            <button type="button" class="sdt-entry-remove-btn" title="Remove SD Entry" aria-label="Remove SD Entry">
+              <svg viewBox="0 0 20 20" fill="none"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            </button>
+            <div class="sdt-hidden-delete">{{ entry_form.DELETE }}</div>
+          </div>
+          {% else %}
+          <div class="sdt-entry-form-remove sdt-entry-form-remove-disabled" aria-hidden="true"></div>
+          {% endif %}
+
+          {{ entry_form.id }}
+        </div>
+        {% endfor %}
+      </div>
+
+      <button type="button" class="sdt-add-entry-btn" id="addEntryBtn">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        Add Another SD
+      </button>
+    </div>
+
+    {% if action == 'Edit' and schedule %}
+    <!-- Audit Trail (only shown when editing) -->
+    <div class="sdt-form-card" style="background: #fefaf5; border-color: #e8dcc8;">
+      <div class="sdt-form-card-title" style="font-size: 13px; color: #6b5a47;">
+        <svg viewBox="0 0 20 20" fill="none" width="16" height="16"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.8"/><path d="M10 6v4l2 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        Record History
+      </div>
+      <div class="sdt-info-grid" style="font-size: 13px;">
+        {% if schedule.created_by %}
+        <div class="sdt-info-item" style="grid-column: 1 / -1;">
+          <span class="sdt-info-label">Created by</span>
+          <span class="sdt-info-value">{{ schedule.created_by.first_name }} {{ schedule.created_by.last_name }} on {{ schedule.created_at|date:"d M Y, g:i A" }}</span>
+        </div>
+        {% endif %}
+        {% if schedule.updated_at %}
+        <div class="sdt-info-item" style="grid-column: 1 / -1;">
+          <span class="sdt-info-label">Last updated</span>
+          <span class="sdt-info-value">{{ schedule.updated_at|date:"d M Y, g:i A" }}</span>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="sdt-form-actions">
+      <a href="{% url 'schedule_view' %}" class="sdt-btn sdt-btn-ghost">Cancel</a>
+      <button type="submit" class="sdt-btn sdt-btn-primary">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        {{ action }} Schedule
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/features/schedule/schedule-form.js' %}"></script>
+<script src="{% static 'js/core/auto-prefix.js' %}"></script>
+<script src="{% static 'js/ui/custom-datepicker.js' %}"></script>
+{% endblock %}

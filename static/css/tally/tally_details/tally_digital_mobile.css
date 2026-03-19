@@ -1,0 +1,29 @@
+@media print {
+    body {
+        background: white;
+        padding: 0;
+    }
+
+    .page-container {
+        filter: none;
+        max-width: 100%;
+        page-break-after: always;
+        margin-bottom: 0;
+    }
+
+    .page-container::before {
+        display: none;
+    }
+
+    .page-container:last-child {
+        page-break-after: auto;
+    }
+
+    .action-buttons {
+        display: none;
+    }
+
+    .tally-sheet::before {
+        display: none;
+    }
+}

@@ -1,0 +1,468 @@
+/* ═══════════════════════════════════════════════════════════════
+   MY TALLIES — tally_details/my_tallies.html
+   Self-contained CSS (no dependencies)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Borrowed from sd_base.css ───────────────────────────────── */
+.sdt-page {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 32px 24px 64px;
+}
+
+.sdt-page-header {
+    margin-bottom: 32px;
+}
+
+.sdt-page-header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.sdt-page-title {
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: var(--cocoa-dark);
+    margin: 0 0 4px;
+    text-transform: uppercase;
+}
+
+.sdt-page-sub {
+    font-size: 13.5px;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.sdt-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 18px;
+    min-height: 38px;
+    border-radius: 9px;
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 13.5px;
+    font-weight: 700;
+    letter-spacing: .8px;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all .2s;
+    white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+.sdt-btn svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+}
+
+.sdt-btn-primary {
+    background: linear-gradient(135deg, var(--cocoa-medium), var(--cocoa-dark));
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(61, 40, 23, .25);
+}
+
+.sdt-btn-primary:hover {
+    background: linear-gradient(135deg, var(--cocoa-brown), var(--cocoa-medium));
+    box-shadow: 0 4px 16px rgba(61, 40, 23, .35);
+    color: #fff;
+}
+
+.sdt-search-wrap {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.sdt-search-form {
+    margin-bottom: 20px;
+}
+
+.sdt-search-inner {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: 1;
+    min-width: 200px;
+}
+
+.sdt-search-icon {
+    position: absolute;
+    left: 14px;
+    width: 20px;
+    height: 20px;
+    color: #a47551;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.sdt-search-input {
+    flex: 1;
+    width: 100%;
+    min-width: 200px;
+    padding: 11px 14px 11px 44px;
+    border: 1.5px solid #ede3da;
+    border-radius: 9px;
+    font-family: "Barlow", sans-serif;
+    font-size: 14px;
+    color: var(--cocoa-dark);
+    background: #fff;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+    -webkit-appearance: none;
+}
+
+.sdt-search-input:focus {
+    border-color: var(--cocoa-brown);
+    box-shadow: 0 0 0 3px rgba(164, 117, 81, .12);
+}
+
+/* ── Borrowed from schedule.css ──────────────────────────────── */
+.sdt-schedule-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 28px;
+    align-items: start;
+}
+
+.sdt-calendar-panel {
+    position: sticky;
+    top: 90px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.sdt-calendar-card {
+    background: #fff;
+    border: 1.5px solid #ede3da;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 2px 12px rgba(61, 40, 23, .07);
+}
+
+.sdt-cal-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.sdt-cal-month-label {
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    color: var(--cocoa-dark);
+}
+
+.sdt-cal-nav-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    color: var(--cocoa-brown);
+    text-decoration: none;
+    transition: all .18s;
+}
+
+.sdt-cal-nav-btn svg {
+    width: 10px;
+    height: 16px;
+}
+
+.sdt-cal-nav-btn:hover {
+    background: rgba(61, 40, 23, .08);
+    color: var(--cocoa-dark);
+}
+
+.sdt-cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+}
+
+.sdt-cal-dow {
+    text-align: center;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: .5px;
+    color: var(--text-muted);
+    padding: 4px 0 8px;
+    text-transform: uppercase;
+}
+
+.sdt-cal-day {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 34px;
+    border-radius: 8px;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--cocoa-dark);
+    text-decoration: none;
+    transition: all .15s;
+}
+
+.sdt-cal-day:hover {
+    background: rgba(61, 40, 23, .07);
+}
+
+.sdt-cal-day.today {
+    font-weight: 700;
+    color: var(--cocoa-brown);
+}
+
+.sdt-cal-day.selected {
+    background: var(--cocoa-dark);
+    color: #fff !important;
+    font-weight: 700;
+}
+
+.sdt-cal-dot {
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--cocoa-light);
+}
+
+.sdt-cal-day.selected .sdt-cal-dot {
+    background: rgba(255, 255, 255, .6);
+}
+
+.sdt-cal-legend {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 14px;
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.sdt-cal-dot-legend {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--cocoa-light);
+}
+
+.sdt-today-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 10px;
+    background: #fff;
+    border: 1.5px solid #ede3da;
+    border-radius: 12px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--cocoa-brown);
+    text-decoration: none;
+    transition: all .2s;
+    box-shadow: 0 1px 6px rgba(61, 40, 23, .06);
+}
+
+.sdt-today-btn svg {
+    width: 15px;
+    height: 15px;
+}
+
+.sdt-today-btn:hover {
+    background: var(--cocoa-dark);
+    color: #fff;
+    border-color: var(--cocoa-dark);
+}
+
+.sdt-schedule-main {
+    min-height: 400px;
+}
+
+.sdt-schedule-badge {
+    background: rgba(61, 40, 23, .1);
+    color: var(--cocoa-medium);
+    border-radius: 100px;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.sdt-entries-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+    background: #fff;
+    border: 1.5px solid #ede3da;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 6px rgba(61, 40, 23, .06);
+}
+
+.sdt-th {
+    padding: 10px 14px;
+    text-align: left;
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    background: #faf6f2;
+    border-bottom: 1.5px solid #ede3da;
+    white-space: nowrap;
+}
+
+.sdt-entry-row {
+    border-bottom: 1px solid #f0e9e2;
+    transition: background .12s;
+}
+
+.sdt-entry-row:last-child {
+    border-bottom: none;
+}
+
+.sdt-entry-row:hover {
+    background: #fdf9f6;
+}
+
+.sdt-td {
+    padding: 11px 14px;
+    color: var(--cocoa-dark);
+    vertical-align: middle;
+}
+
+/* ── Page-specific styles ────────────────────────────────────── */
+.action-btn-view {
+  padding: 3px 6px !important;
+  font-size: 9.5px !important;
+  background: rgba(61, 40, 23, .06) !important;
+  border: 1px solid rgba(61, 40, 23, .15) !important;
+  color: #3d2817 !important;
+  font-weight: 700 !important;
+  border-radius: 4px !important;
+  transition: all 0.2s !important;
+  white-space: nowrap !important;
+}
+
+.action-btn-view:hover {
+  background: rgba(61, 40, 23, .12) !important;
+  border-color: rgba(61, 40, 23, .25) !important;
+  transform: translateY(-1px);
+}
+
+.action-btn-excel {
+  padding: 3px 6px !important;
+  font-size: 9.5px !important;
+  background: rgba(17, 24, 39, .92) !important;
+  border: 1px solid #111827 !important;
+  color: #fff !important;
+  font-weight: 700 !important;
+  border-radius: 4px !important;
+  transition: all 0.2s !important;
+  white-space: nowrap !important;
+}
+
+.action-btn-excel:hover {
+  background: #000 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,.2);
+}
+
+.action-btn-pdf {
+  padding: 3px 6px !important;
+  font-size: 9.5px !important;
+  background: rgba(220, 38, 38, .08) !important;
+  border: 1px solid rgba(220, 38, 38, .2) !important;
+  color: #991b1b !important;
+  font-weight: 700 !important;
+  border-radius: 4px !important;
+  transition: all 0.2s !important;
+  white-space: nowrap !important;
+}
+
+.action-btn-pdf:hover {
+  background: rgba(220, 38, 38, .15) !important;
+  border-color: rgba(220, 38, 38, .3) !important;
+  transform: translateY(-1px);
+}
+
+.action-btn-edit {
+  padding: 3px 6px !important;
+  font-size: 9.5px !important;
+  background: #fdf4ec !important;
+  border: 1px solid #c8a882 !important;
+  color: #7d5a3b !important;
+  font-weight: 700 !important;
+  border-radius: 4px !important;
+  transition: all 0.2s !important;
+  white-space: nowrap !important;
+}
+
+.action-btn-edit:hover {
+  background: #f8ead5 !important;
+  border-color: #b89968 !important;
+  transform: translateY(-1px);
+}
+
+.action-btn-submit {
+  padding: 3px 8px !important;
+  font-size: 9.5px !important;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+  border: 1px solid #1d4ed8 !important;
+  color: #fff !important;
+  font-weight: 800 !important;
+  border-radius: 4px !important;
+  transition: all 0.2s !important;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, .25);
+  white-space: nowrap !important;
+}
+
+.action-btn-submit:hover {
+  background: linear-gradient(135deg, #1d4ed8, #1e40af) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, .35);
+}
+
+.action-btn-delete {
+  padding: 3px 6px !important;
+  font-size: 9.5px !important;
+  background: linear-gradient(135deg, #fee, #fdd) !important;
+  border: 1.5px solid #fbb !important;
+  color: #dc2626 !important;
+  font-weight: 800 !important;
+  border-radius: 4px !important;
+  transition: all 0.2s !important;
+  white-space: nowrap !important;
+}
+
+.action-btn-delete:hover {
+  background: linear-gradient(135deg, #fdd, #fcc) !important;
+  border-color: #f99 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, .2);
+}
+
+/* Hide mobile cards on desktop */
+.sdt-mobile-cards {
+  display: none;
+}

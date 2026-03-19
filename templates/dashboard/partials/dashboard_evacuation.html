@@ -1,0 +1,109 @@
+{# EVACUATION DESK DASHBOARD #}
+<p class="dash-section-label">Evacuation Overview</p>
+<div class="dash-stats dash-stats-4" style="margin-bottom:28px;">
+    <div class="stat-card">
+        <div class="stat-icon stat-icon-brown">
+            <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="6" width="14" height="8" rx="2" stroke="currentColor" stroke-width="1.6"/><circle cx="6" cy="16" r="1.5" fill="currentColor"/><circle cx="14" cy="16" r="1.5" fill="currentColor"/></svg>
+        </div>
+        <div class="stat-info">
+            <div class="stat-value">{{ evacuation_total }}</div>
+            <div class="stat-label">Total Evacuations</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon stat-icon-blue">
+            <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.6"/><path d="M10 6v5l3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </div>
+        <div class="stat-info">
+            <div class="stat-value">{{ evacuation_today }}</div>
+            <div class="stat-label">Evacuations Today</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon stat-icon-purple">
+            <svg viewBox="0 0 20 20" fill="none"><path d="M4 7h12M4 11h12M4 15h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </div>
+        <div class="stat-info">
+            <div class="stat-value">{{ evacuation_week }}</div>
+            <div class="stat-label">Evacuations This Week</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon stat-icon-green">
+            <svg viewBox="0 0 20 20" fill="none"><rect x="4" y="4" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M4 8h12" stroke="currentColor" stroke-width="1.6"/></svg>
+        </div>
+        <div class="stat-info">
+            <div class="stat-value">{{ evacuation_month }}</div>
+            <div class="stat-label">Evacuations This Month</div>
+        </div>
+    </div>
+</div>
+
+<div class="dash-grid">
+    <div>
+        <div class="dash-panel">
+            <div class="dash-panel-header">
+                <h3 class="dash-panel-title">
+                    <svg viewBox="0 0 16 16" fill="none"><rect x="3" y="5" width="10" height="6" rx="1" stroke="currentColor" stroke-width="1.6"/><circle cx="5" cy="13" r="1" fill="currentColor"/><circle cx="11" cy="13" r="1" fill="currentColor"/></svg>
+                    Recent Evacuations
+                </h3>
+                <a class="dash-panel-link" href="{% url 'evacuation_list' %}">View All</a>
+            </div>
+            {% if recent_evacuations %}
+                {% for evacuation in recent_evacuations %}
+                <a class="dash-record" href="{% url 'evacuation_detail' evacuation.pk %}">
+                    <div class="dash-record-dot dot-neutral"></div>
+                    <div class="dash-record-main">
+                        <div class="dash-record-title">{{ evacuation.date|date:"M d, Y" }} — {{ evacuation.shift }}</div>
+                        <div class="dash-record-sub">Created by {{ evacuation.created_by.first_name }}</div>
+                    </div>
+                </a>
+                {% endfor %}
+            {% else %}
+                <div class="dash-empty">No evacuations yet.</div>
+            {% endif %}
+        </div>
+
+        <div class="dash-panel" style="margin-top:20px;">
+            <div class="dash-panel-header">
+                <h3 class="dash-panel-title">
+                    <svg viewBox="0 0 16 16" fill="none"><rect x="4" y="3" width="8" height="10" rx="1" stroke="currentColor" stroke-width="1.6"/><path d="M6 6h4M6 8h4M6 10h3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                    My Recent Tallies
+                </h3>
+                <a class="dash-panel-link" href="{% url 'my_tallies' %}">View All</a>
+            </div>
+            {% if recent_my_tallies %}
+                {% for tally in recent_my_tallies %}
+                <a class="dash-record" href="{% url 'tally_view' tally.pk %}">
+                    <div class="dash-record-dot {% if tally.status == 'DRAFT' %}dot-draft{% elif tally.status == 'PENDING_APPROVAL' %}dot-pending{% elif tally.status == 'APPROVED' %}dot-approved{% elif tally.status == 'REJECTED' %}dot-rejected{% endif %}"></div>
+                    <div class="dash-record-main">
+                        <div class="dash-record-title">{{ tally.tally_number }} — {{ tally.sd_number }}</div>
+                        <div class="dash-record-sub">{{ tally.vessel }} • {{ tally.loading_date|date:"M d, Y" }}</div>
+                    </div>
+                    <span class="dash-record-badge {% if tally.status == 'DRAFT' %}badge-draft{% elif tally.status == 'PENDING_APPROVAL' %}badge-pending{% elif tally.status == 'APPROVED' %}badge-approved{% elif tally.status == 'REJECTED' %}badge-rejected{% endif %}">
+                        {% if tally.status == 'DRAFT' %}Draft{% elif tally.status == 'PENDING_APPROVAL' %}Pending{% elif tally.status == 'APPROVED' %}Approved{% elif tally.status == 'REJECTED' %}Rejected{% endif %}
+                    </span>
+                </a>
+                {% endfor %}
+            {% else %}
+                <div class="dash-empty">No tallies yet.</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="dash-actions">
+        <div class="dash-action-group">
+            <div class="dash-action-group-title">Evacuations</div>
+            <a class="dash-action-btn action-primary" href="{% url 'evacuation_list' %}">
+                <svg viewBox="0 0 16 16" fill="none"><rect x="3" y="5" width="10" height="6" rx="1" stroke="currentColor" stroke-width="1.6"/><circle cx="5" cy="13" r="1" fill="currentColor"/><circle cx="11" cy="13" r="1" fill="currentColor"/></svg>
+                View All Evacuations
+            </a>
+            {% if is_manager_or_super or 'EVACUATION' in all_desks %}
+            <a class="dash-action-btn" href="{% url 'evacuation_create' %}">
+                <svg viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                Create New Evacuation
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>

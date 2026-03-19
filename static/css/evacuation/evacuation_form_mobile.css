@@ -1,0 +1,295 @@
+/* ═══════════════════════════════════════════════════════════════
+   Evacuation Form - Mobile Styles
+   ═══════════════════════════════════════════════════════════════ */
+
+@media (max-width: 800px) {
+   .sdt-tt-col-loaded,
+   .sdt-tt-col-balance {
+      flex: 0 0 160px;
+   }
+}
+
+@media (max-width: 700px) {
+   .sdt-si-band {
+      flex-direction: column;
+   }
+
+   .sdt-si-band-label {
+      width: 100%;
+      border-right: none;
+      border-bottom: 1px solid #f0e8e0;
+      padding: 10px 16px;
+   }
+
+   .sdt-si-fields {
+      padding: 14px 16px;
+   }
+
+   .sdt-si-field-sd,
+   .sdt-si-field-date,
+   .sdt-si-field-sm,
+   .sdt-si-field-xs {
+      flex: 1 1 140px;
+   }
+}
+
+@media (max-width: 620px) {
+   .sdt-tt-thead {
+      display: none;
+   }
+
+   .sdt-tt-data-row,
+   .sdt-tt-tfoot {
+      flex-direction: column;
+      align-items: stretch;
+   }
+
+   .sdt-tt-td {
+      border-left: none !important;
+      border-top: 1px solid #ede3da;
+   }
+
+   .sdt-tt-col-loaded,
+   .sdt-tt-col-balance {
+      flex: unset;
+   }
+
+   .sdt-tt-tfoot .sdt-tt-col-loaded,
+   .sdt-tt-tfoot .sdt-tt-col-balance {
+      border-top-color: rgba(255, 255, 255, .12);
+   }
+}
+
+@media (max-width: 600px) {
+   .sdt-form-card .form-control,
+   .sdt-form-card .form-select,
+   .sdt-si-input,
+   .sdt-si-select {
+      min-height: 44px;
+      font-size: 16px;
+      padding: 10px 14px;
+   }
+
+   /* Evacuation form: SD Lines header + fields layout */
+   #evacLinesCard .sdt-si-header {
+      flex-wrap: wrap;
+      gap: 10px;
+   }
+
+   #evacLinesCard .sdt-si-header-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+   }
+
+   #evacLinesCard .sdt-alloc-add-header-btn {
+      width: 100%;
+      justify-content: center;
+      min-height: 46px;
+      border-radius: 12px;
+      font-size: 13px;
+      letter-spacing: 1px;
+      padding: 10px 16px;
+   }
+
+   #evacLinesCard .sdt-si-fields {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      align-items: stretch;
+   }
+
+   #evacLinesCard .sdt-si-field {
+      width: 100%;
+   }
+
+   #evacLinesCard .sdt-si-file-row {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
+      font-size: 0; /* Hide text nodes on mobile too */
+   }
+
+   #evacLinesCard .sdt-si-file-btn {
+      width: 100%;
+      justify-content: center;
+      min-height: 44px;
+      font-size: 12px; /* Restore font-size */
+   }
+
+   #evacLinesCard .sdt-si-file-name {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: #faf6f2;
+      border: 1px dashed #e0d4ca;
+      white-space: normal;
+      overflow: hidden;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      line-height: 1.25;
+      font-size: 12.5px; /* Restore font-size */
+   }
+
+   #evacLinesCard .sdt-si-file-name a,
+   #evacLinesCard .sdt-si-file-name span {
+      display: block;
+      max-width: 100%;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+   }
+
+   /* Hide Django widget elements on mobile */
+   #evacLinesCard .sdt-si-file-row > a,
+   #evacLinesCard .sdt-si-file-row input[type="checkbox"],
+   #evacLinesCard .sdt-si-file-row > label:not(.sdt-si-file-btn) {
+      display: none !important;
+   }
+
+   #evacLinesCard .sdt-alloc-block {
+      overflow: hidden;
+   }
+
+   #evacLinesCard .sdt-alloc-block-preview {
+      max-width: 48vw;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+   }
+}
+
+@media (max-width: 390px) {
+   #evacLinesCard .sdt-si-header-title {
+      font-size: 15px;
+   }
+
+   #evacLinesCard .sdt-si-header-sub {
+      font-size: 12px;
+   }
+}
+
+@media (prefers-reduced-motion: reduce) {
+   #evacLinesCard .sdt-alloc-add-header-btn {
+      transition: none;
+   }
+}
+
+@media (max-width: 600px) {
+   /* Make remove buttons larger and more visible on mobile */
+   .sdt-alloc-block-remove,
+   .sdt-remove-row-btn {
+      width: 32px;
+      height: 32px;
+      border-width: 2px;
+   }
+
+   .sdt-si-select {
+      padding-right: 36px;
+   }
+
+   /* Make remove buttons larger and more visible on mobile */
+   .sdt-alloc-block-remove,
+   .sdt-remove-row-btn {
+      width: 32px;
+      height: 32px;
+      border-width: 2px;
+   }
+
+   .sdt-alloc-block-remove svg,
+   .sdt-remove-row-btn svg {
+      width: 16px;
+      height: 16px;
+      display: block;
+      color: inherit;
+   }
+
+   /* iOS/mobile: render the X with CSS (more reliable than inline SVG) */
+   .sdt-alloc-block-remove {
+      position: relative;
+   }
+
+   .sdt-alloc-block-remove svg {
+      display: none;
+   }
+
+   .sdt-alloc-block-remove::before,
+   .sdt-alloc-block-remove::after {
+      content: "";
+      position: absolute;
+      width: 14px;
+      height: 2.5px;
+      background: #e07070;
+      border-radius: 3px;
+      left: 50%;
+      top: 50%;
+      transform-origin: center;
+   }
+
+   .sdt-alloc-block-remove::before {
+      transform: translate(-50%, -50%) rotate(45deg);
+   }
+
+   .sdt-alloc-block-remove::after {
+      transform: translate(-50%, -50%) rotate(-45deg);
+   }
+
+   /* Keep SVG stroke rules for other remove buttons that still use inline SVG */
+   .sdt-remove-row-btn svg path {
+      stroke: currentColor;
+   }
+
+   .sdt-save-draft-bar {
+      flex-direction: column;
+      align-items: flex-start;
+   }
+
+   .sdt-btn-save-draft {
+      width: 100%;
+      justify-content: center;
+   }
+
+   .sdt-tt-grid {
+      grid-template-columns: 1fr 1fr;
+   }
+
+   .sdt-form-group-sm {
+      flex: 1;
+      min-width: 140px;
+   }
+}
+
+@media (max-width: 560px) {
+   .sdt-alloc-row-inner:not(.sdt-alloc-row2),
+   .sdt-alloc-row2 {
+      grid-template-columns: 1fr 1fr;
+   }
+
+   .sdt-alloc-buyer-cell,
+   .sdt-alloc-excel-cell {
+      grid-column: 1 / -1;
+   }
+}
+
+@media (max-width: 480px) {
+   .sdt-tt-grid {
+      grid-template-columns: 1fr;
+   }
+}
+
+@media (max-width: 860px) {
+   .sdt-alloc-row-inner:not(.sdt-alloc-row2) {
+      grid-template-columns: 60px 1fr 1fr 100px;
+   }
+
+   .sdt-alloc-buyer-cell {
+      grid-column: 1 / -1;
+   }
+
+   .sdt-alloc-row2 {
+      grid-template-columns: 1fr 1fr 90px 110px;
+   }
+
+   .sdt-alloc-excel-cell {
+      grid-column: 1 / -1;
+   }
+}

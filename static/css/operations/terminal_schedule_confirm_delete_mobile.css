@@ -1,0 +1,81 @@
+/* ═══════════════════════════════════════════════════════════════
+   Terminal Schedule Confirm Delete Page - Mobile Styles
+   Self-contained mobile CSS (copied from sd_base.css @media blocks)
+   ═══════════════════════════════════════════════════════════════ */
+
+@media (max-width: 600px) {
+    .sdt-page {
+        padding: 20px 16px 48px;
+    }
+
+    .sdt-page-title {
+        font-size: 24px;
+    }
+
+    .sdt-page-header-inner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .sdt-btn {
+        width: 100%;
+        justify-content: center;
+        min-height: 44px;
+    }
+}
+
+@media (max-width: 480px) {
+    .sdt-page-title {
+        font-size: 20px;
+    }
+
+    .sdt-btn {
+        font-size: 13px;
+        padding: 10px 16px;
+    }
+}
+
+/* ── Delete Page (Mobile) ────────────────────────────────────── */
+@media (max-width: 600px) {
+    .sdt-delete-page {
+        padding: 40px 16px;
+    }
+
+    .sdt-delete-card {
+        padding: 32px 20px;
+    }
+
+    .sdt-delete-icon {
+        width: 56px;
+        height: 56px;
+    }
+
+    .sdt-delete-title {
+        font-size: 20px;
+    }
+
+    .sdt-delete-message {
+        font-size: 13px;
+    }
+
+    .sdt-delete-info {
+        padding: 16px;
+    }
+
+    .sdt-delete-info-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+
+    .sdt-delete-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .sdt-delete-actions .sdt-btn {
+        width: 100%;
+        min-height: 44px;
+    }
+}

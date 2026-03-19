@@ -1,0 +1,12 @@
+/* ═══════════════════════════════════════════════════════════════
+   SCHEDULE FORM MOBILE — schedule/schedule_form.html
+   Mobile-specific styles
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Form group sizing (600px) */
+@media (max-width: 600px) {
+    .sdt-form-group-sm {
+        flex: 1;
+        min-width: 140px;
+    }
+}

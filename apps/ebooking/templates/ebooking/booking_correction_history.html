@@ -1,0 +1,220 @@
+{% extends "includes/base.html" %}
+{% load static %}
+
+{% block title %}Correction History — {{ detail.booking_number }} | CMC{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/ebooking/booking_correction_history.css' %}">
+<link rel="stylesheet" href="{% static 'css/ebooking/booking_correction_history_mobile.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="sdt-page sdt-form-page">
+
+  <div class="sdt-form-header">
+    <a href="{% url 'booking_list' %}" class="sdt-back-link">
+      <svg viewBox="0 0 20 20" fill="none"><path d="M13 4l-6 6 6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back to Bookings
+    </a>
+    <h1 class="sdt-page-title">Correction History</h1>
+    <p class="sdt-page-sub">Bill of Lading: {{ detail.booking_number }} — SD {{ booking_record.sd_number }}</p>
+  </div>
+
+  <!-- Document Info Card -->
+  <div class="sdt-shipment-card" style="margin-bottom:32px;">
+    <div class="sdt-si-header">
+      <div class="sdt-si-header-icon">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M9 2H4a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V6L9 2z" stroke="currentColor" stroke-width="2"/>
+          <path d="M9 2v4h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div>
+        <div class="sdt-si-header-title">Document Information</div>
+        <div class="sdt-si-header-sub">Bill of Lading details and correction summary</div>
+      </div>
+    </div>
+
+    <div class="sdt-si-band sdt-si-band-last">
+      <div class="sdt-si-fields">
+        <div class="sdt-si-field">
+          <label class="sdt-si-label">Booking Number</label>
+          <div style="padding:8px 0;font-weight:600;color:#3d2817;font-size:14px;">{{ detail.booking_number }}</div>
+        </div>
+        <div class="sdt-si-field">
+          <label class="sdt-si-label">Bill of Lading No.</label>
+          <div style="padding:8px 0;font-weight:600;color:#3d2817;font-size:14px;">{{ detail.bill_number|default:"—" }}</div>
+        </div>
+        <div class="sdt-si-field">
+          <label class="sdt-si-label">Contract Number</label>
+          <div style="padding:8px 0;font-weight:600;color:#3d2817;font-size:14px;">{{ detail.contract_number|default:"—" }}</div>
+        </div>
+        <div class="sdt-si-field">
+          <label class="sdt-si-label">Total Corrections</label>
+          <div style="padding:8px 0;">
+            <span style="display:inline-flex;align-items:center;gap:6px;background:#fff3e0;border:1.5px solid #ffb74d;border-radius:6px;padding:4px 12px;font-weight:700;color:#e65100;font-size:13px;">
+              <svg viewBox="0 0 16 16" fill="none" width="14" height="14">
+                <path d="M11 2l3 3L5 14H2v-3L11 2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              {{ total_corrections }} correction{{ total_corrections|pluralize }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if corrections %}
+  <!-- Correction Timeline -->
+  <div class="sdt-shipment-card">
+    <div class="sdt-si-header" style="margin-bottom:24px;">
+      <div class="sdt-si-header-icon">
+        <svg viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+          <path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div>
+        <div class="sdt-si-header-title">Correction Timeline</div>
+        <div class="sdt-si-header-sub">Complete history of all correction requests</div>
+      </div>
+    </div>
+
+    <div class="correction-timeline" style="padding-left:40px;">
+      {% for correction in corrections %}
+      <div class="correction-item">
+        <div class="correction-header">
+          <span class="correction-round">Correction #{{ correction.round_number }}</span>
+          <div class="correction-meta">
+            <strong>{{ correction.created_by.first_name }} {{ correction.created_by.last_name }}</strong>
+            <span style="color:#ccc;">•</span>
+            <span>{{ correction.created_at|date:"d M Y, g:i A" }}</span>
+          </div>
+        </div>
+        <div class="correction-text">{{ correction.correction_text }}</div>
+        {% if correction.attachments.exists %}
+        <div style="margin-top:12px;padding-top:12px;border-top:1px solid #f0e8e0;">
+          <div style="font-size:12px;color:#8b6f47;font-weight:600;margin-bottom:8px;">
+            {{ correction.attachments.count }} Attachment{{ correction.attachments.count|pluralize }}
+          </div>
+          <div class="attachment-tiles">
+            {% for attachment in correction.attachments.all %}
+            <div class="attachment-tile" onclick="openAttachmentModal('{{ attachment.file.url }}', '{{ attachment.file.name }}')">
+              {% if attachment.file.url|slice:"-4:" == ".pdf" or attachment.file.url|slice:"-4:" == ".PDF" %}
+              <div class="attachment-tile-icon">
+                <svg viewBox="0 0 24 24" fill="none" width="32" height="32">
+                  <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="currentColor" stroke-width="2"/>
+                  <path d="M14 2v6h6M10 13h4M10 17h4M10 9h1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <span>PDF</span>
+              </div>
+              {% else %}
+              <img src="{{ attachment.file.url }}" alt="Attachment" class="attachment-tile-img">
+              {% endif %}
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% elif correction.attachment %}
+        <div style="margin-top:12px;padding-top:12px;border-top:1px solid #f0e8e0;">
+          <a href="{{ correction.attachment.url }}" target="_blank" class="sdt-btn sdt-btn-ghost" style="font-size:13px;padding:8px 14px;display:inline-flex;align-items:center;gap:6px;">
+            <svg viewBox="0 0 16 16" fill="none" width="14" height="14">
+              <path d="M8.5 3.5l-1-1h-5a1 1 0 00-1 1v9a1 1 0 001 1h11a1 1 0 001-1v-7a1 1 0 00-1-1h-5z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            View Attachment
+          </a>
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if corrections.has_other_pages %}
+    <div style="display:flex;justify-content:center;align-items:center;gap:12px;padding:24px 0 8px;">
+      {% if corrections.has_previous %}
+      <a href="?page=1" class="sdt-btn sdt-btn-ghost" style="font-size:12px;padding:6px 12px;">
+        <svg viewBox="0 0 16 16" fill="none" width="12" height="12">
+          <path d="M10 2L4 8l6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        First
+      </a>
+      <a href="?page={{ corrections.previous_page_number }}" class="sdt-btn sdt-btn-ghost" style="font-size:12px;padding:6px 12px;">← Prev</a>
+      {% endif %}
+
+      <span style="font-size:13px;color:#5c3d2e;font-weight:600;">
+        Page {{ corrections.number }} of {{ corrections.paginator.num_pages }}
+      </span>
+
+      {% if corrections.has_next %}
+      <a href="?page={{ corrections.next_page_number }}" class="sdt-btn sdt-btn-ghost" style="font-size:12px;padding:6px 12px;">Next →</a>
+      <a href="?page={{ corrections.paginator.num_pages }}" class="sdt-btn sdt-btn-ghost" style="font-size:12px;padding:6px 12px;">
+        Last
+        <svg viewBox="0 0 16 16" fill="none" width="12" height="12">
+          <path d="M6 2l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+  {% else %}
+  <div class="sdt-shipment-card">
+    <div class="correction-empty">
+      <svg viewBox="0 0 64 64" fill="none" width="64" height="64">
+        <path d="M32 8v24M32 40h.01" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="32" cy="32" r="28" stroke="currentColor" stroke-width="3"/>
+      </svg>
+      <h3>No Corrections Yet</h3>
+      <p>No correction requests have been submitted for this document.</p>
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+
+<!-- Attachment Modal -->
+<div class="attachment-modal" id="attachmentModal" onclick="closeAttachmentModal(event)">
+  <div class="attachment-modal-content" onclick="event.stopPropagation()">
+    <button class="attachment-modal-close" onclick="closeAttachmentModal()">&times;</button>
+    <div id="attachmentModalBody"></div>
+  </div>
+</div>
+
+<script>
+function openAttachmentModal(url, filename) {
+  const modal = document.getElementById('attachmentModal');
+  const body = document.getElementById('attachmentModalBody');
+
+  // Check if PDF
+  if (url.toLowerCase().endsWith('.pdf')) {
+    body.innerHTML = `<iframe src="${url}"></iframe>`;
+  } else {
+    body.innerHTML = `<img src="${url}" alt="${filename}">`;
+  }
+
+  modal.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeAttachmentModal(event) {
+  if (event && event.target.closest('.attachment-modal-content') && !event.target.classList.contains('attachment-modal-close')) {
+    return;
+  }
+
+  const modal = document.getElementById('attachmentModal');
+  modal.classList.remove('active');
+  document.body.style.overflow = '';
+
+  // Clear content
+  document.getElementById('attachmentModalBody').innerHTML = '';
+}
+
+// Close on ESC key
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeAttachmentModal();
+  }
+});
+</script>
+{% endblock %}

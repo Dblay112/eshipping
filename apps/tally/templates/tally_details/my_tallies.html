@@ -1,0 +1,589 @@
+{% extends "includes/base.html" %}
+{% load static %}
+
+{% block title %}MY TALLIES{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/tally/tally_details/my_tallies.css' %}">
+<link rel="stylesheet" href="{% static 'css/tally/tally_details/my_tallies_mobile.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="sdt-page" style="padding-top:8px;">
+
+  <!-- Page Header -->
+  <div class="sdt-page-header" style="margin-bottom:12px;">
+    <div class="sdt-page-header-inner">
+      <div>
+        <h1 class="sdt-page-title" style="font-size:22px;margin-bottom:2px;">My Tallies</h1>
+        <p class="sdt-page-sub" style="font-size:12px;">View, download and manage tallies you have created</p>
+      </div>
+      <a href="{% url 'new_tally' %}" class="sdt-btn sdt-btn-primary">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        Create New Tally
+      </a>
+    </div>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="sdt-search-wrap" style="max-width:500px;margin:0 auto 8px auto;">
+    <form method="get" class="sdt-search-form">
+      <div class="sdt-search-inner">
+        <svg class="sdt-search-icon" viewBox="0 0 20 20" fill="none">
+          <circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M13 13l3.5 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        <input
+          type="search"
+          name="q"
+          value="{{ q }}"
+          class="sdt-search-input"
+          placeholder="Search by SD, MK, vessel..."
+          autocomplete="off"
+        />
+        <input type="hidden" name="period" value="{{ period }}">
+        <input type="hidden" name="sort" value="{{ sort }}">
+        <input type="hidden" name="cal_year" value="{{ cal_year }}">
+        <input type="hidden" name="cal_month" value="{{ cal_month }}">
+      </div>
+    </form>
+  </div>
+
+  {% if messages %}
+  <div class="sdt-messages" style="margin-bottom:12px;">
+    {% for msg in messages %}
+    <div class="sdt-alert sdt-alert-{{ msg.tags }}">{{ msg }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="sdt-schedule-layout" style="gap:16px;">
+
+    <!-- LEFT: Calendar Panel -->
+    <aside class="sdt-calendar-panel" style="top:60px;">
+      <div class="sdt-calendar-card">
+        <div class="sdt-cal-nav">
+          <a href="?period={{ period }}&sort={{ sort }}&cal_year={{ prev_month.year }}&cal_month={{ prev_month.month }}" class="sdt-cal-nav-btn" title="Previous month">
+            <svg viewBox="0 0 12 20" fill="none"><path d="M10 2L2 10l8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <span class="sdt-cal-month-label">{{ cal_month_name }}</span>
+          <a href="?period={{ period }}&sort={{ sort }}&cal_year={{ next_month.year }}&cal_month={{ next_month.month }}" class="sdt-cal-nav-btn" title="Next month">
+            <svg viewBox="0 0 12 20" fill="none"><path d="M2 2l8 8-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+        </div>
+
+        <div class="sdt-cal-grid">
+          <div class="sdt-cal-dow">Su</div>
+          <div class="sdt-cal-dow">Mo</div>
+          <div class="sdt-cal-dow">Tu</div>
+          <div class="sdt-cal-dow">We</div>
+          <div class="sdt-cal-dow">Th</div>
+          <div class="sdt-cal-dow">Fr</div>
+          <div class="sdt-cal-dow">Sa</div>
+
+          {% for week in cal_weeks %}
+            {% for day in week %}
+              {% if day == 0 %}
+                <div class="sdt-cal-day sdt-cal-empty"></div>
+              {% else %}
+                <a href="?date={{ cal_year }}-{{ cal_month|stringformat:'02d' }}-{{ day|stringformat:'02d' }}&period=all&sort={{ sort }}&cal_year={{ cal_year }}&cal_month={{ cal_month }}"
+                   class="sdt-cal-day{% if cal_year == selected_date.year and cal_month == selected_date.month and day == selected_date.day %} selected{% endif %}{% if cal_year == today.year and cal_month == today.month and day == today.day %} today{% endif %}">
+                  {{ day }}
+                </a>
+              {% endif %}
+            {% endfor %}
+          {% endfor %}
+        </div>
+
+        <div class="sdt-cal-legend">
+          <span class="sdt-cal-dot-legend"></span> Tallies exist
+        </div>
+      </div>
+
+      <!-- Quick jump to today -->
+      <a href="?date={{ today|date:'Y-m-d' }}&period=today&sort={{ sort }}&cal_year={{ today.year }}&cal_month={{ today.month }}" class="sdt-today-btn">
+        <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="4" width="14" height="14" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M3 8h14M7 2v4M13 2v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        Jump to Today
+      </a>
+    </aside>
+
+    <!-- RIGHT: Tallies Display -->
+    <div class="sdt-schedule-main">
+
+      <!-- Date Bar -->
+      <div class="sdt-schedule-date-bar" style="padding:8px 16px;margin-bottom:8px;">
+        <div class="sdt-schedule-date-info">
+          <span class="sdt-schedule-weekday" style="font-size:11px;">{{ selected_date|date:"l" }}</span>
+          <span class="sdt-schedule-fulldate" style="font-size:15px;">{{ selected_date|date:"j F Y" }}</span>
+        </div>
+      </div>
+
+      <!-- Summary Stats -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin-bottom:16px;">
+        <div style="background:linear-gradient(135deg,#faf7f2 0%,#f8f2ec 100%);border:1.5px solid #e8ddd0;border-radius:8px;padding:16px 20px;box-shadow:0 1px 3px rgba(125,90,59,0.08);">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:#7d5a3b;letter-spacing:0.5px;margin-bottom:6px;">Total Tallies</div>
+          <div style="font-size:32px;font-weight:800;color:#3d2817;font-family:'Barlow Condensed',sans-serif;line-height:1;">{{ total_tallies|default:"0" }}</div>
+        </div>
+        <div style="background:linear-gradient(135deg,#faf7f2 0%,#f8f2ec 100%);border:1.5px solid #e8ddd0;border-radius:8px;padding:16px 20px;box-shadow:0 1px 3px rgba(125,90,59,0.08);">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:#7d5a3b;letter-spacing:0.5px;margin-bottom:6px;">This Week</div>
+          <div style="font-size:32px;font-weight:800;color:#3d2817;font-family:'Barlow Condensed',sans-serif;line-height:1;">{{ this_week_count|default:"0" }}</div>
+        </div>
+        <div style="background:linear-gradient(135deg,#faf7f2 0%,#f8f2ec 100%);border:1.5px solid #e8ddd0;border-radius:8px;padding:16px 20px;box-shadow:0 1px 3px rgba(125,90,59,0.08);">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:#7d5a3b;letter-spacing:0.5px;margin-bottom:6px;">Today</div>
+          <div style="font-size:32px;font-weight:800;color:#3d2817;font-family:'Barlow Condensed',sans-serif;line-height:1;">{{ today_count|default:"0" }}</div>
+        </div>
+      </div>
+
+      <!-- Filter Chips & Sort -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px;">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <a href="?q={{ q|urlencode }}&period=all&sort={{ sort|urlencode }}&cal_year={{ cal_year }}&cal_month={{ cal_month }}"
+             style="display:inline-flex;align-items:center;padding:8px 16px;background:{% if period == 'all' %}#7d5a3b{% else %}#fff{% endif %};color:{% if period == 'all' %}#fff{% else %}#7d5a3b{% endif %};border:1.5px solid {% if period == 'all' %}#7d5a3b{% else %}#e8ddd0{% endif %};border-radius:6px;font-size:12px;font-weight:700;text-decoration:none;transition:all 0.2s;letter-spacing:0.3px;">ALL</a>
+          <a href="?q={{ q|urlencode }}&period=today&sort={{ sort|urlencode }}&cal_year={{ cal_year }}&cal_month={{ cal_month }}"
+             style="display:inline-flex;align-items:center;padding:8px 16px;background:{% if period == 'today' %}#7d5a3b{% else %}#fff{% endif %};color:{% if period == 'today' %}#fff{% else %}#7d5a3b{% endif %};border:1.5px solid {% if period == 'today' %}#7d5a3b{% else %}#e8ddd0{% endif %};border-radius:6px;font-size:12px;font-weight:700;text-decoration:none;transition:all 0.2s;letter-spacing:0.3px;">TODAY</a>
+          <a href="?q={{ q|urlencode }}&period=week&sort={{ sort|urlencode }}&cal_year={{ cal_year }}&cal_month={{ cal_month }}"
+             style="display:inline-flex;align-items:center;padding:8px 16px;background:{% if period == 'week' %}#7d5a3b{% else %}#fff{% endif %};color:{% if period == 'week' %}#fff{% else %}#7d5a3b{% endif %};border:1.5px solid {% if period == 'week' %}#7d5a3b{% else %}#e8ddd0{% endif %};border-radius:6px;font-size:12px;font-weight:700;text-decoration:none;transition:all 0.2s;letter-spacing:0.3px;">THIS WEEK</a>
+          <a href="?q={{ q|urlencode }}&period=month&sort={{ sort|urlencode }}&cal_year={{ cal_year }}&cal_month={{ cal_month }}"
+             style="display:inline-flex;align-items:center;padding:8px 16px;background:{% if period == 'month' %}#7d5a3b{% else %}#fff{% endif %};color:{% if period == 'month' %}#fff{% else %}#7d5a3b{% endif %};border:1.5px solid {% if period == 'month' %}#7d5a3b{% else %}#e8ddd0{% endif %};border-radius:6px;font-size:12px;font-weight:700;text-decoration:none;transition:all 0.2s;letter-spacing:0.3px;">THIS MONTH</a>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:8px;">
+          <label style="font-size:11px;font-weight:700;text-transform:uppercase;color:#7d5a3b;letter-spacing:0.5px;" for="sortSelect">SORT:</label>
+          <select class="sdt-si-select" id="sortSelect" style="height:36px;padding:0 32px 0 12px;font-size:12px;min-width:140px;border:1.5px solid #e8ddd0;border-radius:6px;background:#fff;color:#3d2817;font-weight:600;">
+            <option value="newest" {% if sort == "newest" %}selected{% endif %}>NEWEST FIRST</option>
+            <option value="oldest" {% if sort == "oldest" %}selected{% endif %}>OLDEST FIRST</option>
+            <option value="sd" {% if sort == "sd" %}selected{% endif %}>SD/MK</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Results Count -->
+      <div style="margin-bottom:12px;">
+        <span style="display:inline-flex;align-items:center;padding:6px 14px;background:#f8f2ec;color:#7d5a3b;border:1.5px solid #e8ddd0;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:0.3px;">SHOWING {{ showing|default:"0" }} OF {{ page_obj.paginator.count|default:"0" }}</span>
+      </div>
+
+      <table class="sdt-entries-table">
+        <thead>
+          <tr>
+            <th class="sdt-th" style="width:35px;">NO.</th>
+            <th class="sdt-th" style="width:95px;">TALLY NO.</th>
+            <th class="sdt-th" style="width:85px;">TYPE</th>
+            <th class="sdt-th" style="width:70px;">SD</th>
+            <th class="sdt-th" style="width:80px;">MK</th>
+            <th class="sdt-th" style="width:120px;">VESSEL</th>
+            <th class="sdt-th" style="width:95px;">DESTINATION</th>
+            <th class="sdt-th" style="width:80px;">DATE</th>
+            <th class="sdt-th" style="width:75px;">STATUS</th>
+            <th class="sdt-th" style="width:100px;">CREATED BY</th>
+            <th class="sdt-th" style="width:110px;">UPDATED</th>
+            <th class="sdt-th" style="width:auto;min-width:180px;">ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for sd_number, sd_tallies in tallies_by_sd.items %}
+            <!-- SD Group Header Row (Clickable) -->
+            <tr class="sd-group-header" data-sd-group="{{ sd_number }}" style="background:#f8f2ec;border-top:2px solid #e8ddd0;border-bottom:1px solid #e8ddd0;cursor:pointer;user-select:none;">
+              <td colspan="12" style="padding:12px 14px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;">
+                  <div style="display:flex;align-items:center;gap:12px;">
+                    <svg class="sd-arrow" viewBox="0 0 20 20" fill="none" style="width:16px;height:16px;color:#7d5a3b;transition:transform 0.3s;flex-shrink:0;">
+                      <path d="M8 6l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:800;color:#3d2817;letter-spacing:0.5px;">{{ sd_number }}</span>
+                  </div>
+                  <span style="font-size:12px;font-weight:600;color:#7d5a3b;padding-right:8px;">{{ sd_tallies|length }} {% if sd_tallies|length == 1 %}TALLY{% else %}TALLIES{% endif %}</span>
+                </div>
+              </td>
+            </tr>
+            <!-- Tallies for this SD (Hidden by default) -->
+            {% for t in sd_tallies %}
+          <tr class="sdt-entry-row sd-tally-row" data-sd-group="{{ sd_number }}" style="display:none;">
+            <td class="sdt-td" data-label="NO." style="text-align:center;font-weight:700;white-space:nowrap;">
+              {{ forloop.counter }}
+            </td>
+            <td class="sdt-td" data-label="TALLY NO." style="white-space:nowrap;">
+              <a href="{% url 'tally_view' t.id %}" style="color:#7d5a3b;font-weight:600;text-decoration:none;">
+                {{ t.tally_number }}
+              </a>
+            </td>
+            <td class="sdt-td" data-label="TYPE" style="white-space:nowrap;font-size:10px;">
+              {% if t.tally_type == "BULK" %}
+                BULK
+              {% elif t.tally_type == "STRAIGHT_40FT" %}
+                STRAIGHT 40
+              {% elif t.tally_type == "JAPAN_STRAIGHT_40FT" %}
+                JAPAN
+              {% elif t.tally_type == "STRAIGHT_20FT" %}
+                STRAIGHT 20
+              {% else %}
+                {{ t.tally_type }}
+              {% endif %}
+            </td>
+            <td class="sdt-td" data-label="SD" style="white-space:nowrap;">{{ t.sd_number }}</td>
+            <td class="sdt-td" data-label="MK" style="white-space:nowrap;">{{ t.mk_number }}</td>
+            <td class="sdt-td" data-label="VESSEL" style="white-space:nowrap;max-width:120px;overflow:hidden;text-overflow:ellipsis;" title="{{ t.vessel }}">{{ t.vessel }}</td>
+            <td class="sdt-td" data-label="DESTINATION" style="white-space:nowrap;max-width:95px;overflow:hidden;text-overflow:ellipsis;" title="{{ t.destination }}">{{ t.destination }}</td>
+            <td class="sdt-td" data-label="DATE" style="white-space:nowrap;font-size:10px;">{{ t.loading_date|date:"d/m/y" }}</td>
+            <td class="sdt-td" data-label="STATUS" style="white-space:nowrap;">
+              <div style="display:flex;align-items:center;gap:4px;">
+                {% if t.status == 'APPROVED' %}
+                <span style="color:#0f5132;font-size:14px;font-weight:bold;">✓</span>
+                <span class="sdt-schedule-badge" style="background:rgba(34,197,94,.12);color:#15803d;font-size:9px;padding:2px 6px;">OK</span>
+                {% elif t.status == 'REJECTED' %}
+                <span style="color:#842029;font-size:14px;font-weight:bold;">✗</span>
+                <span class="sdt-schedule-badge" style="background:rgba(239,68,68,.12);color:#991b1b;font-size:9px;padding:2px 6px;">REJ</span>
+                {% elif t.status == 'PENDING_APPROVAL' %}
+                <span style="color:#856404;font-size:12px;">⏱</span>
+                <span class="sdt-schedule-badge" style="background:rgba(234,179,8,.12);color:#a16207;font-size:9px;padding:2px 6px;">PEND</span>
+                {% elif t.status == 'DRAFT' %}
+                <span class="sdt-schedule-badge" style="background:rgba(107,114,128,.12);color:#4b5563;font-size:9px;padding:2px 6px;">DRAFT</span>
+                {% endif %}
+              </div>
+            </td>
+            <td class="sdt-td" data-label="CREATED BY" style="white-space:nowrap;">
+              <div style="font-size:10px;color:#3d2817;">
+                {% if t.created_by %}
+                  {{ t.created_by.first_name }} {{ t.created_by.last_name }}
+                {% else %}
+                  —
+                {% endif %}
+              </div>
+            </td>
+            <td class="sdt-td" data-label="UPDATED" style="white-space:nowrap;">
+              <div style="font-size:10px;color:#7d5a3b;">
+                {{ t.updated_at|date:"d/m/y g:iA" }}
+              </div>
+            </td>
+            <td class="sdt-td" data-label="ACTIONS" style="white-space:nowrap;">
+              {% if t.status == 'APPROVED' %}
+              <div style="display:flex;gap:3px;flex-wrap:nowrap;align-items:center;">
+                <span style="color:#0f5132;font-size:14px;font-weight:bold;">✓</span>
+                <a href="{% url 'tally_view' t.id %}" title="View Details" style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:#f8f9fa;border:1px solid #dee2e6;border-radius:4px;color:#495057;text-decoration:none;transition:all 0.15s;">
+                  <svg viewBox="0 0 16 16" fill="none" width="16" height="16"><path d="M8 3C4.5 3 1.7 5.6 1 8c.7 2.4 3.5 5 7 5s6.3-2.6 7-5c-.7-2.4-3.5-5-7-5z" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.5"/></svg>
+                </a>
+                <a href="{% url 'export_tally_excel' t.id %}" title="Export Excel" style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:#1e3a5f;border:1px solid #1e3a5f;border-radius:4px;color:#fff;text-decoration:none;transition:all 0.15s;">
+                  <svg viewBox="0 0 16 16" fill="none" width="16" height="16"><rect x="3" y="2" width="10" height="12" rx="1" stroke="currentColor" stroke-width="1.5"/><path d="M6 6h4M6 9h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                </a>
+                {% if t.recall_request_count > 0 %}
+                <button type="button" data-bs-toggle="modal" data-bs-target="#recallHistoryModal{{ t.id }}" title="Recall History ({{ t.recall_request_count }})" style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:#fef3c7;border:1px solid #f59e0b;border-radius:4px;color:#92400e;cursor:pointer;transition:all 0.15s;position:relative;">
+                  <svg viewBox="0 0 16 16" fill="none" width="16" height="16"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M8 4v4l3 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                  <span style="position:absolute;top:-6px;right:-6px;background:#ef4444;color:#fff;border-radius:10px;font-size:9px;font-weight:700;min-width:16px;height:16px;display:flex;align-items:center;justify-content:center;padding:0 4px;">{{ t.recall_request_count }}</span>
+                </button>
+                {% endif %}
+              </div>
+              {% elif t.status == 'PENDING_APPROVAL' %}
+              <div style="display:flex;gap:3px;flex-wrap:nowrap;">
+                <a href="{% url 'tally_view' t.id %}" title="View Details" style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:#f8f9fa;border:1px solid #dee2e6;border-radius:4px;color:#495057;text-decoration:none;transition:all 0.15s;">
+                  <svg viewBox="0 0 16 16" fill="none" width="16" height="16"><path d="M8 3C4.5 3 1.7 5.6 1 8c.7 2.4 3.5 5 7 5s6.3-2.6 7-5c-.7-2.4-3.5-5-7-5z" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.5"/></svg>
+                </a>
+                <a href="{% url 'export_tally_excel' t.id %}" title="Export Excel" style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:#1e3a5f;border:1px solid #1e3a5f;border-radius:4px;color:#fff;text-decoration:none;transition:all 0.15s;">
+                  <svg viewBox="0 0 16 16" fill="none" width="16" height="16"><rect x="3" y="2" width="10" height="12" rx="1" stroke="currentColor" stroke-width="1.5"/><path d="M6 6h4M6 9h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                </a>
+                <a href="{% url 'tally_pdf' t.id %}" title="Export PDF" style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:#f8f9fa;border:1px solid #dee2e6;border-radius:4px;color:#495057;text-decoration:none;transition:all 0.15s;">
+                  <svg viewBox="0 0 16 16" fill="none" width="16" height="16"><path d="M4 2h8l2 2v9a1 1 0 01-1 1H4a1 1 0 01-1-1V3a1 1 0 011-1z" stroke="currentColor" stroke-width="1.5"/><path d="M9 2v3h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                </a>
+                {% if t.recall_request_count > 0 %}
+                <button type="button" data-bs-toggle="modal" data-bs-target="#recallHistoryModal{{ t.id }}" title="Recall History ({{ t.recall_request_count }})" style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:#fef3c7;border:1px solid #f59e0b;border-radius:4px;color:#92400e;cursor:pointer;transition:all 0.15s;position:relative;">
+                  <svg viewBox="0 0 16 16" fill="none" width="16" height="16"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M8 4v4l3 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                  <span style="position:absolute;top:-6px;right:-6px;background:#ef4444;color:#fff;border-radius:10px;font-size:9px;font-weight:700;min-width:16px;height:16px;display:flex;align-items:center;justify-content:center;padding:0 4px;">{{ t.recall_request_count }}</span>
+                </button>
+                {% endif %}
+              </div>
+              {% else %}
+              <div style="display:flex;gap:3px;flex-wrap:nowrap;">
+                <a href="{% url 'tally_view' t.id %}" title="View Details" style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:#f8f9fa;border:1px solid #dee2e6;border-radius:4px;color:#495057;text-decoration:none;transition:all 0.15s;">
+                  <svg viewBox="0 0 16 16" fill="none" width="16" height="16"><path d="M8 3C4.5 3 1.7 5.6 1 8c.7 2.4 3.5 5 7 5s6.3-2.6 7-5c-.7-2.4-3.5-5-7-5z" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.5"/></svg>
+                </a>
+                <a href="{% url 'export_tally_excel' t.id %}" title="Export Excel" style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:#1e3a5f;border:1px solid #1e3a5f;border-radius:4px;color:#fff;text-decoration:none;transition:all 0.15s;">
+                  <svg viewBox="0 0 16 16" fill="none" width="16" height="16"><rect x="3" y="2" width="10" height="12" rx="1" stroke="currentColor" stroke-width="1.5"/><path d="M6 6h4M6 9h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                </a>
+                <a href="{% url 'tally_pdf' t.id %}" title="Export PDF" style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:#f8f9fa;border:1px solid #dee2e6;border-radius:4px;color:#495057;text-decoration:none;transition:all 0.15s;">
+                  <svg viewBox="0 0 16 16" fill="none" width="16" height="16"><path d="M4 2h8l2 2v9a1 1 0 01-1 1H4a1 1 0 01-1-1V3a1 1 0 011-1z" stroke="currentColor" stroke-width="1.5"/><path d="M9 2v3h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                </a>
+                {% if t.recall_request_count > 0 %}
+                <button type="button" data-bs-toggle="modal" data-bs-target="#recallHistoryModal{{ t.id }}" title="Recall History ({{ t.recall_request_count }})" style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:#fef3c7;border:1px solid #f59e0b;border-radius:4px;color:#92400e;cursor:pointer;transition:all 0.15s;position:relative;">
+                  <svg viewBox="0 0 16 16" fill="none" width="16" height="16"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M8 4v4l3 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                  <span style="position:absolute;top:-6px;right:-6px;background:#ef4444;color:#fff;border-radius:10px;font-size:9px;font-weight:700;min-width:16px;height:16px;display:flex;align-items:center;justify-content:center;padding:0 4px;">{{ t.recall_request_count }}</span>
+                </button>
+                {% endif %}
+                {% if t.status == 'REJECTED' %}
+                <a href="{% url 'tally_edit' t.id %}" title="Edit Tally" style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:#f8f9fa;border:1px solid #dee2e6;border-radius:4px;color:#495057;text-decoration:none;transition:all 0.15s;">
+                  <svg viewBox="0 0 16 16" fill="none" width="16" height="16"><path d="M11 2l3 3-8 8H3v-3l8-8z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </a>
+                <form method="post" action="{% url 'submit_tally' t.id %}" style="display:inline;margin:0;">
+                  {% csrf_token %}
+                  <button type="submit" title="Resubmit for Approval" style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:#16a34a;border:1px solid #15803d;border-radius:4px;color:#fff;cursor:pointer;transition:all 0.15s;">
+                    <svg viewBox="0 0 16 16" fill="none" width="16" height="16"><path d="M2 8h10M8 2l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                </form>
+                <a href="{% url 'tally_delete' t.id %}" title="Delete Tally" style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:#f8f9fa;border:1px solid #dee2e6;border-radius:4px;color:#dc3545;text-decoration:none;transition:all 0.15s;">
+                  <svg viewBox="0 0 16 16" fill="none" width="16" height="16"><path d="M3 4h10M5 4V3h6v1M6 7v4M10 7v4M4 4l1 9h6l1-9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                </a>
+                {% elif t.status == 'DRAFT' %}
+                <a href="{% url 'tally_edit' t.id %}" title="Edit Tally" style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:#f8f9fa;border:1px solid #dee2e6;border-radius:4px;color:#495057;text-decoration:none;transition:all 0.15s;">
+                  <svg viewBox="0 0 16 16" fill="none" width="16" height="16"><path d="M11 2l3 3-8 8H3v-3l8-8z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </a>
+                <form method="post" action="{% url 'submit_tally' t.id %}" style="display:inline;margin:0;">
+                  {% csrf_token %}
+                  <button type="submit" title="Submit for Approval" style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:#0d6efd;border:1px solid #0d6efd;border-radius:4px;color:#fff;cursor:pointer;transition:all 0.15s;">
+                    <svg viewBox="0 0 16 16" fill="none" width="16" height="16"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                  </button>
+                </form>
+                <a href="{% url 'tally_delete' t.id %}" title="Delete Tally" style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:#f8f9fa;border:1px solid #dee2e6;border-radius:4px;color:#dc3545;text-decoration:none;transition:all 0.15s;">
+                  <svg viewBox="0 0 16 16" fill="none" width="16" height="16"><path d="M3 4h10M5 4V3h6v1M6 7v4M10 7v4M4 4l1 9h6l1-9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                </a>
+                {% endif %}
+              </div>
+              {% endif %}
+            </td>
+          </tr>
+          {% if t.status == 'REJECTED' and t.rejection_reason and t.rejection_reason|slice:":10" != "[RECALLED]" %}
+          <tr class="sdt-entry-row">
+            <td colspan="12" style="padding:12px 20px;background:#fef2f2;border-top:none;">
+              <div style="display:flex;align-items:start;gap:10px;">
+                <svg viewBox="0 0 20 20" fill="none" style="width:18px;height:18px;color:#dc2626;flex-shrink:0;margin-top:2px;">
+                  <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M10 6v4M10 14h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <div style="flex:1;">
+                  <div style="font-size:11px;font-weight:700;color:#991b1b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">
+                    REJECTION REASON
+                  </div>
+                  <div style="font-size:12px;color:#7f1d1d;line-height:1.5;">
+                    {{ t.rejection_reason }}
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+          {% endif %}
+          {% empty %}
+          <tr>
+            <td colspan="12" class="sdt-td" style="text-align:center;padding:60px 20px;color:#a47551;">
+              YOU HAVE NOT CREATED ANY TALLIES YET.
+            </td>
+          </tr>
+          {% endfor %}
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <!-- Mobile Card Layout -->
+      <div class="sdt-mobile-cards">
+        {% for sd_number, sd_tallies in tallies_by_sd_mobile.items %}
+        <div class="sdt-mobile-card">
+          <div class="sdt-mobile-card-header">
+            <div>
+              <div class="sdt-mobile-card-sd">{{ sd_number }}</div>
+              <div class="sdt-mobile-card-tally">{{ sd_tallies|length }} {% if sd_tallies|length == 1 %}TALLY{% else %}TALLIES{% endif %}</div>
+            </div>
+            <svg viewBox="0 0 20 20" fill="none" style="width:20px;height:20px;color:#7d5a3b;transition:transform 0.3s;">
+              <path d="M8 6l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+
+          <div class="sdt-mobile-card-details">
+            {% for t in sd_tallies %}
+            <div style="padding:12px 0;{% if not forloop.last %}border-bottom:1px solid #f0e8e0;{% endif %}">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                <div style="font-weight:700;color:#3d2817;font-size:13px;">{{ t.tally_number }}</div>
+                {% if t.status == 'APPROVED' %}
+                <span class="sdt-schedule-badge" style="background:rgba(34,197,94,.12);color:#15803d;font-size:9px;padding:3px 6px;">✓ APPROVED</span>
+                {% elif t.status == 'REJECTED' %}
+                <span class="sdt-schedule-badge" style="background:rgba(239,68,68,.12);color:#991b1b;font-size:9px;padding:3px 6px;">✗ REJECTED</span>
+                {% elif t.status == 'PENDING_APPROVAL' %}
+                <span class="sdt-schedule-badge" style="background:rgba(234,179,8,.12);color:#a16207;font-size:9px;padding:3px 6px;">⏱ PENDING</span>
+                {% elif t.status == 'DRAFT' %}
+                <span class="sdt-schedule-badge" style="background:rgba(107,114,128,.12);color:#4b5563;font-size:9px;padding:3px 6px;">DRAFT</span>
+                {% endif %}
+              </div>
+
+              <div class="sdt-mobile-card-row">
+                <div class="sdt-mobile-card-label">Type</div>
+                <div class="sdt-mobile-card-value">
+                  {% if t.tally_type == "BULK" %}BULK
+                  {% elif t.tally_type == "STRAIGHT_40FT" %}STRAIGHT 40
+                  {% elif t.tally_type == "JAPAN_STRAIGHT_40FT" %}JAPAN
+                  {% elif t.tally_type == "STRAIGHT_20FT" %}STRAIGHT 20
+                  {% else %}{{ t.tally_type }}{% endif %}
+                </div>
+              </div>
+
+              <div class="sdt-mobile-card-row">
+                <div class="sdt-mobile-card-label">MK Number</div>
+                <div class="sdt-mobile-card-value">{{ t.mk_number }}</div>
+              </div>
+
+              <div class="sdt-mobile-card-row">
+                <div class="sdt-mobile-card-label">Vessel</div>
+                <div class="sdt-mobile-card-value">{{ t.vessel }}</div>
+              </div>
+
+              <div class="sdt-mobile-card-row">
+                <div class="sdt-mobile-card-label">Date</div>
+                <div class="sdt-mobile-card-value">{{ t.loading_date|date:"Y-m-d" }}</div>
+              </div>
+
+              {% if t.status == 'REJECTED' and t.rejection_reason and t.rejection_reason|slice:":10" != "[RECALLED]" %}
+              <div style="margin-top:8px;padding:8px;background:#fef2f2;border:1px solid #fecaca;border-radius:4px;">
+                <div style="font-size:10px;font-weight:700;color:#991b1b;text-transform:uppercase;margin-bottom:4px;">REJECTION REASON</div>
+                <div style="font-size:11px;color:#7f1d1d;">{{ t.rejection_reason }}</div>
+              </div>
+              {% endif %}
+
+              <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;">
+                {% if t.status == 'APPROVED' %}
+                  <a href="{% url 'tally_view' t.id %}" style="flex:1;min-width:80px;display:inline-flex;align-items:center;justify-content:center;padding:8px 12px;background:#f8f9fa;border:1px solid #dee2e6;border-radius:4px;font-size:11px;font-weight:600;color:#495057;text-decoration:none;">VIEW</a>
+                  <a href="{% url 'export_tally_excel' t.id %}" style="flex:1;min-width:80px;display:inline-flex;align-items:center;justify-content:center;padding:8px 12px;background:#1e3a5f;border:1px solid #1e3a5f;border-radius:4px;font-size:11px;font-weight:600;color:#fff;text-decoration:none;">EXCEL</a>
+                  {% if t.recall_request_count > 0 %}
+                  <button type="button" data-bs-toggle="modal" data-bs-target="#recallHistoryModal{{ t.id }}" style="flex:1;min-width:80px;display:inline-flex;align-items:center;justify-content:center;padding:8px 12px;background:#fef3c7;border:1px solid #f59e0b;border-radius:4px;font-size:11px;font-weight:600;color:#92400e;cursor:pointer;">RECALL ({{ t.recall_request_count }})</button>
+                  {% endif %}
+                {% elif t.status == 'PENDING_APPROVAL' %}
+                  <a href="{% url 'tally_view' t.id %}" style="flex:1;min-width:80px;display:inline-flex;align-items:center;justify-content:center;padding:8px 12px;background:#f8f9fa;border:1px solid #dee2e6;border-radius:4px;font-size:11px;font-weight:600;color:#495057;text-decoration:none;">VIEW</a>
+                  <a href="{% url 'export_tally_excel' t.id %}" style="flex:1;min-width:80px;display:inline-flex;align-items:center;justify-content:center;padding:8px 12px;background:#1e3a5f;border:1px solid #1e3a5f;border-radius:4px;font-size:11px;font-weight:600;color:#fff;text-decoration:none;">EXCEL</a>
+                  <a href="{% url 'tally_pdf' t.id %}" style="flex:1;min-width:80px;display:inline-flex;align-items:center;justify-content:center;padding:8px 12px;background:#f8f9fa;border:1px solid #dee2e6;border-radius:4px;font-size:11px;font-weight:600;color:#495057;text-decoration:none;">PDF</a>
+                  {% if t.recall_request_count > 0 %}
+                  <button type="button" data-bs-toggle="modal" data-bs-target="#recallHistoryModal{{ t.id }}" style="flex:1;min-width:80px;display:inline-flex;align-items:center;justify-content:center;padding:8px 12px;background:#fef3c7;border:1px solid #f59e0b;border-radius:4px;font-size:11px;font-weight:600;color:#92400e;cursor:pointer;">RECALL ({{ t.recall_request_count }})</button>
+                  {% endif %}
+                {% elif t.status == 'REJECTED' %}
+                  <a href="{% url 'tally_view' t.id %}" style="flex:1;min-width:80px;display:inline-flex;align-items:center;justify-content:center;padding:8px 12px;background:#f8f9fa;border:1px solid #dee2e6;border-radius:4px;font-size:11px;font-weight:600;color:#495057;text-decoration:none;">VIEW</a>
+                  <a href="{% url 'export_tally_excel' t.id %}" style="flex:1;min-width:80px;display:inline-flex;align-items:center;justify-content:center;padding:8px 12px;background:#1e3a5f;border:1px solid #1e3a5f;border-radius:4px;font-size:11px;font-weight:600;color:#fff;text-decoration:none;">EXCEL</a>
+                  <a href="{% url 'tally_pdf' t.id %}" style="flex:1;min-width:80px;display:inline-flex;align-items:center;justify-content:center;padding:8px 12px;background:#f8f9fa;border:1px solid #dee2e6;border-radius:4px;font-size:11px;font-weight:600;color:#495057;text-decoration:none;">PDF</a>
+                  {% if t.recall_request_count > 0 %}
+                  <button type="button" data-bs-toggle="modal" data-bs-target="#recallHistoryModal{{ t.id }}" style="flex:1;min-width:80px;display:inline-flex;align-items:center;justify-content:center;padding:8px 12px;background:#fef3c7;border:1px solid #f59e0b;border-radius:4px;font-size:11px;font-weight:600;color:#92400e;cursor:pointer;">RECALL ({{ t.recall_request_count }})</button>
+                  {% endif %}
+                  <a href="{% url 'tally_edit' t.id %}" style="flex:1;min-width:80px;display:inline-flex;align-items:center;justify-content:center;padding:8px 12px;background:#f8f9fa;border:1px solid #dee2e6;border-radius:4px;font-size:11px;font-weight:600;color:#495057;text-decoration:none;">EDIT</a>
+                  <form method="post" action="{% url 'submit_tally' t.id %}" style="flex:1;min-width:80px;margin:0;">
+                    {% csrf_token %}
+                    <button type="submit" style="width:100%;display:inline-flex;align-items:center;justify-content:center;padding:8px 12px;background:#16a34a;border:1px solid #15803d;border-radius:4px;font-size:11px;font-weight:600;color:#fff;cursor:pointer;">RESUBMIT</button>
+                  </form>
+                  <a href="{% url 'tally_delete' t.id %}" style="flex:1;min-width:80px;display:inline-flex;align-items:center;justify-content:center;padding:8px 12px;background:#f8f9fa;border:1px solid #dee2e6;border-radius:4px;font-size:11px;font-weight:600;color:#dc3545;text-decoration:none;">DELETE</a>
+                {% elif t.status == 'DRAFT' %}
+                  <a href="{% url 'tally_view' t.id %}" style="flex:1;min-width:80px;display:inline-flex;align-items:center;justify-content:center;padding:8px 12px;background:#f8f9fa;border:1px solid #dee2e6;border-radius:4px;font-size:11px;font-weight:600;color:#495057;text-decoration:none;">VIEW</a>
+                  <a href="{% url 'export_tally_excel' t.id %}" style="flex:1;min-width:80px;display:inline-flex;align-items:center;justify-content:center;padding:8px 12px;background:#1e3a5f;border:1px solid #1e3a5f;border-radius:4px;font-size:11px;font-weight:600;color:#fff;text-decoration:none;">EXCEL</a>
+                  <a href="{% url 'tally_pdf' t.id %}" style="flex:1;min-width:80px;display:inline-flex;align-items:center;justify-content:center;padding:8px 12px;background:#f8f9fa;border:1px solid #dee2e6;border-radius:4px;font-size:11px;font-weight:600;color:#495057;text-decoration:none;">PDF</a>
+                  {% if t.recall_request_count > 0 %}
+                  <button type="button" data-bs-toggle="modal" data-bs-target="#recallHistoryModal{{ t.id }}" style="flex:1;min-width:80px;display:inline-flex;align-items:center;justify-content:center;padding:8px 12px;background:#fef3c7;border:1px solid #f59e0b;border-radius:4px;font-size:11px;font-weight:600;color:#92400e;cursor:pointer;">RECALL ({{ t.recall_request_count }})</button>
+                  {% endif %}
+                  <a href="{% url 'tally_edit' t.id %}" style="flex:1;min-width:80px;display:inline-flex;align-items:center;justify-content:center;padding:8px 12px;background:#f8f9fa;border:1px solid #dee2e6;border-radius:4px;font-size:11px;font-weight:600;color:#495057;text-decoration:none;">EDIT</a>
+                  <form method="post" action="{% url 'submit_tally' t.id %}" style="flex:1;min-width:80px;margin:0;">
+                    {% csrf_token %}
+                    <button type="submit" style="width:100%;display:inline-flex;align-items:center;justify-content:center;padding:8px 12px;background:#0d6efd;border:1px solid #0d6efd;border-radius:4px;font-size:11px;font-weight:600;color:#fff;cursor:pointer;">SUBMIT</button>
+                  </form>
+                  <a href="{% url 'tally_delete' t.id %}" style="flex:1;min-width:80px;display:inline-flex;align-items:center;justify-content:center;padding:8px 12px;background:#f8f9fa;border:1px solid #dee2e6;border-radius:4px;font-size:11px;font-weight:600;color:#dc3545;text-decoration:none;">DELETE</a>
+                {% endif %}
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% empty %}
+        <div style="text-align:center;padding:60px 20px;color:#a47551;">
+          YOU HAVE NOT CREATED ANY TALLIES YET.
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- Pagination -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:24px;padding-top:20px;border-top:1.5px solid #ede3da;flex-wrap:wrap;gap:12px;">
+        <div style="font-size:11px;color:#a47551;font-style:italic;text-transform:uppercase;letter-spacing:0.3px;">
+          TIP: USE THE CALENDAR TO FILTER TALLIES BY DATE
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          {% if page_obj.has_previous %}
+          <a class="sdt-btn sdt-btn-ghost" href="?q={{ q|urlencode }}&period={{ period|urlencode }}&sort={{ sort|urlencode }}&page={{ page_obj.previous_page_number }}&cal_year={{ cal_year }}&cal_month={{ cal_month }}" style="padding:8px 16px;font-size:12px;font-weight:700;">PREV</a>
+          {% else %}
+          <button class="sdt-btn sdt-btn-ghost" disabled style="opacity:0.3;cursor:not-allowed;padding:8px 16px;font-size:12px;font-weight:700;">PREV</button>
+          {% endif %}
+          <span style="font-size:13px;font-weight:700;color:#3d2817;padding:0 12px;font-family:'Barlow Condensed',sans-serif;">PAGE {{ page_obj.number }} OF {{ page_obj.paginator.num_pages }}</span>
+          {% if page_obj.has_next %}
+          <a class="sdt-btn sdt-btn-ghost" href="?q={{ q|urlencode }}&period={{ period|urlencode }}&sort={{ sort|urlencode }}&page={{ page_obj.next_page_number }}&cal_year={{ cal_year }}&cal_month={{ cal_month }}" style="padding:8px 16px;font-size:12px;font-weight:700;">NEXT</a>
+          {% else %}
+          <button class="sdt-btn sdt-btn-ghost" disabled style="opacity:0.3;cursor:not-allowed;padding:8px 16px;font-size:12px;font-weight:700;">NEXT</button>
+          {% endif %}
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Recall History Modals -->
+{% for t in tallies %}
+  {% if t.recall_request_count > 0 %}
+  <div class="modal fade" id="recallHistoryModal{{ t.id }}" tabindex="-1" aria-labelledby="recallHistoryModalLabel{{ t.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header" style="background:#fef3c7;border-bottom:1px solid #f59e0b;">
+          <h5 class="modal-title" id="recallHistoryModalLabel{{ t.id }}" style="color:#92400e;font-weight:700;">
+            <svg viewBox="0 0 20 20" fill="none" style="width:20px;height:20px;display:inline-block;margin-right:8px;vertical-align:middle;">
+              <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M10 5v5l4 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            Recall History - Tally {{ t.tally_number }}
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" style="max-height:500px;overflow-y:auto;">
+          {% for req in t.recall_requests.all %}
+          <div style="padding:16px;margin-bottom:12px;background:{% if req.status == 'PENDING' %}#fef3c7{% elif req.status == 'APPROVED' %}#d1fae5{% else %}#fee2e2{% endif %};border:1px solid {% if req.status == 'PENDING' %}#f59e0b{% elif req.status == 'APPROVED' %}#10b981{% else %}#ef4444{% endif %};border-radius:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:12px;">
+              <div>
+                <div style="font-size:13px;font-weight:700;color:#1f2937;margin-bottom:4px;">
+                  Requested by: {{ req.requested_by.first_name }} {{ req.requested_by.last_name }} ({{ req.requested_by.staff_number }})
+                </div>
+                <div style="font-size:12px;color:#6b7280;">{{ req.created_at|date:"d M Y, g:i A" }}</div>
+              </div>
+              <span style="padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;
+                {% if req.status == 'PENDING' %}background:#f59e0b;color:#fff;
+                {% elif req.status == 'APPROVED' %}background:#10b981;color:#fff;
+                {% else %}background:#ef4444;color:#fff;{% endif %}">
+                {{ req.get_status_display }}
+              </span>
+            </div>
+            <div style="padding:10px;background:#fff;border-radius:4px;margin-bottom:8px;">
+              <div style="font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;margin-bottom:4px;">Reason:</div>
+              <div style="font-size:13px;color:#1f2937;">{{ req.reason }}</div>
+            </div>
+            {% if req.status != 'PENDING' %}
+            <div style="padding:10px;background:#f9fafb;border-radius:4px;border-left:3px solid {% if req.status == 'APPROVED' %}#10b981{% else %}#ef4444{% endif %};">
+              <div style="font-size:12px;color:#6b7280;margin-bottom:4px;">
+                <strong>{% if req.status == 'APPROVED' %}Approved{% else %}Rejected{% endif %} by:</strong>
+                {{ req.approved_by.first_name }} {{ req.approved_by.last_name }} ({{ req.approved_by.staff_number }})
+              </div>
+              <div style="font-size:11px;color:#9ca3af;">{{ req.processed_at|date:"d M Y, g:i A" }}</div>
+              {% if req.operations_notes %}
+              <div style="margin-top:8px;font-size:12px;color:#1f2937;">
+                <strong>Notes:</strong> {{ req.operations_notes }}
+              </div>
+              {% endif %}
+            </div>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">CLOSE</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+{% endfor %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+window.MY_TALLIES_CONFIG = {
+  tallyDates: {{ tally_dates|safe }},
+  calYear: {{ cal_year|default:today.year }},
+  calMonth: {{ cal_month|default:today.month }},
+  qVal: "{{ q|default:''|escapejs }}",
+  periodVal: "{{ period|default:'all'|escapejs }}",
+  myTalliesUrl: "{% url 'my_tallies' %}",
+};
+</script>
+<script src="{% static 'js/features/tally/my-tallies.js' %}"></script>
+{% endblock %}

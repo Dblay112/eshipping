@@ -1,0 +1,171 @@
+/* ═══════════════════════════════════════════════════════════════
+   STAFF LIST MOBILE — accounts/staff_list.html
+   Mobile-specific styles (max-width: 768px)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Mobile: Touch-friendly buttons and collapsible card layout */
+@media (max-width: 768px) {
+  .staff-page {
+    padding: 20px 16px;
+  }
+
+  .staff-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .staff-btn,
+  .staff-btn-edit,
+  .staff-btn-delete {
+    min-height: 44px;
+    padding: 10px 14px;
+    font-size: 14px;
+  }
+
+  /* Hide desktop table on mobile */
+  .staff-table-wrap {
+    display: none;
+  }
+
+  /* Mobile card layout */
+  .staff-mobile-cards {
+    display: block;
+  }
+
+  .staff-mobile-card {
+    background: #fff;
+    border: 1px solid #e8ddd4;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+
+  .staff-mobile-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .staff-mobile-card-header:active {
+    background: #f8f2ec;
+  }
+
+  .staff-mobile-card-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: #3d2817;
+  }
+
+  .staff-mobile-card-rank {
+    font-size: 13px;
+    color: #7d5a3b;
+    font-weight: 600;
+    margin-top: 2px;
+  }
+
+  .staff-mobile-card-details {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    padding: 0 16px;
+  }
+
+  .staff-mobile-card.expanded .staff-mobile-card-details {
+    max-height: 1000px;
+    padding: 0 16px 16px 16px;
+  }
+
+  .staff-mobile-card-row {
+    display: flex;
+    padding: 8px 0;
+    gap: 12px;
+  }
+
+  .staff-mobile-card-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #7d5a3b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    min-width: 110px;
+    flex-shrink: 0;
+  }
+
+  .staff-mobile-card-value {
+    font-size: 13px;
+    color: #3d2817;
+    flex: 1;
+  }
+
+  .staff-mobile-card-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #f0e8e0;
+  }
+
+  .staff-mobile-card-actions .staff-btn {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .desk-badges {
+    gap: 4px;
+  }
+
+  .desk-badge {
+    font-size: 10px;
+    padding: 4px 10px;
+  }
+
+  .sdt-pagination {
+    gap: 8px;
+  }
+
+  .sdt-pagination .sdt-btn {
+    flex: 1;
+    min-width: 100px;
+  }
+}
+
+/* Desktop: Hide mobile cards */
+@media (min-width: 769px) {
+  .staff-mobile-cards {
+    display: none;
+  }
+}
+
+/* ── Empty State (Mobile) ────────────────────────────────────── */
+@media (max-width: 768px) {
+  .sdt-empty-state {
+    padding: 40px 20px;
+  }
+
+  .sdt-empty-icon svg {
+    width: 64px;
+    height: 64px;
+  }
+
+  .sdt-empty-title {
+    font-size: 18px;
+  }
+
+  .sdt-empty-text {
+    font-size: 13px;
+  }
+}
+
+/* Additional mobile styles extracted from staff_list.css */
+@media (max-width: 768px) {
+  .staff-filter {
+    width: 100%;
+    margin-left: 0;
+    justify-content: space-between;
+  }
+}

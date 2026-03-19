@@ -1,0 +1,174 @@
+{% extends "includes/base.html" %}
+{% load static %}
+{% load sd_permissions %}
+
+{% block title %}Terminal Schedule — CMC{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/operations/terminal_schedule_list.css' %}">
+<link rel="stylesheet" href="{% static 'css/operations/terminal_schedule_mobile.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="sdt-page">
+
+  <div class="sdt-page-header">
+    <div class="sdt-page-header-inner">
+      <div>
+        <h1 class="sdt-page-title">Terminal Schedule</h1>
+        <p class="sdt-page-sub">Manage terminals and their assigned supervisors</p>
+      </div>
+      {% if can_manage %}
+      <a href="{% url 'terminal_schedule_create' %}" class="sdt-btn sdt-btn-primary">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        Add Terminal
+      </a>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if terminals %}
+  <div class="sdt-table-wrap">
+    <table class="sdt-records-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>TERMINAL</th>
+          <th>LOCATION</th>
+          <th>SUPERVISOR</th>
+          <th>ASSISTED BY</th>
+          {% if can_manage %}<th style="width:180px;">ACTIONS</th>{% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for terminal in terminals %}
+        <tr class="sdt-main-row">
+          <td class="text-center fw-bold" data-label="#">{{ forloop.counter }}</td>
+          <td class="sdt-td-sd fw-bold" data-label="TERMINAL">{{ terminal.name }}</td>
+          <td data-label="LOCATION">{{ terminal.get_location_display }}</td>
+          <td data-label="SUPERVISOR">
+            {% for sup in terminal.supervisors.all %}
+              {% if forloop.first %}
+                <span style="display:inline-block;background:#e8ddd4;color:#3d2817;border-radius:4px;padding:2px 8px;font-size:12px;font-weight:600;">
+                  {{ sup.first_name }} {{ sup.last_name }}
+                </span>
+              {% endif %}
+            {% empty %}
+              <span style="color:#aaa;font-size:13px;">—</span>
+            {% endfor %}
+          </td>
+          <td data-label="ASSISTED BY">
+            {% for sup in terminal.supervisors.all|slice:"1:" %}
+              <span style="display:inline-block;background:#f0e8e0;color:#5c3d2e;border-radius:4px;padding:2px 8px;font-size:12px;font-weight:600;margin:1px;">
+                {{ sup.first_name }} {{ sup.last_name }}
+              </span>
+            {% empty %}
+              <span style="color:#aaa;font-size:13px;">—</span>
+            {% endfor %}
+          </td>
+          {% if can_manage %}
+          <td data-label="ACTIONS">
+            <div style="display:flex;gap:6px;align-items:center;">
+              <a href="{% url 'terminal_schedule_edit' terminal.pk %}" class="sdt-row-edit-btn">
+                <svg viewBox="0 0 14 14" fill="none" width="11" height="11"><path d="M9.5 1.5l3 3L4 13H1v-3L9.5 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Edit
+              </a>
+              <a href="{% url 'terminal_schedule_delete' terminal.pk %}" class="sdt-row-edit-btn" style="background:#fee;border-color:#fcc;color:#c00;">
+                <svg viewBox="0 0 14 14" fill="none" width="11" height="11"><path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                Delete
+              </a>
+            </div>
+          </td>
+          {% endif %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Mobile Card Layout -->
+  <div class="sdt-mobile-cards">
+    {% for terminal in terminals %}
+    <div class="sdt-mobile-card">
+      <div class="sdt-mobile-card-header">
+        <div>
+          <div class="sdt-mobile-card-terminal">{{ terminal.name }}</div>
+          <div class="sdt-mobile-card-supervisor">
+            {% for sup in terminal.supervisors.all %}
+              {% if forloop.first %}
+                {{ sup.first_name }} {{ sup.last_name }}
+              {% endif %}
+            {% empty %}
+              Unassigned
+            {% endfor %}
+          </div>
+        </div>
+        <span style="font-size:12px;color:#7d5a3b;font-weight:600;">#{{ forloop.counter }}</span>
+      </div>
+
+      <div class="sdt-mobile-card-details">
+        <div class="sdt-mobile-card-row">
+          <div class="sdt-mobile-card-label">Location</div>
+          <div class="sdt-mobile-card-value">{{ terminal.get_location_display }}</div>
+        </div>
+
+        <div class="sdt-mobile-card-row">
+          <div class="sdt-mobile-card-label">Assisted By</div>
+          <div class="sdt-mobile-card-value">
+            {% for sup in terminal.supervisors.all|slice:"1:" %}
+              <span style="display:inline-block;background:#f0e8e0;color:#5c3d2e;border-radius:4px;padding:2px 8px;font-size:12px;font-weight:600;margin:2px;">
+                {{ sup.first_name }} {{ sup.last_name }}
+              </span>
+            {% empty %}
+              <span style="color:#aaa;font-size:13px;">—</span>
+            {% endfor %}
+          </div>
+        </div>
+
+        {% if can_manage %}
+        <div class="sdt-mobile-card-actions">
+          <a href="{% url 'terminal_schedule_edit' terminal.pk %}" class="sdt-row-edit-btn">
+            <svg viewBox="0 0 14 14" fill="none" width="11" height="11"><path d="M9.5 1.5l3 3L4 13H1v-3L9.5 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Edit
+          </a>
+          <a href="{% url 'terminal_schedule_delete' terminal.pk %}" class="sdt-row-edit-btn" style="background:#fee;border-color:#fcc;color:#c00;">
+            <svg viewBox="0 0 14 14" fill="none" width="11" height="11"><path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            Delete
+          </a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% else %}
+  <div class="sdt-empty-state">
+    <div class="sdt-empty-icon">
+      <svg viewBox="0 0 64 64" fill="none">
+        <rect x="8" y="8" width="20" height="20" rx="3" stroke="currentColor" stroke-width="2.5"/>
+        <rect x="36" y="8" width="20" height="20" rx="3" stroke="currentColor" stroke-width="2.5"/>
+        <rect x="8" y="36" width="20" height="20" rx="3" stroke="currentColor" stroke-width="2.5"/>
+        <rect x="36" y="36" width="20" height="20" rx="3" stroke="currentColor" stroke-width="2.5"/>
+      </svg>
+    </div>
+    <h3 class="sdt-empty-title">No Terminals Yet</h3>
+    <p class="sdt-empty-text">{% if can_manage %}Add the first terminal to start assigning supervisors.{% else %}No terminals have been configured yet.{% endif %}</p>
+    {% if can_manage %}
+    <a href="{% url 'terminal_schedule_create' %}" class="sdt-btn sdt-btn-primary">Add First Terminal</a>
+    {% endif %}
+  </div>
+  {% endif %}
+
+</div>
+
+<script>
+// Mobile card expand/collapse functionality
+document.querySelectorAll('.sdt-mobile-card-header').forEach(function(header) {
+  header.addEventListener('click', function(e) {
+    const card = this.closest('.sdt-mobile-card');
+    card.classList.toggle('expanded');
+  });
+});
+</script>
+{% endblock %}

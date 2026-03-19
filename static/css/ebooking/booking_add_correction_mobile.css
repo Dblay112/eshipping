@@ -1,0 +1,52 @@
+/* ═══════════════════════════════════════════════════════════════
+   BOOKING ADD CORRECTION MOBILE — ebooking/booking_add_correction.html
+   Mobile-specific styles (700px and below)
+   ═══════════════════════════════════════════════════════════════ */
+
+@media (max-width: 700px) {
+   .sdt-si-band {
+      flex-direction: column;
+   }
+
+   .sdt-si-band-label {
+      width: 100%;
+      border-right: none;
+      border-bottom: 1px solid #f0e8e0;
+      padding: 10px 16px;
+   }
+
+   .sdt-si-fields {
+      padding: 14px 16px;
+   }
+}
+
+@media (max-width: 600px) {
+   .sdt-page {
+      padding: 20px 16px 48px;
+   }
+
+   .sdt-page-title {
+      font-size: 24px;
+   }
+
+   .sdt-si-input {
+      min-height: 44px;
+      font-size: 16px;
+      padding: 10px 14px;
+   }
+
+   .sdt-btn {
+      width: 100%;
+      justify-content: center;
+      min-height: 44px;
+   }
+
+   .sdt-form-actions {
+      flex-direction: column;
+      gap: 8px;
+   }
+
+   .sdt-form-actions .sdt-btn {
+      width: 100%;
+   }
+}

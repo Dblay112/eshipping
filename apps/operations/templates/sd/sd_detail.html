@@ -1,0 +1,464 @@
+{% extends "includes/base.html" %}
+{% load static %}
+{% load sd_permissions %}
+
+{% block title %}SD {{ sd.sd_number }} — CMC{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/operations/sd_detail.css' %}">
+<link rel="stylesheet" href="{% static 'css/operations/sd_detail_mobile.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="sdt-page">
+
+  <!-- ── Dark header banner ── -->
+  <div class="sdt-detail-header">
+    <div class="sdt-detail-header-inner">
+      <a href="{% url 'operations_list' %}" class="sdt-back-link">
+        <svg viewBox="0 0 20 20" fill="none"><path d="M13 4l-6 6 6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Back to SD Records
+      </a>
+      <div class="sdt-detail-title-row">
+        <div>
+          <h1 class="sdt-detail-sd-number">{{ sd.sd_number }}</h1>
+          <div class="sdt-detail-vessel">
+            <svg viewBox="0 0 20 20" fill="none"><path d="M3 14l4-8 3 5 2-3 4 6H3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M10 3v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            {{ sd.vessel_name }}
+            {% if sd.eta %}<span class="sdt-detail-eta">ETA {{ sd.eta|date:"d M Y" }}</span>{% endif %}
+          </div>
+        </div>
+        <div class="sdt-detail-header-actions">
+          <span class="sdt-status-badge sdt-status-lg {% if sd.is_complete %}sdt-status-complete{% else %}sdt-status-active{% endif %}">
+            {% if sd.is_complete %}✓ Complete{% else %}● Active{% endif %}
+          </span>
+          <!-- EXCEL EXPORT BUTTON -->
+          <a href="{% url 'sd_export_excel' sd.pk %}" class="sdt-btn sdt-btn-excel">
+            <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M5 6l2 2-2 2M9 10h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            EXCEL
+          </a>
+          {% if can_manage %}
+          <a href="{% url 'sd_edit' sd.pk %}" class="sdt-btn sdt-btn-ghost">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M11.5 2.5l2 2L5 13H3v-2L11.5 2.5z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Edit Record
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sdt-detail-layout">
+
+    <!-- ── LEFT COLUMN ── -->
+    <div class="sdt-detail-left">
+
+      <!-- Core shipment info -->
+      <div class="sdt-detail-card">
+        <div class="sdt-detail-card-title">
+          <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M7 8h6M7 11h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Shipment Details
+        </div>
+        <div class="sdt-info-grid">
+          {% if sd.si_ref %}
+          <div class="sdt-info-item"><span class="sdt-info-label">Document Ref</span><span class="sdt-info-value sdt-mono">{{ sd.si_ref }}</span></div>
+          {% endif %}
+          <div class="sdt-info-item"><span class="sdt-info-label">Vessel</span><span class="sdt-info-value">{{ sd.vessel_name }}</span></div>
+          <div class="sdt-info-item"><span class="sdt-info-label">Total Tonnage</span><span class="sdt-info-value"><strong>{{ sd.tonnage|clean_decimal }} MT</strong></span></div>
+          <div class="sdt-info-item"><span class="sdt-info-label">Agent</span><span class="sdt-info-value">{{ sd.agent }}</span></div>
+          {% if sd.schedule_assigned_officer %}
+          <div class="sdt-info-item"><span class="sdt-info-label">Officer Assigned</span><span class="sdt-info-value"><strong>{{ sd.schedule_assigned_officer.first_name }} {{ sd.schedule_assigned_officer.last_name }}</strong></span></div>
+          {% endif %}
+          {% if sd.crop_year %}<div class="sdt-info-item"><span class="sdt-info-label">Crop Year</span><span class="sdt-info-value">{{ sd.crop_year }}</span></div>{% endif %}
+          {% if sd.shipment_period %}<div class="sdt-info-item"><span class="sdt-info-label">Shipment Period</span><span class="sdt-info-value">{{ sd.shipment_period }}</span></div>{% endif %}
+          <div class="sdt-info-item"><span class="sdt-info-label">Port of Loading</span><span class="sdt-info-value">{{ sd.port_of_loading }}</span></div>
+          {% if sd.port_of_discharge %}<div class="sdt-info-item"><span class="sdt-info-label">Port of Discharge</span><span class="sdt-info-value">{{ sd.port_of_discharge }}</span></div>{% endif %}
+          {% if sd.container_size %}<div class="sdt-info-item"><span class="sdt-info-label">Container Size</span><span class="sdt-info-value">{{ sd.container_size }}</span></div>{% endif %}
+          {% if sd.sd_document %}
+          <div class="sdt-info-item" style="grid-column: 1 / -1;">
+            <span class="sdt-info-label">SD Document</span>
+            <span class="sdt-info-value">
+              <a href="{{ sd.sd_document.url }}" download class="sdt-download-btn" title="Download SD document">
+                <svg viewBox="0 0 16 16" fill="none" width="14" height="14">
+                  <path d="M8 2v8M5 7l3 3 3-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M2 12h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                </svg>
+                Download PDF
+              </a>
+            </span>
+          </div>
+          {% endif %}
+          {% if sd.container_list %}
+          <div class="sdt-info-item" style="grid-column: 1 / -1;">
+            <span class="sdt-info-label">Container List</span>
+            <span class="sdt-info-value">
+              <a href="{{ sd.container_list.url }}" download class="sdt-download-btn" title="Download container list">
+                <svg viewBox="0 0 16 16" fill="none" width="14" height="14">
+                  <path d="M8 2v8M5 7l3 3 3-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M2 12h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                </svg>
+                Download Excel
+              </a>
+            </span>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Audit Trail -->
+      <div class="sdt-detail-card" style="background: #fefaf5; border-color: #e8dcc8;">
+        <div class="sdt-detail-card-title" style="font-size: 13px; color: #6b5a47;">
+          <svg viewBox="0 0 20 20" fill="none" width="16" height="16"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.8"/><path d="M10 6v4l2 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          Record History
+        </div>
+        <div class="sdt-info-grid" style="font-size: 13px;">
+          {% if sd.created_by %}
+          <div class="sdt-info-item" style="grid-column: 1 / -1;">
+            <span class="sdt-info-label">Created by</span>
+            <span class="sdt-info-value">{{ sd.created_by.first_name }} {{ sd.created_by.last_name }} on {{ sd.created_at|date:"d M Y, g:i A" }}</span>
+          </div>
+          {% endif %}
+          {% if sd.updated_by %}
+          <div class="sdt-info-item" style="grid-column: 1 / -1;">
+            <span class="sdt-info-label">Last updated by</span>
+            <span class="sdt-info-value">{{ sd.updated_by.first_name }} {{ sd.updated_by.last_name }} on {{ sd.updated_at|date:"d M Y, g:i A" }}</span>
+          </div>
+          {% elif sd.updated_at %}
+          <div class="sdt-info-item" style="grid-column: 1 / -1;">
+            <span class="sdt-info-label">Last updated</span>
+            <span class="sdt-info-value">{{ sd.updated_at|date:"d M Y, g:i A" }}</span>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Contract / Allocation lines -->
+      <div class="sdt-detail-card">
+        <div class="sdt-detail-card-title">
+          <svg viewBox="0 0 20 20" fill="none"><path d="M4 5h12M4 9h12M4 13h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          Contract Allocations
+          <span class="sdt-count-badge">{{ sd.allocations.count }}</span>
+        </div>
+        {% if sd.allocations.exists %}
+        <div style="display:grid;gap:12px;padding:0 20px 20px;">
+          {% for alloc in sd.allocations.all %}
+          <div style="background:#f8f2ec;border:1px solid #e8ddd4;border-radius:8px;padding:16px;">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+              {% if alloc.allocation_label %}
+              <div style="width:40px;height:40px;background:#5c3d2e;color:white;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;">{{ alloc.allocation_label }}</div>
+              {% endif %}
+              <div style="flex:1;">
+                <div style="font-weight:700;color:#3d2817;font-size:15px;margin-bottom:4px;">{{ alloc.contract_number }}</div>
+                <div style="font-size:13px;color:#7d5a3b;">{% if alloc.mk_number|slice:":2" == "MK" %}{{ alloc.mk_number }}{% else %}MK {{ alloc.mk_number }}{% endif %}</div>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-weight:700;color:#3d2817;font-size:16px;">{{ alloc.allocated_tonnage|clean_decimal }} MT</div>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;padding-top:12px;border-top:1px solid #e8ddd4;">
+              {% if alloc.si_ref %}<div style="font-size:12px;"><span style="color:#7d5a3b;font-weight:600;">SI Ref:</span> <span style="color:#3d2817;">{{ alloc.si_ref }}</span></div>{% endif %}
+              {% if alloc.buyer %}<div style="font-size:12px;"><span style="color:#7d5a3b;font-weight:600;">Buyer:</span> <span style="color:#3d2817;">{{ alloc.buyer }}</span></div>{% endif %}
+              {% if alloc.agent %}<div style="font-size:12px;"><span style="color:#7d5a3b;font-weight:600;">Agent:</span> <span style="color:#3d2817;">{{ alloc.agent }}</span></div>{% endif %}
+              {% if alloc.cocoa_type %}<div style="font-size:12px;"><span style="color:#7d5a3b;font-weight:600;">Cocoa Type:</span> <span style="color:#3d2817;">{{ alloc.cocoa_type }}</span></div>{% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p class="sdt-no-data">No contract allocations recorded yet.</p>
+        {% endif %}
+        {% if sd.stock_allocation_notes %}
+        <div style="padding:0 20px 20px;"><pre class="sdt-allocation-text">{{ sd.stock_allocation_notes }}</pre></div>
+        {% endif %}
+      </div>
+
+      <!-- Clerks -->
+      <div class="sdt-detail-card">
+        <div class="sdt-detail-card-title">
+          <svg viewBox="0 0 20 20" fill="none"><circle cx="8" cy="7" r="3" stroke="currentColor" stroke-width="1.8"/><path d="M2 17c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          Clerks / Tally Officers
+          <span class="sdt-count-badge">{{ sd.clerks.count }}</span>
+        </div>
+        {% if sd.clerks.exists %}
+        <div class="sdt-clerks-list">
+          {% for clerk in sd.clerks.all %}
+          <div class="sdt-clerk-row">
+            <div class="sdt-clerk-avatar">{{ clerk.officer_name|slice:":1"|upper }}</div>
+            <div class="sdt-clerk-info">
+              <span class="sdt-clerk-name">{{ clerk.officer_name }}</span>
+              <div class="sdt-clerk-meta">
+                {% if clerk.tally_reference %}<span class="sdt-clerk-tally">{{ clerk.tally_reference }}</span>{% endif %}
+                {% if clerk.date_worked %}<span class="sdt-clerk-date">{{ clerk.date_worked|date:"d M Y" }}</span>{% endif %}
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p class="sdt-no-data">No clerks recorded yet.</p>
+        {% endif %}
+      </div>
+
+      <!-- ── AGGREGATED VIEW: Desk Activity Summary ── -->
+      <div class="sdt-detail-card">
+        <div class="sdt-detail-card-title">
+          <svg viewBox="0 0 20 20" fill="none"><path d="M3 10h14M10 3v14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          Desk Activity
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;">
+          <div style="text-align:center;padding:8px;background:#f8f2ec;border-radius:6px;">
+            <div style="font-size:11px;color:#7d5a3b;font-weight:600;margin-bottom:4px;">SCHEDULE</div>
+            <div style="font-size:18px;font-weight:700;{% if has_schedule %}color:#28a745;{% else %}color:#ccc;{% endif %}">{% if has_schedule %}✓{% else %}✗{% endif %}</div>
+          </div>
+          <div style="text-align:center;padding:8px;background:#f8f2ec;border-radius:6px;">
+            <div style="font-size:11px;color:#7d5a3b;font-weight:600;margin-bottom:4px;">BOOKING</div>
+            <div style="font-size:18px;font-weight:700;{% if has_bookings %}color:#28a745;{% else %}color:#ccc;{% endif %}">{% if has_bookings %}✓{% else %}✗{% endif %}</div>
+          </div>
+          <div style="text-align:center;padding:8px;background:#f8f2ec;border-radius:6px;">
+            <div style="font-size:11px;color:#7d5a3b;font-weight:600;margin-bottom:4px;">DECLARATION</div>
+            <div style="font-size:18px;font-weight:700;{% if has_declarations %}color:#28a745;{% else %}color:#ccc;{% endif %}">{% if has_declarations %}✓{% else %}✗{% endif %}</div>
+          </div>
+          <div style="text-align:center;padding:8px;background:#f8f2ec;border-radius:6px;">
+            <div style="font-size:11px;color:#7d5a3b;font-weight:600;margin-bottom:4px;">TALLIES</div>
+            <div style="font-size:18px;font-weight:700;{% if has_tallies %}color:#28a745;{% else %}color:#ccc;{% endif %}">{% if has_tallies %}✓{% else %}✗{% endif %}</div>
+          </div>
+          <div style="text-align:center;padding:8px;background:#f8f2ec;border-radius:6px;">
+            <div style="font-size:11px;color:#7d5a3b;font-weight:600;margin-bottom:4px;">EVACUATION</div>
+            <div style="font-size:18px;font-weight:700;{% if has_evacuations %}color:#28a745;{% else %}color:#ccc;{% endif %}">{% if has_evacuations %}✓{% else %}✗{% endif %}</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── RIGHT COLUMN ── -->
+    <div class="sdt-detail-right">
+
+      <!-- Summary card -->
+      <div class="sdt-detail-card sdt-balance-card">
+        <div class="sdt-detail-card-title">
+          <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.8"/><path d="M10 6v4l2.5 2.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          Loading Summary
+        </div>
+        <div class="sdt-balance-grid">
+          <div class="sdt-balance-item">
+            <span class="sdt-balance-label">Total Allocated</span>
+            <span class="sdt-balance-val">{{ sd.tonnage|clean_decimal }} MT</span>
+          </div>
+          <div class="sdt-balance-item">
+            <span class="sdt-balance-label">Tonnage Loaded</span>
+            <span class="sdt-balance-val">{{ tonnage_loaded|clean_decimal }} MT</span>
+          </div>
+          <div class="sdt-balance-item">
+            <span class="sdt-balance-label">Balance</span>
+            <span class="sdt-balance-val">{{ grand_balance|clean_decimal }} MT</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Container list -->
+      <div class="sdt-detail-card">
+        <div class="sdt-detail-card-title">
+          <svg viewBox="0 0 20 20" fill="none"><rect x="2" y="6" width="16" height="10" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M6 6V4h8v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Container List
+        </div>
+        {% if sd.container_list %}
+        <div style="padding:20px;text-align:center;">
+          <a href="{{ sd.container_list.url }}" download class="sdt-btn sdt-btn-primary">
+            <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M5 6l2 2-2 2M9 10h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            Download Excel
+          </a>
+        </div>
+        {% else %}
+        <p class="sdt-no-data">No container list uploaded yet.</p>
+        {% endif %}
+      </div>
+
+      <!-- ── SCHEDULE ASSIGNMENTS ── -->
+      {% if schedule_entries %}
+      <div class="sdt-detail-card">
+        <div class="sdt-detail-card-title">
+          <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="4" width="14" height="14" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M3 8h14M7 2v4M13 2v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          Schedule
+          <a href="{% url 'schedule_view' %}" class="sdt-excel-inline-btn" title="View Schedule" style="margin-left:auto;font-size:11px;">VIEW</a>
+        </div>
+        <div style="padding:16px 20px;">
+          {% with first_entry=schedule_entries.first %}
+          {% if first_entry.assigned_officer %}
+          <div style="color:#3d2817;font-weight:600;font-size:14px;">
+            Officer Assigned: {{ first_entry.assigned_officer.first_name }} {{ first_entry.assigned_officer.last_name }}
+          </div>
+          {% else %}
+          <div style="color:#7d5a3b;font-size:13px;">No officer assigned</div>
+          {% endif %}
+          {% endwith %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- ── E-BOOKINGS ── -->
+      {% if bookings %}
+      <div class="sdt-detail-card">
+        <div class="sdt-detail-card-title">
+          <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="5" width="14" height="12" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M7 9h6M7 12h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Bookings
+          <span class="sdt-count-badge">{{ bookings.count }}</span>
+          <a href="{% url 'booking_list' %}?q={{ sd.sd_number }}" class="sdt-excel-inline-btn" title="View All" style="margin-left:auto;font-size:11px;">VIEW</a>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          {% for booking in bookings|slice:":3" %}
+          <div style="padding:6px 10px;background:#f8f2ec;border-radius:4px;font-size:12px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-weight:600;color:#3d2817;">{{ booking.booking_number }}</span>
+              <span style="color:#7d5a3b;font-size:11px;">{{ booking.tonnage_booked|clean_decimal }} MT</span>
+            </div>
+            {% if booking.allocation %}
+            <div style="margin-top:2px;color:#5c3d2e;font-size:11px;">{{ booking.allocation.contract_number }}</div>
+            {% endif %}
+          </div>
+          {% endfor %}
+          {% if bookings.count > 3 %}
+          <div style="text-align:center;padding:2px;color:#7d5a3b;font-size:11px;">+ {{ bookings.count|add:"-3" }} more</div>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- ── DECLARATIONS ── -->
+      {% if declarations %}
+      <div class="sdt-detail-card">
+        <div class="sdt-detail-card-title">
+          <svg viewBox="0 0 20 20" fill="none"><path d="M9 2H4a1 1 0 00-1 1v14a1 1 0 001 1h12a1 1 0 001-1V7L9 2z" stroke="currentColor" stroke-width="1.8"/><path d="M9 2v5h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          Declarations
+          <span class="sdt-count-badge">{{ declarations.count }}</span>
+          <a href="{% url 'declaration_list' %}?q={{ sd.sd_number }}" class="sdt-excel-inline-btn" title="View All" style="margin-left:auto;font-size:11px;">VIEW</a>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          {% for decl in declarations|slice:":3" %}
+          <div style="padding:6px 10px;background:#f8f2ec;border-radius:4px;font-size:12px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-weight:600;color:#3d2817;">{{ decl.declaration_number }}</span>
+              <span style="color:#7d5a3b;font-size:11px;">{{ decl.tonnage|clean_decimal }} MT</span>
+            </div>
+            {% if decl.allocation %}
+            <div style="margin-top:2px;color:#5c3d2e;font-size:11px;">{{ decl.allocation.contract_number }}</div>
+            {% endif %}
+          </div>
+          {% endfor %}
+          {% if declarations.count > 3 %}
+          <div style="text-align:center;padding:2px;color:#7d5a3b;font-size:11px;">+ {{ declarations.count|add:"-3" }} more</div>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- ── APPROVED TALLIES ── -->
+      {% if tallies %}
+      <div class="sdt-detail-card">
+        <div class="sdt-detail-card-title">
+          <svg viewBox="0 0 20 20" fill="none"><path d="M3 6h14M3 10h14M3 14h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          Tallies
+          <span class="sdt-count-badge">{{ tallies.count }}</span>
+        </div>
+
+        <!-- Desktop Table View -->
+        <div class="sdt-tallies-table-desktop" style="overflow-x:auto;">
+          <table style="width:100%;border-collapse:collapse;font-size:11px;">
+            <thead>
+              <tr style="background:#f8f2ec;">
+                <th style="padding:8px 6px;text-align:left;font-weight:700;color:#7d5a3b;border-bottom:1px solid #e8ddd4;">CLERK</th>
+                <th style="padding:8px 6px;text-align:left;font-weight:700;color:#7d5a3b;border-bottom:1px solid #e8ddd4;">TALLY NO.</th>
+                <th style="padding:8px 6px;text-align:center;font-weight:700;color:#7d5a3b;border-bottom:1px solid #e8ddd4;">FILE</th>
+                <th style="padding:8px 6px;text-align:left;font-weight:700;color:#7d5a3b;border-bottom:1px solid #e8ddd4;">DATE</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for tally in tallies %}
+              <tr style="border-bottom:1px solid #f0e8e0;">
+                <td style="padding:8px 6px;color:#5c3d2e;font-weight:600;">
+                  {% if tally.created_by %}
+                    {{ tally.created_by.first_name }} {{ tally.created_by.last_name }}
+                  {% else %}
+                    —
+                  {% endif %}
+                </td>
+                <td style="padding:8px 6px;color:#3d2817;font-weight:700;">#{{ tally.tally_number }}</td>
+                <td style="padding:8px 6px;text-align:center;">
+                  <a href="{% url 'tally_view' tally.pk %}" style="color:#7d5a3b;text-decoration:none;font-weight:600;font-size:10px;">VIEW</a>
+                </td>
+                <td style="padding:8px 6px;color:#7d5a3b;">{{ tally.loading_date|date:"d M Y" }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Mobile Card View -->
+        <div class="sdt-tallies-mobile">
+          {% for tally in tallies %}
+          <div style="padding:12px;background:#f8f2ec;border-radius:8px;margin-bottom:10px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+              <div style="font-weight:700;color:#3d2817;font-size:14px;">#{{ tally.tally_number }}</div>
+              <a href="{% url 'tally_view' tally.pk %}" style="color:#7d5a3b;text-decoration:none;font-weight:600;font-size:12px;padding:4px 12px;background:#fff;border-radius:4px;border:1px solid #e8ddd4;">VIEW</a>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px;font-size:12px;">
+              <div style="display:flex;gap:8px;">
+                <span style="color:#7d5a3b;font-weight:600;min-width:60px;">CLERK:</span>
+                <span style="color:#5c3d2e;">
+                  {% if tally.created_by %}
+                    {{ tally.created_by.first_name }} {{ tally.created_by.last_name }}
+                  {% else %}
+                    —
+                  {% endif %}
+                </span>
+              </div>
+              <div style="display:flex;gap:8px;">
+                <span style="color:#7d5a3b;font-weight:600;min-width:60px;">DATE:</span>
+                <span style="color:#5c3d2e;">{{ tally.loading_date|date:"d M Y" }}</span>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- ── EVACUATIONS ── -->
+      {% if evacuations %}
+      <div class="sdt-detail-card">
+        <div class="sdt-detail-card-title">
+          <svg viewBox="0 0 20 20" fill="none"><rect x="2" y="6" width="16" height="10" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M6 6V4h8v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Evacuations
+          <span class="sdt-count-badge">{{ evacuations.count }}</span>
+          <a href="{% url 'evacuation_list' %}?q={{ sd.sd_number }}" class="sdt-excel-inline-btn" title="View All" style="margin-left:auto;font-size:11px;">VIEW</a>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          {% for evac_line in evacuations|slice:":3" %}
+          <div style="padding:6px 10px;background:#f8f2ec;border-radius:4px;font-size:12px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-weight:600;color:#3d2817;">{{ evac_line.evacuation.date|date:"d M Y" }}</span>
+              <span style="color:#7d5a3b;font-size:11px;">{{ evac_line.evacuation.get_shift_display }}</span>
+            </div>
+            <div style="margin-top:2px;color:#5c3d2e;font-size:11px;">
+              <span style="color:#28a745;">{{ evac_line.lifted_count }}</span> lifted •
+              <span style="color:#dc3545;">{{ evac_line.failed_count }}</span> failed
+            </div>
+          </div>
+          {% endfor %}
+          {% if evacuations.count > 3 %}
+          <div style="text-align:center;padding:2px;color:#7d5a3b;font-size:11px;">+ {{ evacuations.count|add:"-3" }} more</div>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Meta -->
+      <div class="sdt-detail-card sdt-meta-card">
+        <div class="sdt-meta-row"><span class="sdt-meta-label">Created by</span><span class="sdt-meta-val">{% if sd.created_by %}{{ sd.created_by.first_name }} {{ sd.created_by.last_name }}{% else %}—{% endif %}</span></div>
+        <div class="sdt-meta-row"><span class="sdt-meta-label">Created</span><span class="sdt-meta-val">{{ sd.created_at|date:"d M Y, H:i" }}</span></div>
+        <div class="sdt-meta-row"><span class="sdt-meta-label">Last updated</span><span class="sdt-meta-val">{{ sd.updated_at|date:"d M Y, H:i" }}</span></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,209 @@
+{% extends "includes/base.html" %}
+{% load static %}
+
+{% block title %}Add Correction — {{ detail.booking_number }} | CMC{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/ebooking/booking_add_correction.css' %}">
+<link rel="stylesheet" href="{% static 'css/ebooking/booking_add_correction_mobile.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="sdt-page sdt-form-page">
+
+  <div class="sdt-form-header">
+    <a href="{% url 'booking_list' %}" class="sdt-back-link">
+      <svg viewBox="0 0 20 20" fill="none"><path d="M13 4l-6 6 6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back to Bookings
+    </a>
+    <h1 class="sdt-page-title">Request Correction</h1>
+    <p class="sdt-page-sub">Bill of Lading: {{ detail.booking_number }}</p>
+  </div>
+
+  <form method="post" enctype="multipart/form-data" class="sdt-form-wrap">
+    {% csrf_token %}
+
+    <!-- Document Info -->
+    <div class="sdt-shipment-card">
+      <div class="sdt-si-header">
+        <div class="sdt-si-header-icon">
+          <svg viewBox="0 0 24 24" fill="none" width="20" height="20">
+            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div>
+          <div class="sdt-si-header-title">Document Information</div>
+          <div class="sdt-si-header-sub">SD {{ booking_record.sd_number }}</div>
+        </div>
+      </div>
+
+      <div class="sdt-si-band">
+        <div class="sdt-si-fields">
+          <div class="sdt-si-field">
+            <label class="sdt-si-label">Booking Number</label>
+            <div style="padding:10px 0;font-weight:600;color:#3d2817;">{{ detail.booking_number }}</div>
+          </div>
+          <div class="sdt-si-field">
+            <label class="sdt-si-label">Bill of Lading No.</label>
+            <div style="padding:10px 0;font-weight:600;color:#3d2817;">{{ detail.bill_number|default:"—" }}</div>
+          </div>
+          <div class="sdt-si-field">
+            <label class="sdt-si-label">Contract</label>
+            <div style="padding:10px 0;font-weight:600;color:#3d2817;">{{ detail.contract_number|default:"—" }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Correction Request -->
+    <div class="sdt-shipment-card">
+      <div class="sdt-si-header">
+        <div class="sdt-si-header-icon">
+          <svg viewBox="0 0 24 24" fill="none" width="20" height="20">
+            <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div>
+          <div class="sdt-si-header-title">What needs to be corrected?</div>
+          <div class="sdt-si-header-sub">Be specific so E-Booking desk can make accurate corrections</div>
+        </div>
+      </div>
+
+      <div class="sdt-si-band sdt-si-band-last">
+        <div style="padding:16px 20px;">
+          <label class="sdt-si-label" style="margin-bottom:8px;display:block;">Correction Details <span class="sdt-required">*</span></label>
+          <textarea
+            name="correction_text"
+            rows="6"
+            class="sdt-si-input"
+            placeholder="Example: Change consignee name from 'ABC Ltd' to 'ABC Limited'. Update port of discharge from 'Rotterdam' to 'Antwerp'."
+            required
+            style="resize:vertical;min-height:120px;"></textarea>
+          <p class="sdt-form-help" style="margin:8px 0 0 0;">
+            This correction will be timestamped and saved. E-Booking desk will review and update the document.
+          </p>
+
+          <!-- File Attachment -->
+          <div style="margin-top:20px;">
+            <label class="sdt-si-label" style="margin-bottom:8px;display:block;">
+              <svg viewBox="0 0 16 16" fill="none" width="14" height="14" style="display:inline-block;vertical-align:middle;margin-right:4px;">
+                <path d="M14 9v4a2 2 0 01-2 2H4a2 2 0 01-2-2V9M11 4L8 1 5 4M8 1v10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Attach Documents (Optional)
+            </label>
+            <div style="display:flex;gap:8px;align-items:flex-start;">
+              <label for="attachmentInput" class="sdt-btn sdt-btn-ghost" style="cursor:pointer;margin:0;">
+                <svg viewBox="0 0 16 16" fill="none" width="14" height="14">
+                  <path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+                Choose Files
+              </label>
+              <input
+                type="file"
+                id="attachmentInput"
+                name="attachments"
+                accept="image/*,.pdf"
+                multiple
+                style="display:none;"
+                onchange="updateFileList(this)">
+            </div>
+            <div id="fileList" style="margin-top:12px;"></div>
+            <p class="sdt-form-help" style="margin:6px 0 0 0;">
+              Select multiple files (Images or PDF, max 10MB per file)
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="sdt-form-actions">
+      <a href="{% url 'booking_list' %}" class="sdt-btn sdt-btn-ghost">Cancel</a>
+      <button type="submit" class="sdt-btn sdt-btn-primary">
+        <svg viewBox="0 0 16 16" fill="none" width="14" height="14">
+          <path d="M13 4L6 11 3 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Submit Correction Request
+      </button>
+    </div>
+
+  </form>
+
+</div>
+
+<script>
+let selectedFiles = [];
+
+function updateFileList(input) {
+  const fileList = document.getElementById('fileList');
+
+  // Add new files to selectedFiles array
+  if (input.files && input.files.length > 0) {
+    for (let i = 0; i < input.files.length; i++) {
+      selectedFiles.push(input.files[i]);
+    }
+  }
+
+  // Display file list
+  if (selectedFiles.length === 0) {
+    fileList.innerHTML = '';
+    return;
+  }
+
+  let html = '<div class="bac-file-list-container">';
+  html += '<div class="bac-file-list-header">';
+  html += selectedFiles.length + ' file' + (selectedFiles.length !== 1 ? 's' : '') + ' selected';
+  html += '</div>';
+
+  selectedFiles.forEach((file, index) => {
+    const sizeKB = (file.size / 1024).toFixed(1);
+    const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+    const sizeDisplay = file.size > 1024 * 1024 ? sizeMB + ' MB' : sizeKB + ' KB';
+
+    html += '<div class="bac-file-item">';
+    html += '<div class="bac-file-info">';
+
+    // File icon
+    if (file.type === 'application/pdf') {
+      html += '<svg class="bac-file-icon" viewBox="0 0 16 16" fill="none" width="16" height="16"><path d="M9 1H3v14h10V5L9 1z" stroke="#dc2626" stroke-width="1.5"/><path d="M9 1v4h4" stroke="#dc2626" stroke-width="1.5"/></svg>';
+    } else {
+      html += '<svg class="bac-file-icon" viewBox="0 0 16 16" fill="none" width="16" height="16"><rect x="2" y="2" width="12" height="12" rx="2" stroke="#2563eb" stroke-width="1.5"/><circle cx="6" cy="6" r="1.5" fill="#2563eb"/><path d="M14 10l-3-3-3 3-2-2-4 4" stroke="#2563eb" stroke-width="1.5" stroke-linecap="round"/></svg>';
+    }
+
+    html += '<div class="bac-file-details">';
+    html += '<div class="bac-file-name">' + file.name + '</div>';
+    html += '<div class="bac-file-size">' + sizeDisplay + '</div>';
+    html += '</div>';
+    html += '</div>';
+
+    // Remove button
+    html += '<button type="button" onclick="removeFile(' + index + ')" class="bac-file-remove-btn">';
+    html += '<svg viewBox="0 0 16 16" fill="none" width="12" height="12"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+    html += '</button>';
+    html += '</div>';
+  });
+
+  html += '</div>';
+  fileList.innerHTML = html;
+
+  // Update the actual file input with the selected files
+  updateFileInput();
+}
+
+function removeFile(index) {
+  selectedFiles.splice(index, 1);
+  updateFileList(document.getElementById('attachmentInput'));
+}
+
+function updateFileInput() {
+  const input = document.getElementById('attachmentInput');
+  const dt = new DataTransfer();
+
+  selectedFiles.forEach(file => {
+    dt.items.add(file);
+  });
+
+  input.files = dt.files;
+}
+</script>
+{% endblock %}

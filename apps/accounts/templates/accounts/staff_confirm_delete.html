@@ -1,0 +1,105 @@
+{% extends "includes/base.html" %}
+{% load static %}
+
+{% block title %}{% if has_records %}Deactivate{% else %}Delete{% endif %} Staff: {{ staff.first_name }} {{ staff.last_name }} — CMC{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/accounts/staff_confirm_delete.css' %}">
+<link rel="stylesheet" href="{% static 'css/accounts/staff_confirm_delete_mobile.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="sdt-delete-page">
+  <div class="sdt-delete-card">
+    <div class="sdt-delete-icon">
+      {% if has_records %}
+      <svg viewBox="0 0 24 24" fill="none" width="32" height="32">
+        <path d="M12 22c5.5 0 10-4.5 10-10S17.5 2 12 2 2 6.5 2 12s4.5 10 10 10z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M9 9h6M9 15h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      {% else %}
+      <svg viewBox="0 0 24 24" fill="none" width="32" height="32">
+        <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M10 11v6M14 11v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      {% endif %}
+    </div>
+
+    <h1 class="sdt-delete-title">{% if has_records %}Deactivate{% else %}Delete{% endif %} Staff Member?</h1>
+    <p class="sdt-delete-message">
+      {% if has_records %}
+        This staff member has created records in the system and cannot be deleted. You can deactivate their account instead.
+      {% else %}
+        Are you sure you want to permanently delete this staff member? This action cannot be undone.
+      {% endif %}
+    </p>
+
+    {% if has_records %}
+    <div class="info-note">
+      <svg class="info-icon" viewBox="0 0 20 20" fill="none" width="18" height="18">
+        <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM10 10v4M10 6h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <p class="info-text">
+        <strong>Deactivation:</strong> The staff member will no longer be able to log in, but all their records (SDs, bookings, declarations, tallies) will remain intact for audit purposes.
+      </p>
+    </div>
+    {% else %}
+    <div class="warning-note">
+      <svg class="warning-icon" viewBox="0 0 20 20" fill="none" width="18" height="18">
+        <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM10 6v4M10 14h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <p class="warning-text">
+        <strong>Warning:</strong> Deleting this staff member will permanently remove their account from the system. This action cannot be undone.
+      </p>
+    </div>
+    {% endif %}
+
+    <div class="sdt-delete-info">
+      <div class="sdt-delete-info-row">
+        <span class="sdt-delete-info-label">Name</span>
+        <span class="sdt-delete-info-value">{{ staff.first_name }} {{ staff.last_name }}</span>
+      </div>
+      <div class="sdt-delete-info-row">
+        <span class="sdt-delete-info-label">Staff Number</span>
+        <span class="sdt-delete-info-value">{{ staff.staff_number }}</span>
+      </div>
+      <div class="sdt-delete-info-row">
+        <span class="sdt-delete-info-label">Rank</span>
+        <span class="sdt-delete-info-value">{{ staff.rank }}</span>
+      </div>
+      <div class="sdt-delete-info-row">
+        <span class="sdt-delete-info-label">Desk</span>
+        <span class="sdt-delete-info-value">{{ staff.get_desk_display }}</span>
+      </div>
+      <div class="sdt-delete-info-row">
+        <span class="sdt-delete-info-label">Location</span>
+        <span class="sdt-delete-info-value">{{ staff.get_location_display }}</span>
+      </div>
+      <div class="sdt-delete-info-row">
+        <span class="sdt-delete-info-label">Status</span>
+        <span class="sdt-delete-info-value">{% if staff.is_active %}Active{% else %}Inactive{% endif %}</span>
+      </div>
+    </div>
+
+    <form method="post" class="sdt-delete-actions">
+      {% csrf_token %}
+      <a href="{% url 'staff_list' %}" class="sdt-btn sdt-btn-ghost">Cancel</a>
+      {% if has_records %}
+      <button type="submit" name="action" value="deactivate" class="sdt-btn" style="background:#ff6f00;color:#fff;border:none;">
+        <svg viewBox="0 0 16 16" fill="none" width="14" height="14">
+          <path d="M8 14A6 6 0 108 2a6 6 0 000 12zM5 8h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        Deactivate Account
+      </button>
+      {% else %}
+      <button type="submit" name="action" value="delete" class="sdt-btn" style="background:#c62828;color:#fff;border:none;">
+        <svg viewBox="0 0 16 16" fill="none" width="14" height="14">
+          <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        Yes, Delete Staff
+      </button>
+      {% endif %}
+    </form>
+  </div>
+</div>
+{% endblock %}

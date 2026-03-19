@@ -1,0 +1,22 @@
+asgiref==3.11.1
+dj-database-url==3.1.2
+Django==6.0.2
+django-simple-history==3.11.0
+djangorestframework==3.16.1
+et-xmlfile==2.0.0
+openpyxl==3.1.5
+Pillow==12.1.1
+reportlab==4.0.7
+sqlparse==0.5.5
+tzdata==2025.2
+whitenoise==6.8.2
+gunicorn==23.0.0
+python-decouple==3.8
+psycopg[binary]==3.3.3
+
+# Security enhancements
+django-ratelimit==4.1.0  # Rate limiting for brute force protection
+django-csp==3.8
+
+# PDF generation via headless Chrome (mobile only)
+playwright==1.49.1

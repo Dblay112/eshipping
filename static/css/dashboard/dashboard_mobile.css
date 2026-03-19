@@ -1,0 +1,288 @@
+/* ═══════════════════════════════════════════════════════════════
+   Dashboard - Mobile Styles
+   ═══════════════════════════════════════════════════════════════ */
+
+@media (max-width: 1100px) {
+    .dash-stats-4 { grid-template-columns: repeat(2, 1fr); }
+    .dash-grid { grid-template-columns: 1fr; }
+    .dash-actions { flex-direction: row; flex-wrap: wrap; }
+    .dash-action-group { flex: 1; min-width: 200px; }
+}
+
+@media (max-width: 768px) {
+    .dash-page { padding: 20px 16px 40px; }
+
+    .dash-welcome {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+        padding: 20px;
+    }
+
+    .dash-welcome-left {
+        width: 100%;
+    }
+
+    .dash-welcome-avatar {
+        width: 48px;
+        height: 48px;
+        font-size: 20px;
+    }
+
+    .dash-welcome-text h2 {
+        font-size: 22px;
+    }
+
+    .dash-welcome-text p {
+        font-size: 12.5px;
+    }
+
+    .dash-welcome-right {
+        width: 100%;
+        text-align: left;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .dash-date {
+        font-size: 13px;
+    }
+
+    .dash-desk-badge {
+        font-size: 10.5px;
+        padding: 3px 12px;
+    }
+
+    .dash-stats-4,
+    .dash-stats-3 {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .stat-card {
+        padding: 16px 18px;
+    }
+
+    .stat-icon {
+        width: 42px;
+        height: 42px;
+    }
+
+    .stat-icon svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .stat-value {
+        font-size: 28px;
+    }
+
+    .stat-label {
+        font-size: 11px;
+    }
+
+    .dash-alert-banner {
+        padding: 14px 16px;
+        gap: 12px;
+    }
+
+    .dash-alert-icon {
+        width: 36px;
+        height: 36px;
+    }
+
+    .dash-alert-icon svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .dash-alert-text strong {
+        font-size: 13px;
+    }
+
+    .dash-alert-text span {
+        font-size: 11.5px;
+    }
+
+    .dash-alert-count {
+        font-size: 24px;
+    }
+
+    .dash-actions {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .dash-action-group {
+        min-width: 100%;
+        overflow: visible;
+    }
+
+    .dash-action-btn {
+        min-height: 48px;
+        padding: 14px 16px;
+        font-size: 14px;
+        border-bottom: 1.5px solid #f0e8e0;
+    }
+
+    .dash-action-btn:last-child {
+        border-bottom: none;
+    }
+}
+
+@media (max-width: 600px) {
+    .dash-page { padding: 16px 12px 32px; }
+
+    .dash-welcome {
+        padding: 18px 16px;
+        border-radius: 12px;
+    }
+
+    .dash-welcome-text h2 {
+        font-size: 20px;
+    }
+
+    .dash-welcome-text p {
+        font-size: 12px;
+    }
+
+    .dash-stats-4,
+    .dash-stats-3,
+    .dash-stats-2 {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .stat-card {
+        padding: 14px 16px;
+    }
+
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+    }
+
+    .stat-value {
+        font-size: 26px;
+    }
+
+    .stat-label {
+        font-size: 10.5px;
+    }
+
+    .dash-panel-header {
+        padding: 14px 16px;
+    }
+
+    .dash-panel-title {
+        font-size: 13px;
+    }
+
+    .dash-panel-link {
+        font-size: 11px;
+        padding: 3px 8px;
+    }
+
+    .dash-record {
+        padding: 12px 16px;
+    }
+
+    .dash-record-title {
+        font-size: 13px;
+    }
+
+    .dash-record-sub {
+        font-size: 11.5px;
+    }
+
+    .dash-record-badge {
+        font-size: 10px;
+        padding: 2px 8px;
+    }
+
+    .dash-action-btn {
+        padding: 13px 16px;
+        font-size: 13.5px;
+        min-height: 50px;
+    }
+
+    .dash-action-btn svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .dash-action-group-title {
+        padding: 14px 16px;
+        font-size: 11px;
+    }
+
+    .dash-alert-banner {
+        flex-wrap: wrap;
+    }
+
+    .dash-alert-count {
+        width: 100%;
+        text-align: center;
+        margin-top: 8px;
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 400px) {
+    .dash-page { padding: 12px 10px 28px; }
+
+    .dash-welcome {
+        padding: 16px 14px;
+    }
+
+    .dash-welcome-avatar {
+        width: 44px;
+        height: 44px;
+        font-size: 18px;
+    }
+
+    .dash-welcome-text h2 {
+        font-size: 18px;
+    }
+
+    .dash-welcome-text p {
+        font-size: 11.5px;
+        word-break: break-word;
+    }
+
+    .dash-date {
+        font-size: 12px;
+    }
+
+    .stat-card {
+        padding: 12px 14px;
+        gap: 12px;
+    }
+
+    .stat-icon {
+        width: 36px;
+        height: 36px;
+    }
+
+    .stat-icon svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .stat-value {
+        font-size: 24px;
+    }
+
+    .stat-label {
+        font-size: 10px;
+    }
+
+    .dash-record-title,
+    .dash-record-sub {
+        white-space: normal;
+        overflow: visible;
+    }
+}

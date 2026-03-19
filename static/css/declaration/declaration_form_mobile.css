@@ -1,0 +1,207 @@
+/* ═══════════════════════════════════════════════════════════════
+   Declaration Form - Mobile Styles
+   (Contract allocation lines)
+   ═══════════════════════════════════════════════════════════════ */
+
+@media (max-width: 700px) {
+  /* Match banded layout behavior on small screens */
+  .sdt-si-band {
+    flex-direction: column;
+  }
+
+  .sdt-si-band-label {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #f0e8e0;
+    padding: 10px 16px;
+  }
+
+  .sdt-si-fields {
+    padding: 14px 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  /* Prevent long contract/file text from overflowing and overlapping */
+  #allocationsCard {
+    overflow: hidden;
+  }
+
+  #allocationsCard .sdt-si-fields {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+    align-items: stretch;
+  }
+
+  #allocationsCard .sdt-si-field {
+    width: 100%;
+    min-width: 0;
+  }
+
+  #allocationsCard .sdt-si-file-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    height: auto;
+  }
+
+  #allocationsCard .sdt-si-file-btn {
+    width: 100%;
+    justify-content: center;
+    min-height: 44px;
+  }
+
+  #allocationsCard .sdt-si-file-name {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: #faf6f2;
+    border: 1px dashed #e0d4ca;
+    white-space: normal;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    line-height: 1.25;
+  }
+
+  #allocationsCard .sdt-si-file-name a,
+  #allocationsCard .sdt-si-file-name span {
+    display: block;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+}
+
+/* Additional styles extracted from declaration_form.css */
+
+/* Touch-friendly inputs and buttons (600px) */
+@media (max-width: 600px) {
+   .sdt-form-card .form-control,
+   .sdt-form-card .form-select,
+   .sdt-si-input,
+   .sdt-si-select {
+      min-height: 44px;
+      font-size: 16px;
+      padding: 10px 14px;
+   }
+
+   .sdt-si-select {
+      padding-right: 36px;
+   }
+
+   /* Make remove buttons larger and more visible on mobile */
+   .sdt-alloc-block-remove,
+   .sdt-remove-row-btn {
+      width: 32px;
+      height: 32px;
+      border-width: 2px;
+   }
+
+   .sdt-alloc-block-remove svg,
+   .sdt-remove-row-btn svg {
+      width: 16px;
+      height: 16px;
+   }
+}
+
+/* Tonnage tracking columns (800px) */
+@media (max-width: 800px) {
+
+   .sdt-tt-col-loaded,
+   .sdt-tt-col-balance {
+      flex: 0 0 160px;
+   }
+}
+
+/* Tonnage tracking table mobile (620px) */
+@media (max-width: 620px) {
+   .sdt-tt-thead {
+      display: none;
+   }
+
+   .sdt-tt-data-row,
+   .sdt-tt-tfoot {
+      flex-direction: column;
+      align-items: stretch;
+   }
+
+   .sdt-tt-td {
+      border-left: none !important;
+      border-top: 1px solid #ede3da;
+   }
+
+   .sdt-tt-col-loaded,
+   .sdt-tt-col-balance {
+      flex: unset;
+   }
+
+   .sdt-tt-tfoot .sdt-tt-col-loaded,
+   .sdt-tt-tfoot .sdt-tt-col-balance {
+      border-top-color: rgba(255, 255, 255, .12);
+   }
+}
+
+/* Allocation rows (860px) */
+@media (max-width: 860px) {
+   .sdt-alloc-row-inner:not(.sdt-alloc-row2) {
+      grid-template-columns: 60px 1fr 1fr 100px;
+   }
+
+   .sdt-alloc-buyer-cell {
+      grid-column: 1 / -1;
+   }
+
+   .sdt-alloc-row2 {
+      grid-template-columns: 1fr 1fr 90px 110px;
+   }
+
+   .sdt-alloc-excel-cell {
+      grid-column: 1 / -1;
+   }
+}
+
+/* Save draft bar and grids (600px) */
+@media (max-width: 600px) {
+   .sdt-save-draft-bar {
+      flex-direction: column;
+      align-items: flex-start;
+   }
+
+   .sdt-btn-save-draft {
+      width: 100%;
+      justify-content: center;
+   }
+
+   .sdt-tt-grid {
+      grid-template-columns: 1fr 1fr;
+   }
+
+   .sdt-form-group-sm {
+      flex: 1;
+      min-width: 140px;
+   }
+}
+
+/* Allocation rows compact (560px) */
+@media (max-width: 560px) {
+
+   .sdt-alloc-row-inner:not(.sdt-alloc-row2),
+   .sdt-alloc-row2 {
+      grid-template-columns: 1fr 1fr;
+   }
+
+   .sdt-alloc-buyer-cell,
+   .sdt-alloc-excel-cell {
+      grid-column: 1 / -1;
+   }
+}
+
+/* Single column grid (480px) */
+@media (max-width: 480px) {
+   .sdt-tt-grid {
+      grid-template-columns: 1fr;
+   }
+}
+

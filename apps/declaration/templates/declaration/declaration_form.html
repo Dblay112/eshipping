@@ -1,0 +1,107 @@
+{% extends "includes/base.html" %}
+{% load static %}
+
+{% block title %}{{ action }} Declaration — CMC{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/declaration/declaration_form.css' %}">
+<link rel="stylesheet" href="{% static 'css/declaration/declaration_form_mobile.css' %}">
+<link rel="stylesheet" href="{% static 'css/custom-datepicker.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="sdt-page sdt-form-page">
+
+  <div class="sdt-form-header">
+    <a href="{% url 'declaration_list' %}" class="sdt-back-link">
+      <svg viewBox="0 0 20 20" fill="none"><path d="M13 4l-6 6 6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back to Declarations
+    </a>
+    <h1 class="sdt-page-title">{{ action }} Declaration</h1>
+    <p class="sdt-page-sub">Declaration Desk — Customs declaration tracking per SD and contract</p>
+  </div>
+
+  {% if messages %}
+  <div class="sdt-messages">
+    {% for message in messages %}
+    <div class="sdt-alert sdt-alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <form method="post" enctype="multipart/form-data" id="declForm" class="sdt-form-wrap">
+    {% csrf_token %}
+
+    <!-- SD Selection -->
+    <div class="sdt-shipment-card">
+      <div class="sdt-si-header">
+        <div class="sdt-si-header-icon">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M9 2H4a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V6L9 2z" stroke="currentColor" stroke-width="2"/><path d="M9 2v4h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <div>
+          <div class="sdt-si-header-title">SD Selection</div>
+          <div class="sdt-si-header-sub">Select the SD record to create declarations for</div>
+        </div>
+      </div>
+
+      <div class="sdt-si-band sdt-si-band-last">
+        <div class="sdt-si-band-label">
+          <span>SD Reference</span>
+        </div>
+        <div class="sdt-si-fields">
+          <div class="sdt-si-field" style="flex:0 0 auto;">
+            <label class="sdt-si-label">SD Number <span class="sdt-required">*</span></label>
+            <div style="position:relative;">
+              {{ header_form.sd_number }}
+            </div>
+            {% if header_form.sd_number.errors %}
+            <p class="sdt-form-error">{{ header_form.sd_number.errors.0 }}</p>
+            {% endif %}
+          </div>
+
+          <div class="sdt-si-field" style="flex:0 0 auto;">
+            <label class="sdt-si-label">Date <span class="sdt-required">*</span></label>
+            <input type="text" name="date" id="id_date" class="sdt-si-input" placeholder="YYYY-MM-DD" value="{{ header_form.date.value|default:'' }}" data-datepicker readonly required>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contract Allocations -->
+    <div class="sdt-alloc-card" id="allocationsCard" style="display:none;">
+      <div class="sdt-si-header">
+        <div class="sdt-si-header-icon">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 10h16M4 14h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <div>
+          <div class="sdt-si-header-title">Contract Allocations <span class="sdt-alloc-header-count" id="allocCount"></span></div>
+          <div class="sdt-si-header-sub">Fill in declaration details for each contract line</div>
+        </div>
+      </div>
+
+      <div id="allocationsList"></div>
+    </div>
+
+    <!-- Submit buttons -->
+    <div class="sdt-form-actions">
+      <a href="{% url 'declaration_list' %}" class="sdt-btn sdt-btn-ghost">Cancel</a>
+      <button type="submit" class="sdt-btn sdt-btn-primary" id="submitBtn" disabled>
+        <svg viewBox="0 0 16 16" fill="none"><path d="M13 4L6 11 3 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        {{ action }} Declarations
+      </button>
+    </div>
+
+  </form>
+
+</div>
+
+<script src="{% static 'js/features/sd/sd-autofill.js' %}"></script>
+<script>
+window.DECLARATION_FORM_CONFIG = {
+  declarationData: {% if declaration_data_json %}JSON.parse("{{ declaration_data_json|escapejs }}"){% else %}null{% endif %},
+};
+</script>
+<script src="{% static 'js/features/declaration/declaration-form.js' %}"></script>
+<script src="{% static 'js/ui/custom-datepicker.js' %}"></script>
+
+{% endblock %}

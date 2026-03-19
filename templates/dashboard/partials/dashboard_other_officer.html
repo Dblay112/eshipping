@@ -1,0 +1,115 @@
+{# ASSIGNED OFFICER DASHBOARD (OTHER desk, assigned to SDs) #}
+<p class="dash-section-label">My Assigned SDs</p>
+<div class="dash-stats dash-stats-4" style="margin-bottom:28px;">
+    <div class="stat-card">
+        <div class="stat-icon stat-icon-brown">
+            <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="4" width="14" height="2" rx="1" fill="currentColor"/><rect x="3" y="9" width="14" height="2" rx="1" fill="currentColor"/><rect x="3" y="14" width="9" height="2" rx="1" fill="currentColor"/></svg>
+        </div>
+        <div class="stat-info">
+            <div class="stat-value">{{ assigned_sds|length }}</div>
+            <div class="stat-label">Assigned SDs</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon stat-icon-blue">
+            <svg viewBox="0 0 20 20" fill="none"><rect x="4" y="3" width="12" height="14" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M7 7h6M7 10h6M7 13h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </div>
+        <div class="stat-info">
+            <div class="stat-value">{{ my_tallies_total }}</div>
+            <div class="stat-label">Total Tallies</div>
+        </div>
+    </div>
+    <div class="stat-card {% if my_tallies_pending %}stat-alert{% endif %}">
+        <div class="stat-icon stat-icon-amber">
+            <svg viewBox="0 0 20 20" fill="none"><path d="M10 2l2.4 5 5.6.8-4 3.9.9 5.5L10 14.5l-4.9 2.7.9-5.5L2 7.8l5.6-.8L10 2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="stat-info">
+            <div class="stat-value">{{ my_tallies_pending }}</div>
+            <div class="stat-label">Tallies Pending</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon stat-icon-green">
+            <svg viewBox="0 0 20 20" fill="none"><path d="M4 10l4 4 8-8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="stat-info">
+            <div class="stat-value">{{ my_tallies_approved }}</div>
+            <div class="stat-label">Tallies Approved</div>
+        </div>
+    </div>
+</div>
+
+<div class="dash-grid">
+    <div>
+        <div class="dash-panel">
+            <div class="dash-panel-header">
+                <h3 class="dash-panel-title">
+                    <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="2" rx="1" fill="currentColor"/><rect x="2" y="7" width="12" height="2" rx="1" fill="currentColor"/><rect x="2" y="11" width="7" height="2" rx="1" fill="currentColor"/></svg>
+                    My Assigned SD Records
+                </h3>
+                <a class="dash-panel-link" href="{% url 'operations_list' %}">View All</a>
+            </div>
+            {% if assigned_sds %}
+                {% for sd in assigned_sds %}
+                <a class="dash-record" href="{% url 'sd_detail' sd.pk %}">
+                    <div class="dash-record-dot dot-neutral"></div>
+                    <div class="dash-record-main">
+                        <div class="dash-record-title">{{ sd.sd_number }} — {{ sd.vessel_name }}</div>
+                        <div class="dash-record-sub">{{ sd.agent }} • {{ sd.tonnage }} MT • {{ sd.created_at|date:"M d, Y" }}</div>
+                    </div>
+                </a>
+                {% endfor %}
+            {% else %}
+                <div class="dash-empty">No assigned SDs yet.</div>
+            {% endif %}
+        </div>
+
+        <div class="dash-panel" style="margin-top:20px;">
+            <div class="dash-panel-header">
+                <h3 class="dash-panel-title">
+                    <svg viewBox="0 0 16 16" fill="none"><rect x="4" y="3" width="8" height="10" rx="1" stroke="currentColor" stroke-width="1.6"/><path d="M6 6h4M6 8h4M6 10h3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                    Recent Tallies
+                </h3>
+                <a class="dash-panel-link" href="{% url 'my_tallies' %}">View All</a>
+            </div>
+            {% if recent_my_tallies %}
+                {% for tally in recent_my_tallies %}
+                <a class="dash-record" href="{% url 'tally_view' tally.pk %}">
+                    <div class="dash-record-dot {% if tally.status == 'DRAFT' %}dot-draft{% elif tally.status == 'PENDING_APPROVAL' %}dot-pending{% elif tally.status == 'APPROVED' %}dot-approved{% elif tally.status == 'REJECTED' %}dot-rejected{% endif %}"></div>
+                    <div class="dash-record-main">
+                        <div class="dash-record-title">{{ tally.tally_number }} — {{ tally.sd_number }}</div>
+                        <div class="dash-record-sub">{{ tally.vessel }} • {{ tally.loading_date|date:"M d, Y" }}</div>
+                    </div>
+                    <span class="dash-record-badge {% if tally.status == 'DRAFT' %}badge-draft{% elif tally.status == 'PENDING_APPROVAL' %}badge-pending{% elif tally.status == 'APPROVED' %}badge-approved{% elif tally.status == 'REJECTED' %}badge-rejected{% endif %}">
+                        {% if tally.status == 'DRAFT' %}Draft{% elif tally.status == 'PENDING_APPROVAL' %}Pending{% elif tally.status == 'APPROVED' %}Approved{% elif tally.status == 'REJECTED' %}Rejected{% endif %}
+                    </span>
+                </a>
+                {% endfor %}
+            {% else %}
+                <div class="dash-empty">No tallies yet.</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="dash-actions">
+        <div class="dash-action-group">
+            <div class="dash-action-group-title">My SDs</div>
+            <a class="dash-action-btn action-primary" href="{% url 'operations_list' %}">
+                <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="2" rx="1" fill="currentColor"/><rect x="2" y="7" width="12" height="2" rx="1" fill="currentColor"/><rect x="2" y="11" width="7" height="2" rx="1" fill="currentColor"/></svg>
+                View Assigned SDs
+            </a>
+        </div>
+
+        <div class="dash-action-group">
+            <div class="dash-action-group-title">Tallies</div>
+            <a class="dash-action-btn action-primary" href="{% url 'my_tallies' %}">
+                <svg viewBox="0 0 16 16" fill="none"><rect x="4" y="3" width="8" height="10" rx="1" stroke="currentColor" stroke-width="1.6"/><path d="M6 6h4M6 8h4M6 10h3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                View My Tallies
+            </a>
+            <a class="dash-action-btn" href="{% url 'new_tally' %}">
+                <svg viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                Create New Tally
+            </a>
+        </div>
+    </div>
+</div>

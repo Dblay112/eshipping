@@ -1,0 +1,312 @@
+{% extends "includes/base.html" %}
+{% load static %}
+
+{% block title %}Staff Directory | CMC{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/accounts/staff_list.css' %}">
+<link rel="stylesheet" href="{% static 'css/accounts/staff_list_mobile.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="staff-page">
+
+  <a href="{% url 'dashboard' %}" class="staff-back-link">
+    <svg viewBox="0 0 20 20" fill="none"><path d="M13 4l-6 6 6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Back to Dashboard
+  </a>
+
+  <div class="staff-header">
+    <div>
+      <h1 class="staff-title">Staff Directory</h1>
+      <p class="staff-subtitle">
+        {{ page_obj.paginator.count }} team member{{ page_obj.paginator.count|pluralize }}
+        {% if location %}
+          in {{ location|title }}
+        {% else %}
+          (All locations)
+        {% endif %}
+      </p>
+    </div>
+    {% if is_manager %}
+    <a href="{% url 'add_staff' %}" class="sdt-btn sdt-btn-primary">
+      <svg viewBox="0 0 16 16" fill="none" width="14" height="14">
+        <path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      Add Staff
+    </a>
+    {% endif %}
+  </div>
+
+  <!-- Search + Location Filter -->
+  <form method="get" class="staff-search-bar">
+    <input type="hidden" name="page" value="1">
+
+    <svg class="staff-search-icon" viewBox="0 0 20 20" fill="none">
+      <circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.8"/>
+      <path d="M13 13l3.5 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </svg>
+
+    <input
+      type="search"
+      name="q"
+      value="{{ q }}"
+      class="staff-search-input"
+      placeholder="Search by name or rank..."
+      autocomplete="off"
+    />
+
+    <div class="staff-filter">
+      <div class="staff-filter-label">Location</div>
+      <div class="staff-filter-pills" role="tablist" aria-label="Filter staff by location">
+        <button type="submit" name="location" value="" class="staff-pill {% if not location %}active{% endif %}">All</button>
+        <button type="submit" name="location" value="TEMA" class="staff-pill {% if location == 'TEMA' %}active{% endif %}">Tema</button>
+        <button type="submit" name="location" value="TAKORADI" class="staff-pill {% if location == 'TAKORADI' %}active{% endif %}">Takoradi</button>
+        <button type="submit" name="location" value="ACCRA" class="staff-pill {% if location == 'ACCRA' %}active{% endif %}">Accra</button>
+        <button type="submit" name="location" value="KUMASI" class="staff-pill {% if location == 'KUMASI' %}active{% endif %}">Kumasi</button>
+      </div>
+    </div>
+  </form>
+
+  {% if staff_list %}
+  <!-- Staff Table Card -->
+  <div class="staff-card">
+    <div class="staff-card-header">
+      <div class="staff-card-icon">
+        <svg viewBox="0 0 24 24" fill="none" width="20" height="20">
+          <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/>
+          <path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h2 class="staff-card-title">All Staff</h2>
+    </div>
+
+    <div class="staff-table-wrap">
+      <table class="staff-table">
+        <thead>
+          <tr>
+            <th style="width:22%;">Name</th>
+            <th style="width:20%;">Rank</th>
+            {% if is_manager %}<th style="width:23%;">Desk(s)</th>{% endif %}
+            <th style="width:13%;">Date Employed</th>
+            <th style="width:12%;">Years Served</th>
+            {% if is_manager %}<th style="width:10%;text-align:right;">Actions</th>{% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for staff in staff_list %}
+          <tr>
+            <td class="staff-name" data-label="NAME">{{ staff.first_name }} {{ staff.last_name }}</td>
+            <td class="staff-rank" data-label="RANK">{{ staff.rank }}</td>
+            {% if is_manager %}
+            <td data-label="DESK(S)">
+              <div class="desk-badges">
+                {% if staff.get_desks_list %}
+                  {% for desk_code in staff.get_desks_list %}
+                    <span class="desk-badge desk-badge-{{ desk_code|lower }}">
+                      {% if desk_code == "MANAGER" %}Manager
+                      {% elif desk_code == "OPERATIONS" %}Operations
+                      {% elif desk_code == "EBOOKING" %}E-Booking
+                      {% elif desk_code == "DECLARATION" %}Declaration
+                      {% elif desk_code == "TERMINAL_SUPERVISOR" %}Terminal Supervisor
+                      {% elif desk_code == "EVACUATION" %}Evacuation
+                      {% else %}{{ desk_code }}
+                      {% endif %}
+                    </span>
+                  {% endfor %}
+                {% else %}
+                  <span class="desk-badge desk-badge-none">No Desk</span>
+                {% endif %}
+              </div>
+            </td>
+            {% endif %}
+            <td style="color:#7d5a3b;font-size:13px;" data-label="DATE EMPLOYED">
+              {% if staff.profile.date_employed %}
+                {{ staff.profile.date_employed|date:"d M Y" }}
+              {% else %}
+                <span style="color:#bbb;">—</span>
+              {% endif %}
+            </td>
+            <td style="text-align:center;" data-label="YEARS SERVED">
+              {% if staff.profile.calculated_years_served is not None %}
+                <span style="display:inline-flex;align-items:center;justify-content:center;min-width:40px;padding:4px 10px;background:#e8f5e9;border:1.5px solid #81c784;border-radius:6px;color:#2e7d32;font-size:13px;font-weight:700;">
+                  {{ staff.profile.calculated_years_served }} year{{ staff.profile.calculated_years_served|pluralize }}
+                </span>
+              {% else %}
+                <span style="color:#bbb;">—</span>
+              {% endif %}
+            </td>
+            {% if is_manager %}
+            <td style="text-align:right;" data-label="ACTIONS">
+              <div class="staff-actions" style="justify-content:flex-end;">
+                <a href="{% url 'staff_edit' staff.pk %}" class="staff-btn staff-btn-edit">
+                  <svg viewBox="0 0 14 14" fill="none" width="11" height="11">
+                    <path d="M9.5 1.5l3 3L4 13H1v-3L9.5 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  Edit
+                </a>
+                {% if user.staff_number == 1000 or is_manager %}
+                <a href="{% url 'staff_delete' staff.pk %}" class="staff-btn staff-btn-delete">
+                  <svg viewBox="0 0 14 14" fill="none" width="11" height="11">
+                    <path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                  Delete
+                </a>
+                {% endif %}
+              </div>
+            </td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Mobile Card Layout -->
+    <div class="staff-mobile-cards">
+      {% for staff in staff_list %}
+      <div class="staff-mobile-card">
+        <div class="staff-mobile-card-header">
+          <div>
+            <div class="staff-mobile-card-name">{{ staff.first_name }} {{ staff.last_name }}</div>
+            <div class="staff-mobile-card-rank">{{ staff.rank }}</div>
+          </div>
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="color:#7d5a3b;">
+            <path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+
+        <div class="staff-mobile-card-details">
+          {% if is_manager %}
+          <div class="staff-mobile-card-row">
+            <div class="staff-mobile-card-label">Desk(s)</div>
+            <div class="staff-mobile-card-value">
+              <div class="desk-badges">
+                {% if staff.get_desks_list %}
+                  {% for desk_code in staff.get_desks_list %}
+                    <span class="desk-badge desk-badge-{{ desk_code|lower }}">
+                      {% if desk_code == "MANAGER" %}Manager
+                      {% elif desk_code == "OPERATIONS" %}Operations
+                      {% elif desk_code == "EBOOKING" %}E-Booking
+                      {% elif desk_code == "DECLARATION" %}Declaration
+                      {% elif desk_code == "TERMINAL_SUPERVISOR" %}Terminal Supervisor
+                      {% elif desk_code == "EVACUATION" %}Evacuation
+                      {% else %}{{ desk_code }}
+                      {% endif %}
+                    </span>
+                  {% endfor %}
+                {% else %}
+                  <span class="desk-badge desk-badge-none">No Desk</span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          {% endif %}
+
+          <div class="staff-mobile-card-row">
+            <div class="staff-mobile-card-label">Date Employed</div>
+            <div class="staff-mobile-card-value">
+              {% if staff.profile.date_employed %}
+                {{ staff.profile.date_employed|date:"d M Y" }}
+              {% else %}
+                <span style="color:#bbb;">—</span>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="staff-mobile-card-row">
+            <div class="staff-mobile-card-label">Years Served</div>
+            <div class="staff-mobile-card-value">
+              {% if staff.profile.calculated_years_served is not None %}
+                <span style="display:inline-flex;align-items:center;justify-content:center;padding:4px 10px;background:#e8f5e9;border:1.5px solid #81c784;border-radius:6px;color:#2e7d32;font-size:12px;font-weight:700;">
+                  {{ staff.profile.calculated_years_served }} year{{ staff.profile.calculated_years_served|pluralize }}
+                </span>
+              {% else %}
+                <span style="color:#bbb;">—</span>
+              {% endif %}
+            </div>
+          </div>
+
+          {% if is_manager %}
+          <div class="staff-mobile-card-actions">
+            <a href="{% url 'staff_edit' staff.pk %}" class="staff-btn staff-btn-edit">
+              <svg viewBox="0 0 14 14" fill="none" width="11" height="11">
+                <path d="M9.5 1.5l3 3L4 13H1v-3L9.5 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Edit
+            </a>
+            {% if user.staff_number == 1000 or is_manager %}
+            <a href="{% url 'staff_delete' staff.pk %}" class="staff-btn staff-btn-delete">
+              <svg viewBox="0 0 14 14" fill="none" width="11" height="11">
+                <path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+              Delete
+            </a>
+            {% endif %}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  {% if page_obj.has_other_pages %}
+  <div class="sdt-pagination" style="display:flex;justify-content:center;gap:6px;padding:20px 0;">
+    {% if page_obj.has_previous %}
+    <a href="?{% if q %}q={{ q }}&{% endif %}{% if location %}location={{ location }}&{% endif %}page={{ page_obj.previous_page_number }}" class="sdt-btn sdt-btn-ghost" style="font-size:12px;padding:5px 12px;">← Prev</a>
+    {% endif %}
+    <span style="display:flex;align-items:center;gap:4px;font-size:13px;color:#5c3d2e;">
+      Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+    </span>
+    {% if page_obj.has_next %}
+    <a href="?{% if q %}q={{ q }}&{% endif %}{% if location %}location={{ location }}&{% endif %}page={{ page_obj.next_page_number }}" class="sdt-btn sdt-btn-ghost" style="font-size:12px;padding:5px 12px;">Next →</a>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <!-- Total Count -->
+  <div class="staff-count">
+    <div class="staff-count-box">
+      <span class="staff-count-label">TOTAL STAFF:</span>
+      <span class="staff-count-value">{{ page_obj.paginator.count }}</span>
+    </div>
+  </div>
+
+  {% else %}
+  <div class="staff-card">
+    <div class="staff-card-header">
+      <div class="staff-card-icon">
+        <svg viewBox="0 0 24 24" fill="none" width="20" height="20">
+          <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/>
+          <path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h2 class="staff-card-title">All Staff</h2>
+    </div>
+    <div class="staff-empty">
+      <svg class="staff-empty-icon" viewBox="0 0 64 64" fill="none">
+        <circle cx="32" cy="20" r="10" stroke="currentColor" stroke-width="2.5"/>
+        <path d="M12 54v-6a12 12 0 0112-12h16a12 12 0 0112 12v6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+      <h3>{% if q %}No Staff Found{% else %}No Staff Members Yet{% endif %}</h3>
+      <p>{% if q %}Try a different search term.{% else %}No staff members have been added yet.{% endif %}</p>
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Mobile card expand/collapse functionality
+document.querySelectorAll('.staff-mobile-card-header').forEach(header => {
+  header.addEventListener('click', function(e) {
+    const card = this.closest('.staff-mobile-card');
+    card.classList.toggle('expanded');
+  });
+});
+</script>
+{% endblock %}

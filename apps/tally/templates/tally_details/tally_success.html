@@ -1,0 +1,181 @@
+{% extends "includes/base.html" %}
+{% load static %}
+
+{% block title %}Tally Creation Successful{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/tally/tally_details/tally_success.css' %}">
+<link rel="stylesheet" href="{% static 'css/tally/tally_details/tally_success_mobile.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="background"></div>
+
+<main class="page-content">
+    <div class="page-shell">
+
+        <div class="card form-card">
+            <div class="card-body p-4 p-md-5">
+
+                <div class="text-center mb-4">
+                    <h2 class="form-title mb-2">TALLY CREATED</h2>
+                    <div class="produce-title">Your tally has been created successfully.</div>
+                </div>
+
+                <div class="status-strip mb-4">
+                    <div class="status-left">
+                        <div class="status-dot"></div>
+                        <div>
+                            <div class="status-title">TALLY SAVED AS DRAFT</div>
+                            <div class="status-sub text-muted">
+                                Submit your tally from My Tallies page to send it for approval.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="status-meta">
+                        <div class="meta-item">
+                            <div class="meta-label">SD</div>
+                            <div class="meta-value">{{ latest_tally.sd_number|default:"-" }}</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">MK</div>
+                            <div class="meta-value">{{ latest_tally.mk_number|default:"-" }}</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">DATE</div>
+                            <div class="meta-value">{{ latest_tally.loading_date|date:"Y-m-d"|default:"-" }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-card mb-4">
+                    <h3 class="section-title mb-3">WHAT WOULD YOU LIKE TO DO?</h3>
+
+                    <div class="row g-3">
+                        <div class="col-12 col-lg-6">
+                            <a class="big-action big-action-primary" href="{{ latest_view_url|default:'#' }}" aria-label="View generated tally">
+                                <div class="big-action-title">VIEW TALLY</div>
+                                <div class="big-action-sub">Open the digitally designed tally sheet.</div>
+                            </a>
+                        </div>
+
+                        <div class="col-12 col-lg-6">
+                            <a class="big-action big-action-dark" href="{{ latest_excel_url|default:'#' }}" aria-label="Download generated excel">
+                                <div class="big-action-title">DOWNLOAD EXCEL</div>
+                                <div class="big-action-sub">Download the Excel file generated from your form.</div>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mt-1">
+                        <div class="col-12 col-lg-6">
+                            <a class="big-action big-action-outline" href="{{ latest_pdf_url|default:'#' }}" aria-label="Download generated pdf">
+                                <div class="big-action-title">DOWNLOAD PDF</div>
+                                <div class="big-action-sub">Optional: download a PDF copy for printing.</div>
+                            </a>
+                        </div>
+
+                        <div class="col-12 col-lg-6">
+                            <a class="big-action big-action-outline" href="{{ new_tally_url|default:'#' }}" aria-label="Create new tally">
+                                <div class="big-action-title">CREATE NEW TALLY</div>
+                                <div class="big-action-sub">Start another tally without leaving the system.</div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="recent-card">
+                    <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
+                        <h3 class="section-title mb-0">RECENT TALLIES</h3>
+                        <a href="{{ view_all_url|default:'#' }}" class="btn btn-sm btn-outline-brown fw-bold">VIEW ALL</a>
+                    </div>
+
+                    <!-- Desktop Table -->
+                    <div class="table-responsive desktop-only">
+                        <table class="table table-bordered align-middle recent-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th style="width: 80px;">NO.</th>
+                                    <th>SD</th>
+                                    <th>MK</th>
+                                    <th>VESSEL</th>
+                                    <th>DESTINATION</th>
+                                    <th style="width: 140px;">DATE</th>
+                                    <th style="width: 220px;">ACTIONS</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {% for t in recent_tallies %}
+                                <tr>
+                                    <td class="text-center fw-bold">{{ forloop.counter }}</td>
+                                    <td>{{ t.sd_number }}</td>
+                                    <td>{{ t.mk_number }}</td>
+                                    <td>{{ t.vessel }}</td>
+                                    <td>{{ t.destination }}</td>
+                                    <td>{{ t.loading_date|date:"Y-m-d" }}</td>
+                                    <td>
+                                        <div class="actions-row">
+                                            <a class="btn btn-sm btn-primary fw-bold" href="{{ t.view_url|default:'#' }}">VIEW</a>
+                                            <a class="btn btn-sm btn-dark fw-bold" href="{{ t.excel_url|default:'#' }}">EXCEL</a>
+                                            <a class="btn btn-sm btn-outline-secondary fw-bold" href="{{ t.pdf_url|default:'#' }}">PDF</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center text-muted py-4">No recent tallies found.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Mobile Cards -->
+                    <div class="mobile-only">
+                        {% for t in recent_tallies %}
+                        <div class="mobile-tally-card">
+                            <div class="mobile-tally-header">
+                                <div class="mobile-tally-number">{{ forloop.counter }}</div>
+                                <div>
+                                    <div class="mobile-tally-sd">{{ t.sd_number }}</div>
+                                    <div class="mobile-tally-mk">{{ t.mk_number }}</div>
+                                </div>
+                            </div>
+                            <div class="mobile-tally-info">
+                                <div class="mobile-tally-row">
+                                    <span class="mobile-tally-label">Vessel:</span>
+                                    <span class="mobile-tally-value">{{ t.vessel }}</span>
+                                </div>
+                                <div class="mobile-tally-row">
+                                    <span class="mobile-tally-label">Destination:</span>
+                                    <span class="mobile-tally-value">{{ t.destination }}</span>
+                                </div>
+                                <div class="mobile-tally-row">
+                                    <span class="mobile-tally-label">Date:</span>
+                                    <span class="mobile-tally-value">{{ t.loading_date|date:"Y-m-d" }}</span>
+                                </div>
+                            </div>
+                            <div class="mobile-tally-actions">
+                                <a class="btn btn-sm btn-primary fw-bold" href="{{ t.view_url|default:'#' }}">VIEW</a>
+                                <a class="btn btn-sm btn-dark fw-bold" href="{{ t.excel_url|default:'#' }}">EXCEL</a>
+                                <a class="btn btn-sm btn-outline-secondary fw-bold" href="{{ t.pdf_url|default:'#' }}">PDF</a>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="text-center text-muted py-4">No recent tallies found.</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="small text-muted mt-3">
+                        Tip: Use the search bar above to quickly pull a tally by SD or MK number.
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</main>
+{% endblock %}

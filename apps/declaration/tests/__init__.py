@@ -1,0 +1,1 @@
+# Declaration app tests

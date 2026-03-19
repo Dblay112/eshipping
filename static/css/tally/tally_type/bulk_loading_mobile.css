@@ -1,0 +1,154 @@
+/* ═══════════════════════════════════════════════════════════════
+   BULK LOADING MOBILE — bulk/bulk_loading.html
+   Mobile-specific styles
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Name chips grid (min-width 576px) */
+@media (min-width: 576px) {
+    .name-chips {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* Tablet and mobile layout (max-width 992px) */
+@media (max-width: 992px) {
+    .header-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .header-col .field-row {
+        grid-template-columns: 1fr;
+        align-items: start;
+    }
+
+    .split-inputs {
+        grid-template-columns: 1fr;
+    }
+
+    .name-row {
+        grid-template-columns: 1fr;
+    }
+
+    .nav-search {
+        width: 100%;
+    }
+
+    .nav-pills-wrap {
+        margin-top: 12px;
+        gap: 12px;
+    }
+
+    .nav-item-form {
+        width: 100%;
+    }
+
+    .nav-pill {
+        width: 100%;
+    }
+}
+
+/* Mobile page shell (max-width 576px) */
+@media (max-width: 576px) {
+    .page-shell {
+        padding: 12px;
+    }
+}
+
+/* Mobile bags calculator and table (max-width 576px) */
+@media (max-width: 576px) {
+    .bags-row {
+        grid-template-columns: 1fr;
+        gap: 6px;
+    }
+
+    .bags-input {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    /* Mobile table fixes - ensure all columns are visible and scrollable */
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+        display: block;
+        width: 100%;
+        position: relative;
+        margin-bottom: 1rem;
+        border: 2px solid #e6d5c3;
+        border-radius: 8px;
+    }
+
+    /* Removed scroll indicator shadow - was causing dark line on visible columns */
+
+    .container-table {
+        min-width: 950px; /* Increased to ensure all columns fit properly */
+        display: table;
+        margin-bottom: 0;
+    }
+
+    /* Make table cells more readable on mobile */
+    .container-table th,
+    .container-table td {
+        padding: 10px 8px;
+        font-size: 13px;
+        vertical-align: middle;
+    }
+
+    /* Column widths optimized for mobile scrolling */
+    .container-table th:nth-child(1),
+    .container-table td:nth-child(1) {
+        width: 60px;
+        min-width: 60px;
+    }
+
+    .container-table th:nth-child(2),
+    .container-table td:nth-child(2) {
+        width: 160px;
+        min-width: 160px;
+    }
+
+    .container-table th:nth-child(3),
+    .container-table td:nth-child(3) {
+        width: 140px;
+        min-width: 140px;
+    }
+
+    .container-table th:nth-child(4),
+    .container-table td:nth-child(4) {
+        width: 140px;
+        min-width: 140px;
+    }
+
+    .container-table th:nth-child(5),
+    .container-table td:nth-child(5) {
+        width: 140px;
+        min-width: 140px;
+    }
+
+    .container-table th:nth-child(6),
+    .container-table td:nth-child(6) {
+        width: 140px;
+        min-width: 140px;
+    }
+
+    .container-table th:nth-child(7),
+    .container-table td:nth-child(7) {
+        width: 130px;
+        min-width: 130px;
+    }
+
+    /* Action column stays visible */
+    .container-table th:nth-child(8),
+    .container-table td:nth-child(8) {
+        width: 80px;
+        min-width: 80px;
+        position: sticky;
+        right: 0;
+        background: #fff;
+        z-index: 1;
+    }
+
+    .container-table thead th:nth-child(8) {
+        background: #3f2a1d;
+    }
+}

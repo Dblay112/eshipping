@@ -1,0 +1,84 @@
+{% extends "includes/base.html" %}
+{% load static %}
+
+{% block title %}LOADING TYPE{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/tally/loading/loading.css' %}">
+<link rel="stylesheet" href="{% static 'css/tally/loading/loading_mobile.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="background1"></div>
+<div class="grid-overlay"></div>
+<img class="background" src="{% static 'images/shipping_vessel.png' %}" alt="">
+
+<section class="loading-shell">
+
+    <header class="loading-header">
+        <div class="company-badge">INTERNAL OPERATIONS</div>
+        <img src="{% static 'images/cmclogo.png' %}" alt="CMC Logo" class="loading-logo">
+        <h1 class="loading-title">Loading Type</h1>
+        <p class="loading-subtitle">Select the loading method you supervised to continue.</p>
+    </header>
+
+    <div class="loading-card">
+        <div class="security-notice">
+            Select one option — your choice determines the tally workflow and required fields.
+        </div>
+
+        <form method="post" action="{% url 'loading' %}" id="loadingTypeForm">
+            {% csrf_token %}
+
+            <div class="module-grid">
+
+                <button type="submit" name="loading_type" value="STRAIGHT" class="module-tile" aria-label="Straight loading">
+                    <div class="module-top">
+                        <div class="module-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none">
+                                <path d="M5 17h14M7 14h10M9 11h6M11 8h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <div class="module-badge">STANDARD</div>
+                    </div>
+                    <div class="module-body">
+                        <div class="module-title">Straight Loading</div>
+                        <p class="module-desc">Container-by-container tally entry with standard bag counts.</p>
+                    </div>
+                    <div class="module-cta">
+                        Continue
+                        <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                            <path d="M8 5l5 5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                </button>
+
+                <button type="submit" name="loading_type" value="BULK" class="module-tile" aria-label="Bulk loading">
+                    <div class="module-top">
+                        <div class="module-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none">
+                                <path d="M7 7h10M6 11h12M7 15h10M9 19h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <div class="module-badge module-badge-warn">BULK</div>
+                    </div>
+                    <div class="module-body">
+                        <div class="module-title">Bulk Loading</div>
+                        <p class="module-desc">Supports bags cut vs. bags loaded and bulk totals per container.</p>
+                    </div>
+                    <div class="module-cta">
+                        Continue
+                        <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                            <path d="M8 5l5 5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                </button>
+
+            </div>
+        </form>
+    </div>
+
+</section>
+
+{% endblock %}

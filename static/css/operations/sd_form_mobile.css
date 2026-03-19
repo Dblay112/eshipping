@@ -1,0 +1,225 @@
+/* Hide Django's default "Currently:" text and clear checkbox for file inputs */
+.sdt-si-file-row a {
+  display: none !important;
+}
+.sdt-si-file-row input[type="checkbox"] {
+  display: none !important;
+}
+/* Style for file name display */
+.sdt-si-file-name {
+  font-size: 11px;
+  color: #7d5a3b;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Additional mobile optimizations */
+@media (max-width: 768px) {
+  /* Touch-friendly buttons */
+  .sdt-si-file-btn,
+  .sdt-alloc-add-header-btn,
+  .sdt-btn {
+    min-height: 44px !important;
+    padding: 10px 16px !important;
+  }
+
+  /* Full-width form actions on mobile */
+  .sdt-form-actions {
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+
+  .sdt-form-actions .sdt-btn {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+}
+
+/* Styles extracted from sd_form.css */
+
+/* Touch-friendly inputs and buttons (600px) */
+@media (max-width: 600px) {
+   .sdt-form-card .form-control,
+   .sdt-form-card .form-select,
+   .sdt-si-input,
+   .sdt-si-select {
+      min-height: 44px;
+      font-size: 16px;
+      padding: 10px 14px;
+   }
+
+   .sdt-si-select {
+      padding-right: 36px;
+   }
+
+   /* Make remove buttons larger and more visible on mobile */
+   .sdt-alloc-block-remove,
+   .sdt-remove-row-btn {
+      width: 32px;
+      height: 32px;
+      border-width: 2px;
+   }
+
+   .sdt-alloc-block-remove svg,
+   .sdt-remove-row-btn svg {
+      width: 16px;
+      height: 16px;
+   }
+
+   /* iOS/mobile: render the X with CSS (more reliable than inline SVG) */
+   .sdt-alloc-block-remove {
+      position: relative;
+   }
+
+   .sdt-alloc-block-remove svg {
+      display: none;
+   }
+
+   .sdt-alloc-block-remove::before,
+   .sdt-alloc-block-remove::after {
+      content: "";
+      position: absolute;
+      width: 14px;
+      height: 2.5px;
+      background: #e07070;
+      border-radius: 3px;
+      left: 50%;
+      top: 50%;
+      transform-origin: center;
+   }
+
+   .sdt-alloc-block-remove::before {
+      transform: translate(-50%, -50%) rotate(45deg);
+   }
+
+   .sdt-alloc-block-remove::after {
+      transform: translate(-50%, -50%) rotate(-45deg);
+   }
+}
+
+/* Tonnage tracking columns (800px) */
+@media (max-width: 800px) {
+
+   .sdt-tt-col-loaded,
+   .sdt-tt-col-balance {
+      flex: 0 0 160px;
+   }
+}
+
+/* Tonnage tracking table mobile (620px) */
+@media (max-width: 620px) {
+   .sdt-tt-thead {
+      display: none;
+   }
+
+   .sdt-tt-data-row,
+   .sdt-tt-tfoot {
+      flex-direction: column;
+      align-items: stretch;
+   }
+
+   .sdt-tt-td {
+      border-left: none !important;
+      border-top: 1px solid #ede3da;
+   }
+
+   .sdt-tt-col-loaded,
+   .sdt-tt-col-balance {
+      flex: unset;
+   }
+
+   .sdt-tt-tfoot .sdt-tt-col-loaded,
+   .sdt-tt-tfoot .sdt-tt-col-balance {
+      border-top-color: rgba(255, 255, 255, .12);
+   }
+}
+
+/* Allocation rows (860px) */
+@media (max-width: 860px) {
+   .sdt-alloc-row-inner:not(.sdt-alloc-row2) {
+      grid-template-columns: 60px 1fr 1fr 100px;
+   }
+
+   .sdt-alloc-buyer-cell {
+      grid-column: 1 / -1;
+   }
+
+   .sdt-alloc-row2 {
+      grid-template-columns: 1fr 1fr 90px 110px;
+   }
+
+   .sdt-alloc-excel-cell {
+      grid-column: 1 / -1;
+   }
+}
+
+/* Shipment info bands (700px) */
+@media (max-width: 700px) {
+   .sdt-si-band {
+      flex-direction: column;
+   }
+
+   .sdt-si-band-label {
+      width: 100%;
+      border-right: none;
+      border-bottom: 1px solid #f0e8e0;
+      padding: 10px 16px;
+   }
+
+   .sdt-si-fields {
+      padding: 14px 16px;
+   }
+
+   .sdt-si-field-sd,
+   .sdt-si-field-date,
+   .sdt-si-field-sm,
+   .sdt-si-field-xs {
+      flex: 1 1 140px;
+   }
+}
+
+/* Save draft bar and grids (600px) */
+@media (max-width: 600px) {
+   .sdt-save-draft-bar {
+      flex-direction: column;
+      align-items: flex-start;
+   }
+
+   .sdt-btn-save-draft {
+      width: 100%;
+      justify-content: center;
+   }
+
+   .sdt-tt-grid {
+      grid-template-columns: 1fr 1fr;
+   }
+
+   .sdt-form-group-sm {
+      flex: 1;
+      min-width: 140px;
+   }
+}
+
+/* Allocation rows compact (560px) */
+@media (max-width: 560px) {
+
+   .sdt-alloc-row-inner:not(.sdt-alloc-row2),
+   .sdt-alloc-row2 {
+      grid-template-columns: 1fr 1fr;
+   }
+
+   .sdt-alloc-buyer-cell,
+   .sdt-alloc-excel-cell {
+      grid-column: 1 / -1;
+   }
+}
+
+/* Single column grid (480px) */
+@media (max-width: 480px) {
+   .sdt-tt-grid {
+      grid-template-columns: 1fr;
+   }
+}
+

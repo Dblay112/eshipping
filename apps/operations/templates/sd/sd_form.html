@@ -1,0 +1,607 @@
+{% extends "includes/base.html" %}
+{% load static %}
+{% load sd_permissions %}
+{% block title %}{{ action }} SD Record — CMC{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/operations/sd_form.css' %}?v=2">
+<link rel="stylesheet" href="{% static 'css/custom-datepicker.css' %}">
+<link rel="stylesheet" href="{% static 'css/operations/sd_form_mobile.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="sdt-page sdt-form-page">
+  <div class="sdt-form-header">
+    <a href="{% url 'operations_list' %}" class="sdt-back-link">
+      <svg viewBox="0 0 20 20" fill="none"><path d="M13 4l-6 6 6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back to SD Records
+    </a>
+    <h1 class="sdt-page-title">{{ action }} SD Record</h1>
+    <p class="sdt-page-sub">Enter shipping declaration details. You can save a draft first, then come back to add loading details.</p>
+  </div>
+
+  {% if messages %}
+  <div class="sdt-messages">{% for m in messages %}<div class="sdt-alert sdt-alert-{{ m.tags }}">{{ m }}</div>{% endfor %}</div>
+  {% endif %}
+
+  {% if form.errors or alloc_formset.errors or alloc_formset.non_form_errors or container_formset.errors or container_formset.non_form_errors or clerk_formset.errors or clerk_formset.non_form_errors %}
+  <div class="sdt-messages">
+    <div class="sdt-alert sdt-alert-error">
+      <strong>Please fix the following errors:</strong>
+      {% if form.errors %}
+        <ul>
+        {% for field, errors in form.errors.items %}
+          <li><strong>{{ field }}:</strong> {{ errors|join:", " }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+      {% if alloc_formset.non_form_errors %}
+        <ul><li><strong>Contract Allocations:</strong> {{ alloc_formset.non_form_errors|join:", " }}</li></ul>
+      {% endif %}
+      {% if alloc_formset.errors %}
+        {% for form_errors in alloc_formset.errors %}
+          {% if form_errors %}
+            <ul>
+            {% for field, errors in form_errors.items %}
+              <li><strong>Contract {{ forloop.parentloop.counter }} - {{ field }}:</strong> {{ errors|join:", " }}</li>
+            {% endfor %}
+            </ul>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+      {% if container_formset.non_form_errors %}
+        <ul><li><strong>Containers:</strong> {{ container_formset.non_form_errors|join:", " }}</li></ul>
+      {% endif %}
+      {% if container_formset.errors %}
+        {% for form_errors in container_formset.errors %}
+          {% if form_errors %}
+            <ul>
+            {% for field, errors in form_errors.items %}
+              <li><strong>Container {{ forloop.parentloop.counter }} - {{ field }}:</strong> {{ errors|join:", " }}</li>
+            {% endfor %}
+            </ul>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+      {% if clerk_formset.non_form_errors %}
+        <ul><li><strong>Clerks:</strong> {{ clerk_formset.non_form_errors|join:", " }}</li></ul>
+      {% endif %}
+      {% if clerk_formset.errors %}
+        {% for form_errors in clerk_formset.errors %}
+          {% if form_errors %}
+            <ul>
+            {% for field, errors in form_errors.items %}
+              <li><strong>Clerk {{ forloop.parentloop.counter }} - {{ field }}:</strong> {{ errors|join:", " }}</li>
+            {% endfor %}
+            </ul>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  <form method="post" enctype="multipart/form-data" class="sdt-form-wrap" id="sdMainForm">
+    {% csrf_token %}
+    <input type="hidden" name="form_action" id="formAction" value="save_draft">
+
+    <!-- SECTION 1: Shipment Information — redesigned -->
+    <div class="sdt-shipment-card">
+
+      <!-- Card header -->
+      <div class="sdt-si-header">
+        <div class="sdt-si-header-icon">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 10h16M4 14h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><rect x="2" y="3" width="20" height="18" rx="3" stroke="currentColor" stroke-width="2"/></svg>
+        </div>
+        <div>
+          <div class="sdt-si-header-title">Shipment Information</div>
+          <div class="sdt-si-header-sub">Core details of the shipping declaration</div>
+        </div>
+      </div>
+
+      <!-- ── Band 1: Reference & Dates ── -->
+      <div class="sdt-si-band">
+        <div class="sdt-si-band-label">
+          <span>Reference &amp; Dates</span>
+        </div>
+        <div class="sdt-si-fields">
+
+          <!-- SD Number — prominent -->
+          <div class="sdt-si-field sdt-si-field-sd">
+            <label class="sdt-si-label">SD Number <span class="sdt-required">*</span></label>
+            <input type="text" name="sd_number" id="id_sd_number"
+                   value="{{ form.sd_number.value|default:'' }}"
+                   class="sdt-si-input sdt-si-input-bold"
+                   placeholder="SD100" autocomplete="off">
+            {% if form.sd_number.errors %}<p class="sdt-form-error">{{ form.sd_number.errors.0 }}</p>{% endif %}
+          </div>
+
+          {% if sd %}
+          <!-- Date of Entry (read-only, auto-set on creation) -->
+          <div class="sdt-si-field sdt-si-field-date">
+            <label class="sdt-si-label">Date of Entry</label>
+            <input type="text" value="{{ sd.date_of_entry|date:'d M Y' }}" class="sdt-si-input" readonly style="background:#f8f2ec;cursor:not-allowed;">
+          </div>
+          {% endif %}
+
+          <!-- ETA -->
+          <div class="sdt-si-field sdt-si-field-date">
+            <label class="sdt-si-label">ETA <span class="sdt-si-optional">optional</span></label>
+            <input type="text" name="eta" id="id_eta"
+                   value="{{ form.eta.value|default:'' }}"
+                   class="sdt-si-input"
+                   placeholder="YYYY-MM-DD"
+                   data-datepicker
+                   readonly>
+          </div>
+
+          <!-- Document Reference -->
+          <div class="sdt-si-field sdt-si-field-wide">
+            <label class="sdt-si-label">Document Reference <span class="sdt-required">*</span></label>
+            <input type="text" name="si_ref" id="id_si_ref"
+                   value="{{ form.si_ref.value|default:'' }}"
+                   class="sdt-si-input sdt-si-mono"
+                   placeholder="CMC/FAC/TEM/25-26/416">
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── Band 2: Vessel & Cargo ── -->
+      <div class="sdt-si-band">
+        <div class="sdt-si-band-label">
+          <span>Vessel &amp; Cargo</span>
+        </div>
+        <div class="sdt-si-fields">
+
+          <!-- Vessel Name — spans wider -->
+          <div class="sdt-si-field sdt-si-field-vessel">
+            <label class="sdt-si-label">Vessel Name <span class="sdt-required">*</span></label>
+            <input type="text" name="vessel_name" id="id_vessel_name"
+                   value="{{ form.vessel_name.value|default:'' }}"
+                   class="sdt-si-input sdt-si-upper"
+                   placeholder="MSC IKARIA VI">
+            {% if form.vessel_name.errors %}<p class="sdt-form-error">{{ form.vessel_name.errors.0 }}</p>{% endif %}
+          </div>
+
+          <!-- Crop Year -->
+          <div class="sdt-si-field sdt-si-field-sm">
+            <label class="sdt-si-label">Crop Year <span class="sdt-required">*</span></label>
+            <div class="sdt-si-select-wrap">
+              {{ form.crop_year }}
+              <svg class="sdt-si-select-arrow" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            {% if form.crop_year.errors %}<p class="sdt-form-error">{{ form.crop_year.errors.0 }}</p>{% endif %}
+          </div>
+
+          <!-- Total Tonnage -->
+          <div class="sdt-si-field sdt-si-field-sm">
+            <label class="sdt-si-label">Total Tonnage (MT) <span class="sdt-required">*</span></label>
+            <input type="number" name="tonnage" id="id_tonnage"
+                   value="{{ form.tonnage.value|clean_decimal|default:'' }}"
+                   class="sdt-si-input sdt-si-num"
+                   placeholder="0">
+            {% if form.tonnage.errors %}<p class="sdt-form-error">{{ form.tonnage.errors.0 }}</p>{% endif %}
+          </div>
+
+          <!-- Agent -->
+          <div class="sdt-si-field sdt-si-field-xs">
+            <label class="sdt-si-label">Agent <span class="sdt-required">*</span></label>
+            <input type="text" name="agent" id="id_agent"
+                   value="{{ form.agent.value|default:'' }}"
+                   class="sdt-si-input sdt-si-upper"
+                   placeholder="MSC">
+            {% if form.agent.errors %}<p class="sdt-form-error">{{ form.agent.errors.0 }}</p>{% endif %}
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── Band 3: Routing ── -->
+      <div class="sdt-si-band sdt-si-band-last">
+        <div class="sdt-si-band-label">
+          <span>Routing</span>
+        </div>
+        <div class="sdt-si-fields">
+
+          <!-- Port of Loading -->
+          <div class="sdt-si-field sdt-si-field-sm">
+            <label class="sdt-si-label">Port of Loading</label>
+            <div class="sdt-si-select-wrap">
+              <select name="port_of_loading" id="id_port_of_loading" class="sdt-si-select">
+                <option value="TEMA"     {% if form.port_of_loading.value == 'TEMA' or not form.port_of_loading.value %}selected{% endif %}>Tema</option>
+                <option value="TAKORADI" {% if form.port_of_loading.value == 'TAKORADI' %}selected{% endif %}>Takoradi</option>
+                <option value="KUMASI"   {% if form.port_of_loading.value == 'KUMASI' %}selected{% endif %}>Kumasi</option>
+              </select>
+              <svg class="sdt-si-select-arrow" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+
+          <!-- Port of Discharge -->
+          <div class="sdt-si-field sdt-si-field-wide">
+            <label class="sdt-si-label">Port of Discharge <span class="sdt-required">*</span></label>
+            <input type="text" name="port_of_discharge" id="id_port_of_discharge"
+                   value="{{ form.port_of_discharge.value|default_if_none:'' }}"
+                   class="sdt-si-input sdt-si-upper"
+                   placeholder="ANTWERP">
+          </div>
+
+          <!-- SD Document upload — inline, sits at end of routing band -->
+          <div class="sdt-si-field sdt-si-field-doc">
+            <label class="sdt-si-label">SD Document <span class="sdt-si-optional">PDF</span></label>
+            <div class="sdt-si-file-row">
+              <label class="sdt-si-file-btn" for="id_sd_document">
+                <svg viewBox="0 0 16 16" fill="none"><path d="M8 2v8M5 5l3-3 3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 12h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                {% if sd and sd.sd_document %}Replace PDF{% else %}Attach PDF{% endif %}
+              </label>
+              <span class="sdt-si-file-name" id="sdDocName">
+                {% if sd and sd.sd_document %}
+                  <a href="{{ sd.sd_document.url }}" target="_blank" style="color:#7d5a3b;text-decoration:underline;">{{ sd.sd_document.name|slice:"20:" }}</a>
+                  <span style="color:#888;font-size:11px;margin-left:8px;">(Upload new file to replace)</span>
+                {% else %}
+                  No file chosen
+                {% endif %}
+              </span>
+              <input type="file" name="sd_document" id="id_sd_document" accept=".pdf" style="display:none">
+            </div>
+          </div>
+
+          <!-- Container List upload -->
+          <div class="sdt-si-field sdt-si-field-doc">
+            <label class="sdt-si-label">Container List <span class="sdt-si-optional">Excel</span></label>
+            <div class="sdt-si-file-row">
+              <label class="sdt-si-file-btn" for="id_container_list">
+                <svg viewBox="0 0 16 16" fill="none"><path d="M8 2v8M5 5l3-3 3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 12h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                {% if sd and sd.container_list %}Replace Excel{% else %}Attach Excel{% endif %}
+              </label>
+              <span class="sdt-si-file-name" id="containerListName">
+                {% if sd and sd.container_list %}
+                  <a href="{{ sd.container_list.url }}" target="_blank" style="color:#7d5a3b;text-decoration:underline;">{{ sd.container_list.name|slice:"20:" }}</a>
+                  <span style="color:#888;font-size:11px;margin-left:8px;">(Upload new file to replace)</span>
+                {% else %}
+                  No file chosen
+                {% endif %}
+              </span>
+              <input type="file" name="container_list" id="id_container_list" accept=".xlsx,.xls" style="display:none">
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div><!-- /sdt-shipment-card -->
+
+    <!-- SECTION 2: Contract Allocations -->
+    <div class="sdt-alloc-card" id="allocCard">
+
+      <!-- Card header — same dark style as Shipment Information -->
+      <div class="sdt-si-header">
+        <div class="sdt-si-header-icon">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div style="flex:1;">
+          <div class="sdt-si-header-title">Contract Allocations <span class="sdt-alloc-header-count" id="allocCount"></span></div>
+          <div class="sdt-si-header-sub">One band per contract line (A, B, C… from the SD document)</div>
+        </div>
+        <button type="button" class="sdt-alloc-add-header-btn" id="addAllocBtn">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          Add Contract Line
+        </button>
+      </div>
+
+      {{ alloc_formset.management_form }}
+      <div id="allocList">
+
+        {% for af in alloc_formset %}
+        <div class="sdt-alloc-block {% if not forloop.first %}sdt-alloc-block-extra{% endif %}" data-form-idx="{{ forloop.counter0 }}">
+
+          <!-- Block header: contract letter badge + contract no preview + X -->
+          <div class="sdt-alloc-block-header">
+            <span class="sdt-alloc-block-badge">{{ forloop.counter }}</span>
+            <span class="sdt-alloc-block-preview" id="allocPreview_{{ forloop.counter0 }}">Contract {{ forloop.counter }}</span>
+            <button type="button"
+                    class="sdt-alloc-block-remove {% if forloop.first %}sdt-remove-first-alloc{% endif %}"
+                    onclick="removeAllocRow(this)" title="Remove this contract line">
+              <svg viewBox="0 0 16 16" fill="none"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+
+          <!-- Band A: Primary fields -->
+          <div class="sdt-si-band">
+            <div class="sdt-si-band-label"><span>Contract</span></div>
+            <div class="sdt-si-fields">
+
+              <div class="sdt-si-field" style="flex:0 0 56px;">
+                <label class="sdt-si-label">Label</label>
+                <input type="text" name="{{ af.allocation_label.html_name }}" id="{{ af.allocation_label.id_for_label }}"
+                       value="{{ af.allocation_label.value|default:'' }}"
+                       class="sdt-si-input sdt-si-input-bold" placeholder="A"
+                       oninput="updateAllocPreview({{ forloop.counter0 }})">
+              </div>
+
+              <div class="sdt-si-field" style="flex:2;min-width:180px;">
+                <label class="sdt-si-label">Contract No. <span class="sdt-required">*</span></label>
+                <input type="text" name="{{ af.contract_number.html_name }}" id="{{ af.contract_number.id_for_label }}"
+                       value="{{ af.contract_number.value|default:'' }}"
+                       class="sdt-si-input sdt-si-mono alloc-contract-number"
+                       placeholder="e.g. NJ2604251911 PT"
+                       data-alloc-idx="{{ forloop.counter0 }}"
+                       oninput="updateAllocPreview({{ forloop.counter0 }})"
+                       autocomplete="off">
+              </div>
+
+              <div class="sdt-si-field" style="flex:1.5;min-width:150px;">
+                <label class="sdt-si-label">MK No. <span class="sdt-required">*</span></label>
+                <input type="text" name="{{ af.mk_number.html_name }}" id="{{ af.mk_number.id_for_label }}"
+                       value="{{ af.mk_number.value|default:'' }}"
+                       class="sdt-si-input sdt-si-mono"
+                       placeholder="e.g. MK 042519">
+              </div>
+
+              <div class="sdt-si-field" style="flex:0 0 130px;">
+                <label class="sdt-si-label">Tonnage (MT) <span class="sdt-required">*</span></label>
+                <input type="number" name="{{ af.allocated_tonnage.html_name }}" id="{{ af.allocated_tonnage.id_for_label }}"
+                       value="{{ af.allocated_tonnage.value|clean_decimal|default:'' }}"
+                       class="sdt-si-input sdt-si-num alloc-tonnage-input"
+                       data-alloc-idx="{{ forloop.counter0 }}"
+                       placeholder="0">
+              </div>
+
+              <div class="sdt-si-field" style="flex:1.2;min-width:140px;">
+                <label class="sdt-si-label">Buyer</label>
+                <input type="text" name="{{ af.buyer.html_name }}" id="{{ af.buyer.id_for_label }}"
+                       value="{{ af.buyer.value|default:'' }}"
+                       class="sdt-si-input" placeholder="e.g. AGRI, TOUTON">
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Band B: Secondary fields -->
+          <div class="sdt-si-band sdt-si-band-last">
+            <div class="sdt-si-band-label"><span>Details</span></div>
+            <div class="sdt-si-fields">
+
+              <div class="sdt-si-field" style="flex:1.5;min-width:160px;">
+                <label class="sdt-si-label">SI Ref <span class="sdt-si-optional">optional</span></label>
+                <input type="text" name="{{ af.si_ref.html_name }}" id="{{ af.si_ref.id_for_label }}"
+                       value="{{ af.si_ref.value|default:'' }}"
+                       class="sdt-si-input" placeholder="e.g. TO25434">
+              </div>
+
+              <div class="sdt-si-field" style="flex:1.5;min-width:160px;">
+                <label class="sdt-si-label">Cocoa Type</label>
+                <input type="text" name="{{ af.cocoa_type.html_name }}" id="{{ af.cocoa_type.id_for_label }}"
+                       value="{{ af.cocoa_type.value|default:'' }}"
+                       class="sdt-si-input" placeholder="e.g. CLT. 5, KUAPA">
+              </div>
+
+              <div class="sdt-si-field" style="flex:0 0 100px;">
+                <label class="sdt-si-label">Cont. Size</label>
+                <div class="sdt-si-select-wrap">
+                  <select name="alloc_container_size_{{ forloop.counter0 }}" class="sdt-si-select">
+                    <option value="40FT">40FT</option>
+                    <option value="20FT">20FT</option>
+                  </select>
+                  <svg class="sdt-si-select-arrow" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+              </div>
+
+              <div class="sdt-si-field" style="flex:0 0 130px;">
+                <label class="sdt-si-label">Loading Type</label>
+                <div class="sdt-si-select-wrap">
+                  <select name="{{ af.notes.html_name }}" class="sdt-si-select">
+                    <option value="">— Select —</option>
+                    <option value="STRAIGHT" {% if af.notes.value == 'STRAIGHT' %}selected{% endif %}>Straight</option>
+                    <option value="BULK" {% if af.notes.value == 'BULK' %}selected{% endif %}>Bulk</option>
+                  </select>
+                  <svg class="sdt-si-select-arrow" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          {% if af.instance.pk %}<div style="display:none;">{{ af.DELETE }}</div>{% endif %}
+          {{ af.id }}
+
+        </div><!-- /sdt-alloc-block -->
+        {% endfor %}
+
+      </div><!-- /allocList -->
+    </div><!-- /sdt-alloc-card -->
+
+    <!-- SAVE DRAFT BUTTON — before loading/clerks sections -->
+    <div class="sdt-save-draft-bar">
+      <div class="sdt-save-draft-info">
+        <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.6"/><path d="M10 6v4l2 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <span>Save the SD record now. You can come back later to add loading details, tonnage tracking and clerks.</span>
+      </div>
+      <button type="submit" class="sdt-btn sdt-btn-save-draft" onclick="setAction('save_draft')">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M2 10v3h12v-3M8 2v8M5 6l3-3 3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Save SD Record
+      </button>
+    </div>
+
+    <!-- SECTION 3: Tonnage Tracking (filled after loading starts) -->
+    <div class="sdt-form-card sdt-loading-section">
+      <div class="sdt-form-card-title">
+        <svg viewBox="0 0 20 20" fill="none"><path d="M4 14l4-8 2 4 2-3 4 7H4z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        Tonnage Tracking
+        <span class="sdt-form-optional" style="font-size:11px;margin-left:6px;font-weight:500;">— fill in after loading begins</span>
+      </div>
+
+      <!-- Table -->
+      <div class="sdt-tt-table">
+
+        <!-- Header row -->
+        <div class="sdt-tt-thead">
+          <div class="sdt-tt-th sdt-tt-col-contract">Contract</div>
+          <div class="sdt-tt-th sdt-tt-col-loaded">Tonnage Loaded (MT)</div>
+          <div class="sdt-tt-th sdt-tt-col-balance">Balance</div>
+        </div>
+
+        <!-- Data rows — one per contract, built by JS -->
+        <div id="ttContractRows">
+          <!-- injected by buildTTTable() -->
+        </div>
+
+        <!-- Totals footer -->
+        <div class="sdt-tt-tfoot">
+          <div class="sdt-tt-td sdt-tt-col-contract sdt-tt-foot-label">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h12M2 12h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            Grand Total
+            <span class="sdt-tt-foot-sub" id="grandTotalTonnage"></span>
+          </div>
+          <div class="sdt-tt-td sdt-tt-col-loaded">
+            <span class="sdt-tt-foot-value" id="grandTotalLoaded">—</span>
+          </div>
+          <div class="sdt-tt-td sdt-tt-col-balance">
+            <span class="sdt-balance-display" id="grandBalanceDisplay">—</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Hidden fields that get submitted -->
+      <div style="display:none;">
+        {{ form.opening_balance }}
+        {{ form.tonnage_loaded }}
+      </div>
+    </div>
+
+    <!-- SECTION 4: Clerks / Tally Officers (filled after loading starts) -->
+    <div class="sdt-form-card sdt-loading-section">
+      <div class="sdt-form-card-title">
+        <svg viewBox="0 0 20 20" fill="none"><circle cx="8" cy="7" r="3" stroke="currentColor" stroke-width="1.8"/><path d="M2 17c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        Approved Tallies
+        <span class="sdt-form-optional" style="font-size:11px;margin-left:6px;font-weight:500;">— automatically loaded from tally sheets</span>
+      </div>
+
+      {% if sd %}
+        {% if sd.approved_tallies %}
+          <div style="padding:20px 24px;">
+            <div style="display:grid;gap:12px;">
+              {% for tally in sd.approved_tallies %}
+              <div style="display:flex;align-items:center;gap:16px;padding:12px 16px;background:#f8f2ec;border-radius:6px;border:1px solid #e8ddd0;">
+                <div style="flex:1;">
+                  <div style="font-weight:600;color:#3d2817;margin-bottom:4px;">
+                    Tally #{{ tally.tally_number }}
+                    <span style="color:#2e7d32;margin-left:8px;font-size:13px;">✓ APPROVED</span>
+                  </div>
+                  <div style="font-size:13px;color:#7d5a3b;">
+                    {% if tally.created_by %}
+                      {{ tally.created_by.first_name }} {{ tally.created_by.last_name }} ({{ tally.created_by.staff_number }})
+                    {% else %}
+                      Clerk: {{ tally.clerk_name|join:", " }}
+                    {% endif %}
+                    • {{ tally.loading_date|date:"d M Y" }}
+                    {% if tally.terminal %} • {{ tally.terminal.name }}{% endif %}
+                  </div>
+                </div>
+                <div style="text-align:right;">
+                  <a href="{% url 'tally_view' tally.pk %}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:#5c3d2e;color:white;text-decoration:none;font-size:12px;font-weight:600;border-radius:4px;">
+                    <svg viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M8 2v8M5 5l3-3 3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 12h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                    View Tally
+                  </a>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        {% else %}
+          <div style="text-align:center;padding:32px 24px;color:#999;">
+            <svg viewBox="0 0 64 64" fill="none" style="width:48px;height:48px;margin:0 auto 12px;opacity:0.3;">
+              <path d="M16 20h32M16 32h32M16 44h20" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+              <rect x="12" y="12" width="40" height="40" rx="4" stroke="currentColor" stroke-width="3"/>
+            </svg>
+            <div style="font-size:14px;color:#7d5a3b;font-weight:500;">No approved tallies yet</div>
+            <div style="font-size:12px;color:#999;margin-top:4px;">Tallies will appear here automatically once approved by supervisors</div>
+          </div>
+        {% endif %}
+      {% else %}
+        <div style="text-align:center;padding:32px 24px;color:#999;">
+          <div style="font-size:13px;color:#7d5a3b;">Save the SD record first to see approved tallies</div>
+        </div>
+      {% endif %}
+
+      <!-- Hidden clerk formset for backward compatibility -->
+      <div style="display:none;">
+        {{ clerk_formset.management_form }}
+        <div id="clerksList">
+          {% for clk in clerk_formset %}
+            {{ clk.officer }}
+            {{ clk.officer_name }}
+            {{ clk.tally_reference }}
+            {{ clk.date_worked }}
+            {{ clk.id }}
+            {% if clk.instance.pk %}{{ clk.DELETE }}{% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 5: Extra Notes -->
+    <div class="sdt-form-card">
+      <div class="sdt-form-card-title">
+        <svg viewBox="0 0 20 20" fill="none"><path d="M4 6h12M4 10h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        Extra Notes <span class="sdt-form-optional" style="font-size:11px;margin-left:6px;font-weight:500;">— optional</span>
+      </div>
+      <div class="sdt-form-group">{{ form.stock_allocation_notes }}</div>
+    </div>
+
+    {% if sd_record %}
+    <!-- Audit Trail (only shown when editing) -->
+    <div class="sdt-form-card" style="background: #fefaf5; border-color: #e8dcc8;">
+      <div class="sdt-form-card-title" style="font-size: 13px; color: #6b5a47;">
+        <svg viewBox="0 0 20 20" fill="none" width="16" height="16"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.8"/><path d="M10 6v4l2 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        Record History
+      </div>
+      <div class="sdt-info-grid" style="font-size: 13px;">
+        {% if sd_record.created_by %}
+        <div class="sdt-info-item" style="grid-column: 1 / -1;">
+          <span class="sdt-info-label">Created by</span>
+          <span class="sdt-info-value">{{ sd_record.created_by.first_name }} {{ sd_record.created_by.last_name }} on {{ sd_record.created_at|date:"d M Y, g:i A" }}</span>
+        </div>
+        {% endif %}
+        {% if sd_record.updated_by %}
+        <div class="sdt-info-item" style="grid-column: 1 / -1;">
+          <span class="sdt-info-label">Last updated by</span>
+          <span class="sdt-info-value">{{ sd_record.updated_by.first_name }} {{ sd_record.updated_by.last_name }} on {{ sd_record.updated_at|date:"d M Y, g:i A" }}</span>
+        </div>
+        {% elif sd_record.updated_at %}
+        <div class="sdt-info-item" style="grid-column: 1 / -1;">
+          <span class="sdt-info-label">Last updated</span>
+          <span class="sdt-info-value">{{ sd_record.updated_at|date:"d M Y, g:i A" }}</span>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="sdt-form-actions">
+      <a href="{% url 'operations_list' %}" class="sdt-btn sdt-btn-ghost">Cancel</a>
+      <button type="submit" class="sdt-btn sdt-btn-primary" onclick="setAction('create')">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        {{ action }} SD Record
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/core/auto-prefix.js' %}"></script>
+<script>
+window.SD_FORM_CONFIG = {
+  savedTonnageLoaded: {
+    {% if sd and sd.allocations.exists %}
+    {% for alloc in sd.allocations.all %}
+    {{ forloop.counter0 }}: '{{ alloc.tonnage_loaded|clean_decimal|default:"" }}',
+    {% endfor %}
+    {% endif %}
+  },
+};
+</script>
+<script src="{% static 'js/features/sd/sd-form.js' %}"></script>
+<script src="{% static 'js/ui/custom-datepicker.js' %}"></script>
+{% endblock %}

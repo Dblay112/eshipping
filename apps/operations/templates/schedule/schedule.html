@@ -1,0 +1,241 @@
+{% extends "includes/base.html" %}
+{% load static %}
+{% load sd_permissions %}
+
+{% block title %}Schedule — CMC{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/operations/schedule.css' %}">
+<link rel="stylesheet" href="{% static 'css/operations/schedule_mobile.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="sdt-page">
+
+  <!-- Page Header -->
+  <div class="sdt-page-header">
+    <div class="sdt-page-header-inner">
+      <div>
+        <h1 class="sdt-page-title">Allocation Schedule</h1>
+        <p class="sdt-page-sub">Daily SD allocations &amp; officer assignments</p>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div class="sdt-view-toggle">
+          <a href="?mine=false&date={{ selected_date|date:'Y-m-d' }}&cal_year={{ cal_year }}&cal_month={{ cal_month }}" class="sdt-toggle-btn {% if not show_mine %}active{% endif %}">All Records</a>
+          <a href="?mine=true&date={{ selected_date|date:'Y-m-d' }}&cal_year={{ cal_year }}&cal_month={{ cal_month }}" class="sdt-toggle-btn {% if show_mine %}active{% endif %}">My Records</a>
+        </div>
+        {% if is_superior %}
+        <a href="{% url 'schedule_create' %}?date={{ today|date:'Y-m-d' }}" class="sdt-btn sdt-btn-primary">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          Create Schedule
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="sdt-schedule-layout">
+
+    <!-- LEFT: Calendar Panel -->
+    <aside class="sdt-calendar-panel">
+      <div class="sdt-calendar-card">
+        <div class="sdt-cal-nav">
+          <a href="?date={{ selected_date|date:'Y-m-d' }}&cal_year={{ prev_month|date:'Y' }}&cal_month={{ prev_month|date:'n' }}" class="sdt-cal-nav-btn" title="Previous month">
+            <svg viewBox="0 0 12 20" fill="none"><path d="M10 2L2 10l8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <span class="sdt-cal-month-label">{{ cal_month_name }}</span>
+          <a href="?date={{ selected_date|date:'Y-m-d' }}&cal_year={{ next_month|date:'Y' }}&cal_month={{ next_month|date:'n' }}" class="sdt-cal-nav-btn" title="Next month">
+            <svg viewBox="0 0 12 20" fill="none"><path d="M2 2l8 8-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+        </div>
+
+        <div class="sdt-cal-grid">
+          <div class="sdt-cal-dow">Su</div>
+          <div class="sdt-cal-dow">Mo</div>
+          <div class="sdt-cal-dow">Tu</div>
+          <div class="sdt-cal-dow">We</div>
+          <div class="sdt-cal-dow">Th</div>
+          <div class="sdt-cal-dow">Fr</div>
+          <div class="sdt-cal-dow">Sa</div>
+
+          {% for week in cal_weeks %}
+            {% for day in week %}
+              {% if day == 0 %}
+                <div class="sdt-cal-day sdt-cal-empty"></div>
+              {% else %}
+                {% with day_str=cal_year|stringformat:"d" %}
+                {% with full_date=cal_year|stringformat:"04d"|add:"-"|add:cal_month|stringformat:"02d"|add:"-"|add:day|stringformat:"02d" %}
+                <a href="?date={{ cal_year }}-{{ cal_month|stringformat:'02d' }}-{{ day|stringformat:'02d' }}&cal_year={{ cal_year }}&cal_month={{ cal_month }}"
+                   class="sdt-cal-day{% if cal_year == selected_date.year and cal_month == selected_date.month and day == selected_date.day %} selected{% endif %}{% if cal_year == today.year and cal_month == today.month and day == today.day %} today{% endif %}">
+                  {{ day }}
+                  {% with check_date=cal_year|stringformat:"04d" %}
+                  {% endwith %}
+                </a>
+                {% endwith %}
+                {% endwith %}
+              {% endif %}
+            {% endfor %}
+          {% endfor %}
+        </div>
+
+        <!-- Scheduled dates dots are injected via JS below -->
+        <div class="sdt-cal-legend">
+          <span class="sdt-cal-dot-legend"></span> Schedule exists
+        </div>
+      </div>
+
+      <!-- Quick jump to today -->
+      <a href="?date={{ today|date:'Y-m-d' }}&cal_year={{ today|date:'Y' }}&cal_month={{ today|date:'n' }}" class="sdt-today-btn">
+        <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="4" width="14" height="14" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M3 8h14M7 2v4M13 2v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        Jump to Today
+      </a>
+    </aside>
+
+    <!-- RIGHT: Schedule Display -->
+    <div class="sdt-schedule-main">
+      <div class="sdt-schedule-date-bar">
+        <div class="sdt-schedule-date-info">
+          <span class="sdt-schedule-weekday">{{ selected_date|date:"l" }}</span>
+          <span class="sdt-schedule-fulldate">{{ selected_date|date:"j F Y" }}</span>
+        </div>
+        {% if schedule and is_superior %}
+        <div style="display:flex;gap:8px;">
+          <a href="{% url 'schedule_edit' schedule.pk %}" class="sdt-btn sdt-btn-ghost">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M11.5 2.5l2 2L5 13H3v-2L11.5 2.5z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Edit Schedule
+          </a>
+          <a href="{% url 'schedule_delete' schedule.pk %}" class="sdt-btn sdt-btn-ghost" style="background:#fee;border-color:#fcc;color:#c00;">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            Delete
+          </a>
+        </div>
+        {% endif %}
+      </div>
+
+      {% if schedule %}
+        <div class="sdt-schedule-meta">
+          <span class="sdt-schedule-badge">{{ schedule.entries.count }} SD{{ schedule.entries.count|pluralize }}</span>
+          {% if entries_page and entries_page.paginator.num_pages > 1 %}
+          <span class="sdt-schedule-created-by" style="margin-left:auto;">Showing {{ entries_page.start_index }}–{{ entries_page.end_index }} of {{ entries_page.paginator.count }}</span>
+          {% endif %}
+          {% if schedule.created_by %}
+          <span class="sdt-schedule-created-by">Created by {{ schedule.created_by.first_name }} {{ schedule.created_by.last_name }}</span>
+          {% endif %}
+          {% if schedule.notes %}
+          <p class="sdt-schedule-notes">{{ schedule.notes }}</p>
+          {% endif %}
+        </div>
+
+        <table class="sdt-entries-table">
+          <thead>
+            <tr>
+              <th class="sdt-th">#</th>
+              <th class="sdt-th">SD Number</th>
+              <th class="sdt-th">Agent</th>
+              <th class="sdt-th">Tonnage</th>
+              <th class="sdt-th">Officer</th>
+              <th class="sdt-th">Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for entry in entries_page %}
+          <tr class="sdt-entry-row">
+            <td class="sdt-td sdt-td-index" data-label="#">{{ entries_page.start_index|add:forloop.counter0 }}</td>
+            <td class="sdt-td sdt-td-sd" data-label="SD NUMBER">{{ entry.sd_number }}</td>
+            <td class="sdt-td sdt-td-agent" data-label="AGENT">{{ entry.agent }}</td>
+            <td class="sdt-td sdt-td-tonnage" data-label="TONNAGE">{{ entry.tonnage|clean_decimal }} MT</td>
+            <td class="sdt-td sdt-td-officer" data-label="OFFICER">
+              {% if entry.assigned_officer %}
+                <span class="sdt-officer-tag">{{ entry.assigned_officer.first_name }} {{ entry.assigned_officer.last_name }}</span>
+              {% else %}
+                <span class="sdt-unassigned">Unassigned</span>
+              {% endif %}
+            </td>
+            <td class="sdt-td sdt-td-notes" data-label="NOTES">{{ entry.notes|default:"—" }}</td>
+          </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+
+        {% if entries_page and entries_page.has_other_pages %}
+        <div class="sdt-pagination" style="display:flex;justify-content:center;gap:6px;padding:18px 0;">
+          {% if entries_page.has_previous %}
+            <a href="?{% if show_mine %}mine=true&{% else %}mine=false&{% endif %}date={{ selected_date|date:'Y-m-d' }}&cal_year={{ cal_year }}&cal_month={{ cal_month }}&page={{ entries_page.previous_page_number }}" class="sdt-btn sdt-btn-ghost" style="font-size:12px;padding:5px 12px;">← Prev</a>
+          {% endif %}
+          <span style="display:flex;align-items:center;gap:4px;font-size:13px;color:#5c3d2e;">Page {{ entries_page.number }} of {{ entries_page.paginator.num_pages }}</span>
+          {% if entries_page.has_next %}
+            <a href="?{% if show_mine %}mine=true&{% else %}mine=false&{% endif %}date={{ selected_date|date:'Y-m-d' }}&cal_year={{ cal_year }}&cal_month={{ cal_month }}&page={{ entries_page.next_page_number }}" class="sdt-btn sdt-btn-ghost" style="font-size:12px;padding:5px 12px;">Next →</a>
+          {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Mobile Card Layout -->
+        <div class="sdt-mobile-cards">
+          {% for entry in entries_page %}
+          <div class="sdt-mobile-card">
+            <div class="sdt-mobile-card-header">
+              <div>
+                <div class="sdt-mobile-card-sd">{{ entry.sd_number }}</div>
+                <div class="sdt-mobile-card-officer">
+                  {% if entry.assigned_officer %}
+                    {{ entry.assigned_officer.first_name }} {{ entry.assigned_officer.last_name }}
+                  {% else %}
+                    Unassigned
+                  {% endif %}
+                </div>
+              </div>
+              <span style="font-size:12px;color:#7d5a3b;font-weight:600;">#{{ entries_page.start_index|add:forloop.counter0 }}</span>
+            </div>
+
+            <div class="sdt-mobile-card-details">
+              <div class="sdt-mobile-card-row">
+                <div class="sdt-mobile-card-label">Agent</div>
+                <div class="sdt-mobile-card-value">{{ entry.agent }}</div>
+              </div>
+
+              <div class="sdt-mobile-card-row">
+                <div class="sdt-mobile-card-label">Tonnage</div>
+                <div class="sdt-mobile-card-value">{{ entry.tonnage|clean_decimal }} MT</div>
+              </div>
+
+              <div class="sdt-mobile-card-row">
+                <div class="sdt-mobile-card-label">Notes</div>
+                <div class="sdt-mobile-card-value">{{ entry.notes|default:"—" }}</div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+      {% else %}
+        <div class="sdt-empty-state">
+          <div class="sdt-empty-icon">
+            <svg viewBox="0 0 64 64" fill="none">
+              <rect x="8" y="12" width="48" height="44" rx="4" stroke="currentColor" stroke-width="2.5"/>
+              <path d="M8 22h48M22 12V8M42 12V8M24 34h16M24 42h10" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h3 class="sdt-empty-title">No Schedule Available</h3>
+          <p class="sdt-empty-text">There is no loading schedule for {{ selected_date|date:"j F Y" }}.</p>
+          {% if is_superior %}
+          <a href="{% url 'schedule_create' %}?date={{ selected_date|date:'Y-m-d' }}" class="sdt-btn sdt-btn-primary">
+            Create Schedule for this Date
+          </a>
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+window.SCHEDULE_VIEW_CONFIG = {
+  scheduledDates: {{ scheduled_dates|safe }},
+  calYear: {{ cal_year }},
+  calMonth: {{ cal_month }},
+};
+</script>
+<script src="{% static 'js/features/schedule/schedule-view.js' %}"></script>
+{% endblock %}

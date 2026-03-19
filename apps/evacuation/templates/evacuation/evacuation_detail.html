@@ -1,0 +1,184 @@
+{% extends "includes/base.html" %}
+{% load static %}
+{% load sd_permissions %}
+
+{% block title %}EVACUATION {{ evac.date }} — CMC{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/evacuation/evacuation_detail.css' %}">
+<link rel="stylesheet" href="{% static 'css/evacuation/evacuation_detail_mobile.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="sdt-page">
+
+  <div class="sdt-detail-header">
+    <div class="sdt-detail-header-inner">
+      <a href="{% url 'evacuation_list' %}" class="sdt-back-link">
+        <svg viewBox="0 0 20 20" fill="none"><path d="M13 4l-6 6 6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Back to Evacuations
+      </a>
+      <div class="sdt-detail-title-row">
+        <div>
+          <h1 class="sdt-detail-sd-number">{{ evac.date|date:"d M Y" }} — {{ evac.get_shift_display }}</h1>
+          <div class="sdt-detail-vessel">
+            Logged by {{ evac.created_by.first_name }} {{ evac.created_by.last_name }} · {{ evac.created_at|date:"d M Y H:i" }}
+          </div>
+        </div>
+        <div class="sdt-detail-header-actions">
+          <a href="{% url 'evacuation_excel' evac.pk %}" class="sdt-btn sdt-btn-excel">
+            <svg viewBox="0 0 16 16" fill="none" width="14" height="14"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M5 6l2 2-2 2M9 10h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            Export Excel
+          </a>
+          {# Edit button removed - individual SD lines can be edited from the list page #}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="max-width:960px;margin:32px auto;padding:0 16px;">
+
+    {% if messages %}
+    <div class="mb-3">
+      {% for msg in messages %}
+      <div class="alert alert-{{ msg.tags }} alert-dismissible fade show">
+        {{ msg }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Summary strip -->
+    <div class="row g-3 mb-4">
+      <div class="col-4">
+        <div class="card text-center" style="border-color:#e0d4c8;">
+          <div class="card-body py-3">
+            <div class="fw-bold" style="font-size:1.6rem;color:#3d2817;">{{ evac.total_planned }}</div>
+            <div class="small text-muted fw-bold">PLANNED</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-4">
+        <div class="card text-center" style="border-color:#c3e6cb;">
+          <div class="card-body py-3">
+            <div class="fw-bold" style="font-size:1.6rem;color:#155724;">{{ evac.total_lifted }}</div>
+            <div class="small text-muted fw-bold">LIFTED</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-4">
+        <div class="card text-center" style="border-color:#f5c6cb;">
+          <div class="card-body py-3">
+            <div class="fw-bold" style="font-size:1.6rem;color:#721c24;">{{ evac.total_failed }}</div>
+            <div class="small text-muted fw-bold">FAILED</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lines — each with expandable container list -->
+    {% for line in evac.lines.all %}
+    <div class="card mb-3" style="border-color:#e0d4c8;">
+      <div class="card-header d-flex align-items-center justify-content-between"
+           style="background:#f4ece6;cursor:pointer;" onclick="toggleContainers({{ forloop.counter }})">
+        <div>
+          <strong style="color:#3d2817;">
+            {% if line.sd_record %}
+            <a href="{% url 'sd_detail' line.sd_record.pk %}" onclick="event.stopPropagation()" style="color:#3d2817;">{{ line.sd_number }}</a>
+            {% else %}{{ line.sd_number }}{% endif %}
+          </strong>
+          {% if line.allocation_label %}
+          <span style="font-size:12px;background:#3d2817;color:#fff;border-radius:3px;padding:1px 6px;margin-left:6px;">{{ line.allocation_label }}</span>
+          {% endif %}
+          {% if line.contract_number %}
+          <span style="font-size:11px;color:#7d5a3b;margin-left:8px;">{{ line.contract_number }}</span>
+          {% endif %}
+          {% if line.container_file %}
+          <a href="{{ line.container_file.url }}" download class="sdt-download-btn" onclick="event.stopPropagation()" style="margin-left:8px;" title="Download container list">
+            <svg viewBox="0 0 16 16" fill="none" width="14" height="14">
+              <path d="M8 2v8M5 7l3 3 3-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M2 12h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+            File
+          </a>
+          {% endif %}
+        </div>
+        <div class="d-flex gap-3 align-items-center">
+          <span class="fw-bold" style="font-size:13px;">PLANNED: {{ line.planned_count }}</span>
+          <span class="fw-bold text-success" style="font-size:13px;">LIFTED: {{ line.lifted_count }}</span>
+          <span class="fw-bold text-danger" style="font-size:13px;">FAILED: {{ line.failed_count }}</span>
+          <svg id="chevron_{{ forloop.counter }}" width="14" height="14" viewBox="0 0 12 8" fill="none" style="transition:transform .2s;">
+            <path d="M1 1l5 5 5-5" stroke="#5c3d2e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Container list (collapsed by default) -->
+      <div id="containers_{{ forloop.counter }}" style="display:none;">
+        {% with containers=line.containers.all %}
+        {% if containers %}
+        <div class="table-responsive">
+          <table class="table table-bordered mb-0" style="font-size:13px;">
+            <thead style="background:#3d2817;color:#fff;">
+              <tr>
+                <th style="width:40px;">#</th>
+                <th>CONTAINER NUMBER</th>
+                <th style="width:120px;">STATUS</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for c in containers %}
+              <tr style="background:{% if c.status == 'LIFTED' %}#f0fdf4{% else %}#fff5f5{% endif %};">
+                <td class="text-center fw-bold">{{ forloop.counter }}</td>
+                <td class="fw-bold" style="font-family:monospace;font-size:13px;">{{ c.container_number }}</td>
+                <td>
+                  <span class="badge {% if c.status == 'LIFTED' %}bg-success{% else %}bg-danger{% endif %} fw-bold">
+                    {{ c.get_status_display }}
+                  </span>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="card-body py-2 text-muted" style="font-size:13px;">
+          No individual containers logged for this line.
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        {% if line.notes %}
+        <div class="card-body pt-0 pb-2">
+          <small class="text-muted">Notes: {{ line.notes }}</small>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% empty %}
+    <div class="text-center text-muted py-4">No lines recorded.</div>
+    {% endfor %}
+
+    {% if evac.notes %}
+    <div class="card mt-3" style="border-color:#e0d4c8;">
+      <div class="card-body">
+        <div class="fw-bold mb-1" style="color:#3d2817;">RECORD NOTES</div>
+        <div>{{ evac.notes }}</div>
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+
+<script>
+function toggleContainers(idx) {
+  const el = document.getElementById('containers_' + idx);
+  const ch = document.getElementById('chevron_' + idx);
+  if (!el) return;
+  const visible = el.style.display !== 'none';
+  el.style.display = visible ? 'none' : 'block';
+  if (ch) ch.style.transform = visible ? '' : 'rotate(180deg)';
+}
+</script>
+{% endblock %}

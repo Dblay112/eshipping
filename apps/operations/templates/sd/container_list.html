@@ -1,0 +1,121 @@
+{% extends 'includes/base.html' %}
+{% load static %}
+{% load sd_permissions %}
+
+{% block title %}Container Lists - SD {{ sd.sd_number }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/operations/container_list_self.css' %}">
+<link rel="stylesheet" href="{% static 'css/operations/container_list_mobile.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-list-page">
+    <a href="{% url 'sd_detail' sd.pk %}" class="back-link">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M10 12L6 8l4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Back to SD Detail
+    </a>
+
+    <div class="page-header">
+        <h1>Container Lists - SD {{ sd.sd_number }}</h1>
+        <div class="sd-info">
+            <span><strong>Vessel:</strong> {{ sd.vessel_name }}</span>
+            <span><strong>Agent:</strong> {{ sd.agent }}</span>
+            <span><strong>Total Tonnage:</strong> {{ sd.tonnage|clean_decimal }} MT</span>
+        </div>
+    </div>
+
+    {% if can_manage %}
+    <div class="upload-section">
+        <h2>Upload New Container List</h2>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Contract / Allocation</label>
+                    {{ form.allocation }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Contract Number</label>
+                    {{ form.contract_number }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Tonnage (MT)</label>
+                    {{ form.tonnage }}
+                </div>
+                <div class="col-md-8">
+                    <label class="form-label">Excel File</label>
+                    {{ form.excel_file }}
+                </div>
+                <div class="col-md-12">
+                    <label class="form-label">Notes</label>
+                    {{ form.notes }}
+                </div>
+                <div class="col-md-12">
+                    <button type="submit" class="btn-primary">Upload Container List</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+
+    <div class="uploads-list">
+        <h2>Uploaded Container Lists</h2>
+
+        {% if uploads %}
+        <table class="uploads-table">
+            <thead>
+                <tr>
+                    <th>Contract</th>
+                    <th>Tonnage</th>
+                    <th>Uploaded By</th>
+                    <th>Uploaded At</th>
+                    <th>Notes</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for upload in uploads %}
+                <tr>
+                    <td>
+                        {% if upload.allocation %}
+                            {{ upload.allocation.contract_number }}
+                        {% elif upload.contract_number %}
+                            {{ upload.contract_number }}
+                        {% else %}
+                            <em>General</em>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if upload.tonnage %}
+                            {{ upload.tonnage|clean_decimal }} MT
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                    <td>{{ upload.uploaded_by.first_name }} {{ upload.uploaded_by.last_name }}</td>
+                    <td>{{ upload.uploaded_at|date:"d M Y, H:i" }}</td>
+                    <td>{{ upload.notes|default:"—" }}</td>
+                    <td>
+                        <a href="{{ upload.excel_file.url }}" class="btn-download" download>Download</a>
+                        {% if can_manage %}
+                        <form method="post" action="{% url 'container_list_delete' sd.pk upload.pk %}" style="display:inline;" onsubmit="return confirm('Delete this container list?');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-danger">Delete</button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <p>No container lists uploaded yet.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

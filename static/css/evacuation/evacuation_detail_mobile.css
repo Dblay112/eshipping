@@ -1,0 +1,74 @@
+/* ═══════════════════════════════════════════════════════════════
+   Evacuation Detail Page - Mobile Styles
+   Self-contained mobile CSS (copied from sd_base.css + evacuation.css)
+   ═══════════════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+    /* Page padding */
+    .sdt-page {
+        padding: 20px 16px 48px;
+        max-width: 100vw;
+        overflow-x: hidden;
+    }
+
+    /* Detail header */
+    .sdt-detail-header {
+        margin: -20px -12px 0;
+        padding: 20px 12px;
+    }
+
+    .sdt-detail-header-actions {
+        width: 100%;
+        flex-direction: column;
+    }
+
+    .sdt-detail-header-actions .sdt-btn {
+        width: 100%;
+        justify-content: center;
+        min-height: 44px;
+    }
+
+    /* Summary cards - stack vertically */
+    .row.g-3 {
+        margin: 0 !important;
+    }
+
+    .row.g-3 > .col-4 {
+        width: 100% !important;
+        padding: 0 0 12px 0 !important;
+    }
+
+    /* Cards */
+    .card {
+        max-width: 100%;
+        overflow-x: hidden;
+        border-radius: 12px;
+    }
+
+    .card-header {
+        padding: 12px;
+        flex-wrap: wrap;
+    }
+
+    .card-body {
+        padding: 12px !important;
+    }
+
+    /* Buttons */
+    .sdt-btn,
+    .btn {
+        min-height: 44px;
+        padding: 10px 14px;
+    }
+}
+
+@media (max-width: 600px) {
+    /* Smaller padding on very small screens */
+    .card {
+        border-radius: 12px;
+    }
+
+    .card-body {
+        padding: 12px !important;
+    }
+}
