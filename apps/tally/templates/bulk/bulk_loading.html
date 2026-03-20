@@ -534,7 +534,7 @@
         html += '<td class="text-center fw-bold">' + no + idField + '</td>';
         html += '<td><input type="text" class="form-control container-number-input" data-field="container_number" name="containers[' + index + '][container_number]" placeholder="ENTER CONTAINER NUMBER" maxlength="13" required value="' + escapeAttr(containerVal) + '"></td>';
         html += '<td><input type="text" class="form-control" data-field="seal_number" name="containers[' + index + '][seal_number]" placeholder="ENTER SEAL NUMBER" required value="' + escapeAttr(sealVal) + '"></td>';
-        html += '<td><input type="number" class="form-control" data-field="tonnage" name="containers[' + index + '][tonnage]" placeholder="ENTER TONNAGE" min="0" required value="' + escapeAttr(tonnageVal) + '"></td>';
+        html += '<td><input type="number" class="form-control" data-field="tonnage" name="containers[' + index + '][tonnage]" placeholder="ENTER TONNAGE" min="0" step="0.001" required value="' + escapeAttr(tonnageVal) + '"></td>';
         html += '<td><input type="number" class="form-control" data-field="bags_cut" name="containers[' + index + '][bags_cut]" placeholder="ENTER BAGS CUT" step="1" min="0" required value="' + escapeAttr(bagsCutVal) + '"></td>';
         html += '<td class="text-center action-cell">';
         html += '<button type="button" class="btn btn-sm btn-outline-success fw-bold w-100 mb-2 js-save-row">ADD</button>';
