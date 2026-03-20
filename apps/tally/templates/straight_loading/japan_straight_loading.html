@@ -473,9 +473,14 @@
     const totalBagsEl = document.getElementById("totalBags");
     const totalTonnageEl = document.getElementById("totalTonnage");
 
-    // Use window.inMemoryContainers to allow tally-autosave.js to restore data
-    window.inMemoryContainers = window.inMemoryContainers || [];
-    const inMemoryContainers = window.inMemoryContainers;
+    // In-memory state with window exposure for tally-autosave.js
+    let inMemoryContainers = [];
+
+    // Expose on window using getter/setter to maintain sync even after reassignments
+    Object.defineProperty(window, 'inMemoryContainers', {
+        get() { return inMemoryContainers; },
+        set(val) { inMemoryContainers = val; }
+    });
 
     function recalcTotals() {
         let totalB = 0;
