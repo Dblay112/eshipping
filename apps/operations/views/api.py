@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q, Sum
 from django.http import JsonResponse
 from django.urls import reverse
-from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django_ratelimit.decorators import ratelimit
 
 import logging
@@ -203,7 +203,7 @@ def sd_details_json(request):
         return JsonResponse({'exists': False, 'error': 'SD number not found'}, status=404)
 
 
-@csrf_protect
+@csrf_exempt
 @login_required(login_url='login')
 def client_error_report(request):
     """
