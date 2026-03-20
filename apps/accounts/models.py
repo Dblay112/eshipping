@@ -322,7 +322,7 @@ class StaffProfile(models.Model):
         validators=[validate_image_file, validate_file_size_2mb]
     )
     rank = models.CharField(max_length=200, blank=True)
-    date_employed = models.DateTimeField(null=True, blank=True)
+    date_employed = models.DateField(null=True, blank=True)
     years_served = models.PositiveIntegerField(blank=True, null=True)
     password_changed_at = models.DateTimeField(null=True, blank=True)
     first_login = models.DateTimeField(auto_now_add=True)
