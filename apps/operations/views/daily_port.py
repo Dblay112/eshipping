@@ -122,7 +122,7 @@ def daily_port_create(request):
                 ip = ip.split(',')[0].strip()
             staff_number = getattr(request.user, 'staff_number', request.user.id)
             logger.info(
-                f'AUDIT: Daily Port created - Date: {dp.date.strftime("%Y-%m-%d")}, SD: {dp.sd_number}, By: {staff_number} (User ID: {request.user.pk}), IP: {ip}')
+                f'AUDIT: Daily Port created - Date: {dp.date.strftime("%Y-%m-%d")}, By: {staff_number} (User ID: {request.user.pk}), IP: {ip}')
 
             messages.success(
                 request,
@@ -200,7 +200,7 @@ def daily_port_edit(request, pk):
                 ip = ip.split(',')[0].strip()
             staff_number = getattr(request.user, 'staff_number', request.user.id)
             logger.info(
-                f'AUDIT: Daily Port updated - Date: {dp.date.strftime("%Y-%m-%d")}, SD: {dp.sd_number}, By: {staff_number} (User ID: {request.user.pk}), IP: {ip}')
+                f'AUDIT: Daily Port updated - Date: {dp.date.strftime("%Y-%m-%d")}, By: {staff_number} (User ID: {request.user.pk}), IP: {ip}')
 
             messages.success(
                 request,
@@ -266,7 +266,6 @@ def daily_port_delete(request, pk):
 
     if request.method == 'POST':
         dp_date = dp.date
-        dp_sd = dp.sd_number
         dp.delete()
 
         # AUDIT: Daily Port deleted
@@ -277,7 +276,7 @@ def daily_port_delete(request, pk):
             ip = ip.split(',')[0].strip()
         staff_number = getattr(request.user, 'staff_number', request.user.id)
         logger.info(
-            f'AUDIT: Daily Port deleted - Date: {dp_date.strftime("%Y-%m-%d")}, SD: {dp_sd}, By: {staff_number} (User ID: {request.user.pk}), IP: {ip}')
+            f'AUDIT: Daily Port deleted - Date: {dp_date.strftime("%Y-%m-%d")}, By: {staff_number} (User ID: {request.user.pk}), IP: {ip}')
 
         messages.success(request, f"Daily port for {dp_date.strftime('%d %b %Y')} deleted successfully.")
         return redirect('daily_port_view')
