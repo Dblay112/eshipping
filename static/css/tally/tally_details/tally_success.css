@@ -303,3 +303,12 @@
     padding: 0.35rem 0.6rem;
 }
 
+/* ── Visibility toggles ──────────────────────────────────────── */
+.desktop-only {
+    display: block;
+}
+
+.mobile-only {
+    display: none;
+}
+

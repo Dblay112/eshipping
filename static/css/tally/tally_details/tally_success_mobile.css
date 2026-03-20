@@ -4,6 +4,14 @@
    ═══════════════════════════════════════════════════════════════ */
 
 @media (max-width: 992px) {
+    .desktop-only {
+        display: none !important;
+    }
+
+    .mobile-only {
+        display: block !important;
+    }
+
     .nav-search {
         width: 100%;
     }
@@ -33,3 +41,94 @@
         flex-wrap: wrap;
     }
 }
+
+/* ── Mobile tally cards ──────────────────────────────────────── */
+.mobile-tally-card {
+    border: 1px solid rgba(63, 42, 29, 0.18);
+    border-radius: 12px;
+    background: #fff;
+    padding: 14px;
+    margin-bottom: 12px;
+}
+
+.mobile-tally-card:last-child {
+    margin-bottom: 0;
+}
+
+.mobile-tally-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(63, 42, 29, 0.12);
+}
+
+.mobile-tally-number {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #3f2a1d;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.mobile-tally-sd {
+    font-weight: 900;
+    font-size: 1rem;
+    color: #111827;
+    letter-spacing: 0.3px;
+}
+
+.mobile-tally-mk {
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: rgba(17, 24, 39, 0.65);
+    margin-top: 2px;
+}
+
+.mobile-tally-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.mobile-tally-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+}
+
+.mobile-tally-label {
+    font-weight: 700;
+    font-size: 0.8rem;
+    color: rgba(63, 42, 29, 0.75);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.mobile-tally-value {
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: #111827;
+    text-align: right;
+}
+
+.mobile-tally-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.mobile-tally-actions .btn {
+    flex: 1;
+    min-width: 80px;
+}
+
