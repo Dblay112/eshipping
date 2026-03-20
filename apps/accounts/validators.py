@@ -22,7 +22,7 @@ def validate_admin_password(password):
     - At least 1 special character (maximum complexity)
 
     Special Characters Allowed:
-        !@#$%^&*(),.?":{}|<>_-+=[]\\\/;~`
+        !@#$%^&*(),.?":{}|<>_-+=[]\/;~`
 
     Args:
         password: Password string to validate
@@ -61,8 +61,8 @@ def validate_admin_password(password):
     if not re.search(r'\d', password):
         errors.append("Password must contain at least one number.")
 
-    if not re.search(r'[!@#$%^&*(),.?":{}|<>_\-+=\[\]\\\/;~`]', password):
-        errors.append("Password must contain at least one special character (!@#$%^&*(),.?\":{}|<>_-+=[]\\\/;~`).")
+    if not re.search(r'[!@#$%^&*(),.?":{}|<>_\-+=\[\]\/;~`]', password):
+        errors.append(r"Password must contain at least one special character (!@#$%^&*(),.?\":{}|<>_-+=[]\/;~`).")
 
     if errors:
         raise ValidationError(errors)
