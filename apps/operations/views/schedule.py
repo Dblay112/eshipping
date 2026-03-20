@@ -131,6 +131,17 @@ def schedule_create(request):
             schedule.save()
             formset.instance = schedule
             formset.save()
+
+            # AUDIT: Schedule created
+            import logging
+            logger = logging.getLogger(__name__)
+            ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', 'unknown'))
+            if ',' in ip:
+                ip = ip.split(',')[0].strip()
+            staff_number = getattr(request.user, 'staff_number', request.user.id)
+            logger.info(
+                f'AUDIT: Schedule created - Date: {schedule.date.strftime("%Y-%m-%d")}, Entries: {schedule.entries.count()}, By: {staff_number} (User ID: {request.user.pk}), IP: {ip}')
+
             messages.success(
                 request,
                 f"✓ Schedule for {schedule.date.strftime('%d %b %Y')} created by {request.user.first_name} {request.user.last_name}"
@@ -214,6 +225,17 @@ def schedule_edit(request, pk):
 
             form.save()
             formset.save()
+
+            # AUDIT: Schedule updated
+            import logging
+            logger = logging.getLogger(__name__)
+            ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', 'unknown'))
+            if ',' in ip:
+                ip = ip.split(',')[0].strip()
+            staff_number = getattr(request.user, 'staff_number', request.user.id)
+            logger.info(
+                f'AUDIT: Schedule updated - Date: {schedule.date.strftime("%Y-%m-%d")}, Entries: {schedule.entries.count()}, By: {staff_number} (User ID: {request.user.pk}), IP: {ip}')
+
             messages.success(
                 request,
                 f"✓ Schedule for {schedule.date.strftime('%d %b %Y')} updated by {request.user.first_name} {request.user.last_name}"
@@ -278,6 +300,17 @@ def schedule_delete(request, pk):
     if request.method == 'POST':
         schedule_date = schedule.date
         schedule.delete()
+
+        # AUDIT: Schedule deleted
+        import logging
+        logger = logging.getLogger(__name__)
+        ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', 'unknown'))
+        if ',' in ip:
+            ip = ip.split(',')[0].strip()
+        staff_number = getattr(request.user, 'staff_number', request.user.id)
+        logger.info(
+            f'AUDIT: Schedule deleted - Date: {schedule_date.strftime("%Y-%m-%d")}, By: {staff_number} (User ID: {request.user.pk}), IP: {ip}')
+
         messages.success(request, f"Schedule for {schedule_date.strftime('%d %b %Y')} deleted successfully.")
         return redirect('schedule_view')
 

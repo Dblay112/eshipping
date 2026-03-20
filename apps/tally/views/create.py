@@ -343,6 +343,14 @@ def bulk(request):
                     bags=container_data["bags_cut"],
                 )
 
+            # AUDIT: Tally created
+            ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', 'unknown'))
+            if ',' in ip:
+                ip = ip.split(',')[0].strip()
+            staff_number = getattr(request.user, 'staff_number', request.user.id)
+            logger.info(
+                f'AUDIT: Tally created - Type: BULK, Tally#: {tally_number}, SD: {sd_number}, Terminal: {terminal_obj.name}, By: {staff_number} (User ID: {request.user.pk}), IP: {ip}')
+
         messages.success(
             request,
             f"✓ Bulk loading tally #{tally_number} created successfully"
@@ -609,6 +617,14 @@ def normal_straight(request):
 
     for c in containers_data:
         TallyContainer.objects.create(tally=tally, **c)
+
+    # AUDIT: Tally created
+    ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', 'unknown'))
+    if ',' in ip:
+        ip = ip.split(',')[0].strip()
+    staff_number = getattr(request.user, 'staff_number', request.user.id)
+    logger.info(
+        f'AUDIT: Tally created - Type: STRAIGHT_40FT, Tally#: {tally_number}, SD: {sd_number}, Terminal: {terminal_obj.name}, By: {staff_number} (User ID: {request.user.pk}), IP: {ip}')
 
     messages.success(
         request,
@@ -877,6 +893,14 @@ def japan(request):
         for c in containers_data:
             TallyContainer.objects.create(tally=tally, **c)
 
+        # AUDIT: Tally created
+        ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', 'unknown'))
+        if ',' in ip:
+            ip = ip.split(',')[0].strip()
+        staff_number = getattr(request.user, 'staff_number', request.user.id)
+        logger.info(
+            f'AUDIT: Tally created - Type: JAPAN_STRAIGHT_40FT, Tally#: {tally_number}, SD: {sd_number}, Terminal: {terminal_obj.name}, By: {staff_number} (User ID: {request.user.pk}), IP: {ip}')
+
     messages.success(
         request,
         f"✓ Japan straight loading tally #{tally_number} created successfully"
@@ -1135,6 +1159,14 @@ def straight_20(request):
 
         for c in containers_data:
             TallyContainer.objects.create(tally=tally, **c)
+
+        # AUDIT: Tally created
+        ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', 'unknown'))
+        if ',' in ip:
+            ip = ip.split(',')[0].strip()
+        staff_number = getattr(request.user, 'staff_number', request.user.id)
+        logger.info(
+            f'AUDIT: Tally created - Type: STRAIGHT_20FT, Tally#: {tally_number}, SD: {sd_number}, Terminal: {terminal_obj.name}, By: {staff_number} (User ID: {request.user.pk}), IP: {ip}')
 
     messages.success(
         request,

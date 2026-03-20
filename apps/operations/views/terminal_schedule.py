@@ -66,6 +66,17 @@ def terminal_schedule_create(request):
         form = TerminalScheduleForm(request.POST)
         if form.is_valid():
             terminal = form.save()
+
+            # AUDIT: Terminal created
+            import logging
+            logger = logging.getLogger(__name__)
+            ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', 'unknown'))
+            if ',' in ip:
+                ip = ip.split(',')[0].strip()
+            staff_number = getattr(request.user, 'staff_number', request.user.id)
+            logger.info(
+                f'AUDIT: Terminal created - Name: {terminal.name}, Supervisors: {terminal.supervisors.count()}, By: {staff_number} (User ID: {request.user.pk}), IP: {ip}')
+
             messages.success(
                 request,
                 f"✓ Terminal '{terminal.name}' created by {request.user.first_name} {request.user.last_name}"
@@ -115,6 +126,17 @@ def terminal_schedule_edit(request, pk):
         form = TerminalScheduleForm(request.POST, instance=terminal)
         if form.is_valid():
             form.save()
+
+            # AUDIT: Terminal updated
+            import logging
+            logger = logging.getLogger(__name__)
+            ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', 'unknown'))
+            if ',' in ip:
+                ip = ip.split(',')[0].strip()
+            staff_number = getattr(request.user, 'staff_number', request.user.id)
+            logger.info(
+                f'AUDIT: Terminal updated - Name: {terminal.name}, Supervisors: {terminal.supervisors.count()}, By: {staff_number} (User ID: {request.user.pk}), IP: {ip}')
+
             messages.success(
                 request,
                 f"✓ Terminal '{terminal.name}' updated by {request.user.first_name} {request.user.last_name}"
@@ -163,6 +185,17 @@ def terminal_schedule_delete(request, pk):
     if request.method == 'POST':
         terminal_name = terminal.name
         terminal.delete()
+
+        # AUDIT: Terminal deleted
+        import logging
+        logger = logging.getLogger(__name__)
+        ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', 'unknown'))
+        if ',' in ip:
+            ip = ip.split(',')[0].strip()
+        staff_number = getattr(request.user, 'staff_number', request.user.id)
+        logger.info(
+            f'AUDIT: Terminal deleted - Name: {terminal_name}, By: {staff_number} (User ID: {request.user.pk}), IP: {ip}')
+
         messages.success(request, f"Terminal '{terminal_name}' has been deleted.")
         return redirect('terminal_schedule_list')
 

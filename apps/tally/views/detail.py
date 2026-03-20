@@ -842,6 +842,14 @@ def tally_edit(request, pk):
         tally.updated_by = request.user
         tally.save()
 
+        # AUDIT: Tally updated
+        ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', 'unknown'))
+        if ',' in ip:
+            ip = ip.split(',')[0].strip()
+        staff_number = getattr(request.user, 'staff_number', request.user.id)
+        logger.info(
+            f'AUDIT: Tally updated - Type: {tally.tally_type}, Tally#: {tally.tally_number}, SD: {tally.sd_number}, Terminal: {tally.terminal.name if tally.terminal else "N/A"}, By: {staff_number} (User ID: {request.user.pk}), IP: {ip}')
+
         # Delete containers removed from the form
         for c in existing:
             if str(c.id) not in used_ids:
@@ -878,7 +886,17 @@ def tally_delete(request, pk):
     if request.method == 'POST':
         tally_number = tally.tally_number
         sd_number = tally.sd_number
+        terminal_name = tally.terminal.name if tally.terminal else "N/A"
         tally.delete()
+
+        # AUDIT: Tally deleted
+        ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', 'unknown'))
+        if ',' in ip:
+            ip = ip.split(',')[0].strip()
+        staff_number = getattr(request.user, 'staff_number', request.user.id)
+        logger.info(
+            f'AUDIT: Tally deleted - Tally#: {tally_number}, SD: {sd_number}, Terminal: {terminal_name}, By: {staff_number} (User ID: {request.user.pk}), IP: {ip}')
+
         messages.success(
             request, f"Tally {tally_number} for SD {sd_number} has been deleted successfully.")
 

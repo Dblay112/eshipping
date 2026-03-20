@@ -107,6 +107,14 @@ def booking_add_correction(request, detail_pk):
             created_by=request.user
         )
 
+        # AUDIT: Booking correction requested
+        ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', 'unknown'))
+        if ',' in ip:
+            ip = ip.split(',')[0].strip()
+        staff_number = getattr(request.user, 'staff_number', request.user.id)
+        logger.info(
+            f'AUDIT: Booking correction requested - Booking: {detail.booking_number}, Round: {correction.round_number}, By: {staff_number} (User ID: {request.user.pk}), IP: {ip}')
+
         # Create separate attachment records for each file
         for attachment in attachments:
             CorrectionAttachment.objects.create(

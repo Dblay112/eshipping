@@ -88,6 +88,17 @@ def work_program_create(request):
             wp.created_by = request.user
             wp.updated_by = request.user
             wp.save()
+
+            # AUDIT: Work Program created
+            import logging
+            logger = logging.getLogger(__name__)
+            ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', 'unknown'))
+            if ',' in ip:
+                ip = ip.split(',')[0].strip()
+            staff_number = getattr(request.user, 'staff_number', request.user.id)
+            logger.info(
+                f'AUDIT: Work Program created - Date: {wp.date.strftime("%Y-%m-%d")}, By: {staff_number} (User ID: {request.user.pk}), IP: {ip}')
+
             messages.success(request, f"Work program for {wp.date.strftime('%d %b %Y')} created successfully.")
             return redirect('work_program_list')
     else:
@@ -135,6 +146,17 @@ def work_program_edit(request, pk):
             wp = form.save(commit=False)
             wp.updated_by = request.user
             wp.save()
+
+            # AUDIT: Work Program updated
+            import logging
+            logger = logging.getLogger(__name__)
+            ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', 'unknown'))
+            if ',' in ip:
+                ip = ip.split(',')[0].strip()
+            staff_number = getattr(request.user, 'staff_number', request.user.id)
+            logger.info(
+                f'AUDIT: Work Program updated - Date: {wp.date.strftime("%Y-%m-%d")}, By: {staff_number} (User ID: {request.user.pk}), IP: {ip}')
+
             messages.success(request, f"Work program for {wp.date.strftime('%d %b %Y')} updated successfully.")
             return redirect('work_program_list')
     else:
@@ -180,6 +202,17 @@ def work_program_delete(request, pk):
     if request.method == 'POST':
         wp_date = wp.date
         wp.delete()
+
+        # AUDIT: Work Program deleted
+        import logging
+        logger = logging.getLogger(__name__)
+        ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', 'unknown'))
+        if ',' in ip:
+            ip = ip.split(',')[0].strip()
+        staff_number = getattr(request.user, 'staff_number', request.user.id)
+        logger.info(
+            f'AUDIT: Work Program deleted - Date: {wp_date.strftime("%Y-%m-%d")}, By: {staff_number} (User ID: {request.user.pk}), IP: {ip}')
+
         messages.success(request, f"Work program for {wp_date.strftime('%d %b %Y')} deleted successfully.")
         return redirect('work_program_list')
 

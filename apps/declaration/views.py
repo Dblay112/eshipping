@@ -266,6 +266,14 @@ def declaration_create(request):
                             created_by=request.user,
                         )
                         declarations_created += 1
+
+                        # AUDIT: Declaration created (log once per declaration)
+                        ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', 'unknown'))
+                        if ',' in ip:
+                            ip = ip.split(',')[0].strip()
+                        staff_number = getattr(request.user, 'staff_number', request.user.id)
+                        logger.info(
+                            f'AUDIT: Declaration created - SD: {sd_record.sd_number}, Contract: {allocation.contract_number}, Decl#: {decl_number}, By: {staff_number} (User ID: {request.user.pk}), IP: {ip}')
                     except ValidationError as e:
                         messages.error(request, str(e))
                     except Exception as e:
@@ -414,6 +422,14 @@ def declaration_edit(request, pk):
                     existing_decl.updated_by = request.user
                     existing_decl.save()
                     declarations_updated += 1
+
+                    # AUDIT: Declaration updated
+                    ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', 'unknown'))
+                    if ',' in ip:
+                        ip = ip.split(',')[0].strip()
+                    staff_number = getattr(request.user, 'staff_number', request.user.id)
+                    logger.info(
+                        f'AUDIT: Declaration updated - SD: {sd_record.sd_number}, Contract: {allocation.contract_number}, Decl#: {decl_number}, By: {staff_number} (User ID: {request.user.pk}), IP: {ip}')
                 else:
                     # Create new declaration for this allocation
                     Declaration.objects.create(
@@ -554,7 +570,18 @@ def declaration_delete(request, pk):
 
     if request.method == 'POST':
         sd_number = decl.sd_number
+        contract_number = decl.contract_number
+        decl_number = decl.declaration_number
         decl.delete()
+
+        # AUDIT: Declaration deleted
+        ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', 'unknown'))
+        if ',' in ip:
+            ip = ip.split(',')[0].strip()
+        staff_number = getattr(request.user, 'staff_number', request.user.id)
+        logger.info(
+            f'AUDIT: Declaration deleted - SD: {sd_number}, Contract: {contract_number}, Decl#: {decl_number}, By: {staff_number} (User ID: {request.user.pk}), IP: {ip}')
+
         messages.success(request, f"Declaration for SD {sd_number} deleted successfully.")
         return redirect('declaration_list')
 

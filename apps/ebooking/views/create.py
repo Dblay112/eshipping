@@ -127,6 +127,14 @@ def booking_create(request):
                                     updated_by=request.user,
                                 )
 
+                                # AUDIT: Booking created
+                                ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', 'unknown'))
+                                if ',' in ip:
+                                    ip = ip.split(',')[0].strip()
+                                staff_number = getattr(request.user, 'staff_number', request.user.id)
+                                logger.info(
+                                    f'AUDIT: Booking created - SD: {sd_record.sd_number}, Agent: {agent or sd_record.agent}, By: {staff_number} (User ID: {request.user.pk}), IP: {ip}')
+
                             # Get or create booking line for this contract
                             booking_line, created = BookingLine.objects.get_or_create(
                                 booking_record=booking_record,

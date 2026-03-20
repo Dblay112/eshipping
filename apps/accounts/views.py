@@ -148,8 +148,11 @@ def login_view(request):
         if user is None:
             messages.error(
                 request, "Invalid login credentials. Please try again.")
+            ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', 'unknown'))
+            if ',' in ip:
+                ip = ip.split(',')[0].strip()
             logger.warning(
-                f'Failed login attempt for staff_number: {staff_number} from IP {request.META.get("REMOTE_ADDR")}')
+                f'AUDIT: Login failed - Staff: {staff_number}, IP: {ip}')
             return render(request, "accounts/login.html")
 
         if getattr(user, "force_password_change", False):
@@ -161,8 +164,11 @@ def login_view(request):
         auth_login(request, user)
         request.session.cycle_key()  # Regenerate session ID to prevent session fixation
         messages.success(request, f"Welcome {user.first_name}!")
+        ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', 'unknown'))
+        if ',' in ip:
+            ip = ip.split(',')[0].strip()
         logger.info(
-            f'Successful login for staff_number: {staff_number} from IP {request.META.get("REMOTE_ADDR")}')
+            f'AUDIT: Login successful - Staff: {staff_number}, IP: {ip}')
         return redirect("dashboard")
 
     return render(request, "accounts/login.html")
@@ -235,6 +241,15 @@ def change_password(request):
         user.set_password(new_password)
         user.save()
         update_session_auth_hash(request, user)
+
+        # AUDIT: Password changed
+        ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', 'unknown'))
+        if ',' in ip:
+            ip = ip.split(',')[0].strip()
+        staff_number = getattr(request.user, 'staff_number', request.user.id)
+        logger.info(
+            f'AUDIT: Password changed - Staff: {staff_number}, By: {staff_number} (User ID: {request.user.pk}), IP: {ip}')
+
         messages.success(request, "Password changed successfully.")
         return redirect("dashboard")
 
@@ -248,6 +263,17 @@ def logout_view(request):
 
     Clears session data and displays logout confirmation message.
     """
+    import logging
+    logger = logging.getLogger('apps.accounts')
+
+    # AUDIT: Logout
+    ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', 'unknown'))
+    if ',' in ip:
+        ip = ip.split(',')[0].strip()
+    staff_number = getattr(request.user, 'staff_number', request.user.id)
+    logger.info(
+        f'AUDIT: Logout - Staff: {staff_number}, IP: {ip}')
+
     auth_logout(request)
     messages.info(request, "You have been logged out!")
     return redirect("login")
@@ -749,7 +775,15 @@ def staff_edit(request, pk):
             form.save()
             messages.success(
                 request, f"Staff member {staff.first_name} {staff.last_name} updated successfully.")
-            logger.info(f'User {request.user.pk} updated staff {staff.pk}')
+
+            # AUDIT: Staff updated
+            ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', 'unknown'))
+            if ',' in ip:
+                ip = ip.split(',')[0].strip()
+            staff_number = getattr(request.user, 'staff_number', request.user.id)
+            logger.info(
+                f'AUDIT: Staff updated - Staff: {staff.staff_number} ({staff.first_name} {staff.last_name}), By: {staff_number} (User ID: {request.user.pk}), IP: {ip}')
+
             return redirect('staff_list')
         else:
             messages.error(request, "Please correct the errors below.")

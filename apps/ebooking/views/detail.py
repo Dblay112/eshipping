@@ -72,6 +72,14 @@ def booking_edit(request, pk):
         booking.updated_by = request.user
         booking.save()
 
+        # AUDIT: Booking updated
+        ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', 'unknown'))
+        if ',' in ip:
+            ip = ip.split(',')[0].strip()
+        staff_number = getattr(request.user, 'staff_number', request.user.id)
+        logger.info(
+            f'AUDIT: Booking updated - SD: {booking.sd_number}, By: {staff_number} (User ID: {request.user.pk}), IP: {ip}')
+
         # Parse contract indices
         contract_indices = set()
         for key in request.POST.keys():
@@ -233,6 +241,14 @@ def booking_detail_delete(request, detail_pk):
 
         # Delete the booking detail
         detail.delete()
+
+        # AUDIT: Booking deleted
+        ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', 'unknown'))
+        if ',' in ip:
+            ip = ip.split(',')[0].strip()
+        staff_number = getattr(request.user, 'staff_number', request.user.id)
+        logger.info(
+            f'AUDIT: Booking deleted - SD: {sd_number}, Contract: {contract_number}, Booking: {booking_number}, By: {staff_number} (User ID: {request.user.pk}), IP: {ip}')
 
         # Check if the booking line is now empty (no more details)
         booking_line = detail.booking_line

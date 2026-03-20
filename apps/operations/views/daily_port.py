@@ -113,6 +113,17 @@ def daily_port_create(request):
             dp = form.save(commit=False)
             dp.created_by = request.user
             dp.save()
+
+            # AUDIT: Daily Port created
+            import logging
+            logger = logging.getLogger(__name__)
+            ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', 'unknown'))
+            if ',' in ip:
+                ip = ip.split(',')[0].strip()
+            staff_number = getattr(request.user, 'staff_number', request.user.id)
+            logger.info(
+                f'AUDIT: Daily Port created - Date: {dp.date.strftime("%Y-%m-%d")}, SD: {dp.sd_number}, By: {staff_number} (User ID: {request.user.pk}), IP: {ip}')
+
             messages.success(
                 request,
                 f"✓ Daily port for {dp.date.strftime('%d %b %Y')} created by {request.user.first_name} {request.user.last_name}"
@@ -180,6 +191,17 @@ def daily_port_edit(request, pk):
         form = DailyPortForm(request.POST, request.FILES, instance=dp)
         if form.is_valid():
             form.save()
+
+            # AUDIT: Daily Port updated
+            import logging
+            logger = logging.getLogger(__name__)
+            ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', 'unknown'))
+            if ',' in ip:
+                ip = ip.split(',')[0].strip()
+            staff_number = getattr(request.user, 'staff_number', request.user.id)
+            logger.info(
+                f'AUDIT: Daily Port updated - Date: {dp.date.strftime("%Y-%m-%d")}, SD: {dp.sd_number}, By: {staff_number} (User ID: {request.user.pk}), IP: {ip}')
+
             messages.success(
                 request,
                 f"✓ Daily port for {dp.date.strftime('%d %b %Y')} updated by {request.user.first_name} {request.user.last_name}"
@@ -244,7 +266,19 @@ def daily_port_delete(request, pk):
 
     if request.method == 'POST':
         dp_date = dp.date
+        dp_sd = dp.sd_number
         dp.delete()
+
+        # AUDIT: Daily Port deleted
+        import logging
+        logger = logging.getLogger(__name__)
+        ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', 'unknown'))
+        if ',' in ip:
+            ip = ip.split(',')[0].strip()
+        staff_number = getattr(request.user, 'staff_number', request.user.id)
+        logger.info(
+            f'AUDIT: Daily Port deleted - Date: {dp_date.strftime("%Y-%m-%d")}, SD: {dp_sd}, By: {staff_number} (User ID: {request.user.pk}), IP: {ip}')
+
         messages.success(request, f"Daily port for {dp_date.strftime('%d %b %Y')} deleted successfully.")
         return redirect('daily_port_view')
 

@@ -215,6 +215,17 @@ def sd_create(request):
             alloc_formset.instance = sd
             alloc_formset.save()
 
+            # AUDIT: SD Record created
+            import logging
+            logger = logging.getLogger(__name__)
+            ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', 'unknown'))
+            if ',' in ip:
+                ip = ip.split(',')[0].strip()
+            staff_number = getattr(request.user, 'staff_number', request.user.id)
+            logger.info(
+                f'AUDIT: SD Record created - SD: {sd.sd_number}, '
+                f'By: {staff_number} (User ID: {request.user.pk}), IP: {ip}')
+
             # Save containers and clerks if valid (they're auto-populated from tallies)
             if not is_draft:
                 if container_formset.is_valid():
@@ -298,6 +309,14 @@ def sd_edit(request, pk):
             sd.updated_by = request.user
             sd.save()
             alloc_formset.save()
+
+            # AUDIT: SD Record updated
+            ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', 'unknown'))
+            if ',' in ip:
+                ip = ip.split(',')[0].strip()
+            staff_number = getattr(request.user, 'staff_number', request.user.id)
+            logger.info(
+                f'AUDIT: SD Record updated - SD: {sd.sd_number}, By: {staff_number} (User ID: {request.user.pk}), IP: {ip}')
 
             # Save tonnage tracking data (tt_loaded_0, tt_loaded_1, etc.)
             allocations = sd.allocations.all().order_by('allocation_label', 'contract_number')
@@ -578,6 +597,15 @@ def sd_record_delete(request, pk):
     if request.method == 'POST':
         sd_number = sd.sd_number
         sd.delete()
+
+        # AUDIT: SD Record deleted
+        ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', 'unknown'))
+        if ',' in ip:
+            ip = ip.split(',')[0].strip()
+        staff_number = getattr(request.user, 'staff_number', request.user.id)
+        logger.info(
+            f'AUDIT: SD Record deleted - SD: {sd_number}, By: {staff_number} (User ID: {request.user.pk}), IP: {ip}')
+
         messages.success(request, f'SD {sd_number} deleted successfully.')
         return redirect('operations_list')
 

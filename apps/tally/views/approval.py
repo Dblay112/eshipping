@@ -46,6 +46,14 @@ def submit_tally(request, pk):
     tally.status = 'PENDING_APPROVAL'
     tally.save(update_fields=['status'])
 
+    # AUDIT: Tally submitted
+    ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', 'unknown'))
+    if ',' in ip:
+        ip = ip.split(',')[0].strip()
+    staff_number = getattr(request.user, 'staff_number', request.user.id)
+    logger.info(
+        f'AUDIT: Tally submitted - Tally#: {tally.tally_number}, SD: {tally.sd_number}, Terminal: {tally.terminal.name if tally.terminal else "N/A"}, By: {staff_number} (User ID: {request.user.pk}), IP: {ip}')
+
     messages.success(
         request,
         f"✓ Tally #{tally.tally_number} submitted for approval"

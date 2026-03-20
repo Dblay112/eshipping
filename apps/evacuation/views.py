@@ -253,6 +253,15 @@ def evacuation_create(request):
             logger.info(
                 f"DEBUG evacuation_create - Saved {len(saved_lines)} EvacuationLine records")
 
+            # AUDIT: Evacuation created
+            ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', 'unknown'))
+            if ',' in ip:
+                ip = ip.split(',')[0].strip()
+            staff_number = getattr(request.user, 'staff_number', request.user.id)
+            sd_list = ', '.join([line.sd_number for line in saved_lines])
+            logger.info(
+                f'AUDIT: Evacuation created - Date: {evac.date.strftime("%Y-%m-%d")}, Shift: {evac.get_shift_display()}, SDs: {sd_list}, By: {staff_number} (User ID: {request.user.pk}), IP: {ip}')
+
             # Log what was actually saved
             for line in saved_lines:
                 logger.info(
@@ -380,6 +389,19 @@ def evacuation_edit(request, pk, line_pk=None):
             saved.updated_by = request.user
             saved.save()
             saved_lines = formset.save()
+
+            # AUDIT: Evacuation updated
+            ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', 'unknown'))
+            if ',' in ip:
+                ip = ip.split(',')[0].strip()
+            staff_number = getattr(request.user, 'staff_number', request.user.id)
+            if line_pk:
+                logger.info(
+                    f'AUDIT: Evacuation line updated - SD: {line.sd_number}, Date: {evac.date.strftime("%Y-%m-%d")}, By: {staff_number} (User ID: {request.user.pk}), IP: {ip}')
+            else:
+                sd_list = ', '.join([line.sd_number for line in evac.lines.all()])
+                logger.info(
+                    f'AUDIT: Evacuation updated - Date: {evac.date.strftime("%Y-%m-%d")}, Shift: {evac.get_shift_display()}, SDs: {sd_list}, By: {staff_number} (User ID: {request.user.pk}), IP: {ip}')
 
             # Build descriptive success message
             if line_pk:
@@ -513,6 +535,14 @@ def evacuation_line_delete(request, line_pk):
 
         # Delete the line
         line.delete()
+
+        # AUDIT: Evacuation deleted
+        ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', 'unknown'))
+        if ',' in ip:
+            ip = ip.split(',')[0].strip()
+        staff_number = getattr(request.user, 'staff_number', request.user.id)
+        logger.info(
+            f'AUDIT: Evacuation line deleted - SD: {sd_number}, Date: {evac_date.strftime("%Y-%m-%d")}, Shift: {shift}, By: {staff_number} (User ID: {request.user.pk}), IP: {ip}')
 
         # Check if parent Evacuation has any remaining lines
         remaining_lines = evac.lines.count()
