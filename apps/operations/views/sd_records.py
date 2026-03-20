@@ -599,6 +599,8 @@ def sd_record_delete(request, pk):
         sd.delete()
 
         # AUDIT: SD Record deleted
+        import logging
+        logger = logging.getLogger(__name__)
         ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', 'unknown'))
         if ',' in ip:
             ip = ip.split(',')[0].strip()
