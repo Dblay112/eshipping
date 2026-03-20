@@ -311,6 +311,8 @@ def sd_edit(request, pk):
             alloc_formset.save()
 
             # AUDIT: SD Record updated
+            import logging
+            logger = logging.getLogger(__name__)
             ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', 'unknown'))
             if ',' in ip:
                 ip = ip.split(',')[0].strip()
@@ -323,8 +325,6 @@ def sd_edit(request, pk):
 
             # Calculate totals while saving to ensure accuracy
             from decimal import Decimal
-            import logging
-            logger = logging.getLogger(__name__)
 
             total_allocated = Decimal('0')
             total_loaded = Decimal('0')
