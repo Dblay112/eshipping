@@ -208,6 +208,16 @@
     padding: 6px 2px;
   }
 
+  /* Hide desktop table on mobile */
+  .sdt-table-wrap {
+    display: none !important;
+  }
+
+  /* Show mobile cards on mobile */
+  .sdt-mobile-cards {
+    display: block !important;
+  }
+
   /* Mobile SD Group Card */
   .pt-sd-card-mobile {
     margin-bottom: 14px;
@@ -225,6 +235,11 @@
     cursor: pointer;
     border-bottom: 2px solid #e8ddd0;
     touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(125, 90, 59, 0.1);
+  }
+
+  .pt-sd-header-mobile:active {
+    background: #f0e8e0;
   }
 
   .pt-sd-header-mobile-inner {
@@ -282,6 +297,16 @@
     background: #fafaf8;
   }
 
+  /* Show content when expanded */
+  .pt-sd-card-mobile.expanded .pt-sd-content-mobile {
+    display: block !important;
+  }
+
+  /* Rotate icon when expanded */
+  .pt-sd-card-mobile.expanded .pt-sd-icon-box-mobile svg {
+    transform: rotate(90deg);
+  }
+
   /* Mobile Tally Card */
   .pt-tally-card-mobile {
     margin-bottom: 10px;
@@ -290,5 +315,9 @@
     background: #fff;
     box-shadow: 0 1px 3px rgba(125, 90, 59, 0.08);
     padding: 14px 16px;
+  }
+
+  .pt-tally-card-mobile:last-child {
+    margin-bottom: 0;
   }
 }

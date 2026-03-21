@@ -28,17 +28,10 @@
   // Toggle SD group expansion (Mobile) with error handling
   window.toggleSDGroupMobile = (header) => {
     try {
-      const content = header.nextElementSibling;
-      const icon = header.querySelector('.expand-icon-mobile');
+      const card = header.closest('.pt-sd-card-mobile');
 
-      if (content && icon) {
-        if (content.style.display === 'none' || content.style.display === '') {
-          content.style.display = 'block';
-          icon.style.transform = 'rotate(90deg)';
-        } else {
-          content.style.display = 'none';
-          icon.style.transform = 'rotate(0deg)';
-        }
+      if (card) {
+        card.classList.toggle('expanded');
       }
     } catch (err) {
       console.error('Error toggling SD group:', err);
