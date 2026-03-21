@@ -179,3 +179,21 @@
     </div>
 </main>
 {% endblock %}
+
+{% block extra_js %}
+<script>
+// Clear auto-saved tally data on success page
+(function() {
+    'use strict';
+
+    // Clear all tally auto-save data from localStorage
+    const tallyTypes = ['bulk', 'japan', '20ft', '40ft', 'default'];
+    tallyTypes.forEach(type => {
+        const key = `tally_autosave_${type}`;
+        localStorage.removeItem(key);
+    });
+
+    console.log('[Tally Auto-Save] Cleared all auto-saved data on success page');
+})();
+</script>
+{% endblock %}

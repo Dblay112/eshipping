@@ -357,19 +357,9 @@
             });
         }
 
-        // Clear saved data on successful form submission
-        form.addEventListener('submit', (e) => {
-            // Don't prevent default - let form submit normally
-            // Clear saved data after a short delay (form will submit first)
-            setTimeout(clearSavedData, 100);
-        });
-
-        // Also clear on page unload if form was submitted
-        let formSubmitted = false;
-        form.addEventListener('submit', () => { formSubmitted = true; });
-        window.addEventListener('beforeunload', () => {
-            if (formSubmitted) clearSavedData();
-        });
+        // Clear saved data ONLY on successful submission (when redirected to success page)
+        // Don't clear on submit - wait to see if validation passes
+        // The success page will clear the data instead
     }
 
     // Wait for DOM to be ready
