@@ -136,18 +136,56 @@
 
     // Get container rows data
     function getContainersData() {
-        // Access the global inMemory or inMemoryContainers variable that stores container data
+        // Read from DOM to capture ALL filled rows (even if ADD wasn't clicked)
+        const containersBody = document.getElementById('containersBody');
+        if (containersBody) {
+            const rows = Array.from(containersBody.querySelectorAll('tr.container-row'));
+            const domData = rows.map(row => {
+                const containerInput = row.querySelector('input[data-field="container_number"]');
+                const sealInput = row.querySelector('input[data-field="seal_number"]');
+                const bagsInput = row.querySelector('input[data-field="bags"]');
+                const bagsCutInput = row.querySelector('input[data-field="bags_cut"]');
+                const tonnageInput = row.querySelector('input[data-field="tonnage"]');
+
+                const container_number = containerInput?.value || '';
+                const seal_number = sealInput?.value || '';
+                const bags = bagsInput?.value || '';
+                const bags_cut = bagsCutInput?.value || '';
+                const tonnage = tonnageInput?.value || '';
+
+                // Only return if row has data
+                if (container_number || seal_number || bags || bags_cut || tonnage) {
+                    return {
+                        container_number,
+                        seal_number,
+                        bags,
+                        bags_cut,
+                        tonnage,
+                        saved: true // Mark as saved for restoration
+                    };
+                }
+                return null;
+            }).filter(row => row !== null);
+
+            console.log('[Tally Auto-Save] Read from DOM:', domData.length, 'containers');
+            if (domData.length > 0) {
+                return domData;
+            }
+        }
+
+        // Fallback to inMemory (for when DOM is not available)
         const containerData = typeof inMemory !== 'undefined' ? inMemory :
                              typeof inMemoryContainers !== 'undefined' ? inMemoryContainers : null;
 
         if (containerData && Array.isArray(containerData)) {
-            return containerData.filter(row => {
-                // Only save rows that have some data
+            const filtered = containerData.filter(row => {
                 if (!row) return false;
                 const hasData = row.container_number || row.seal_number ||
                                row.bags || row.tonnage || row.bags_cut;
                 return hasData;
             });
+            console.log('[Tally Auto-Save] Read from inMemory:', filtered.length, 'containers');
+            return filtered;
         }
         return [];
     }
