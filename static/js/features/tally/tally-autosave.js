@@ -229,19 +229,32 @@
     function restoreContainers(containersData) {
         if (!Array.isArray(containersData) || containersData.length === 0) return;
 
+        console.log('[Tally Auto-Save] Restoring containers:', containersData.length, 'containers');
+
         // Determine which global variable to use (different templates use different names)
         if (typeof inMemory !== 'undefined') {
             window.inMemory = containersData;
+            console.log('[Tally Auto-Save] Set inMemory with', containersData.length, 'containers');
         } else if (typeof inMemoryContainers !== 'undefined') {
             window.inMemoryContainers = containersData;
+            console.log('[Tally Auto-Save] Set inMemoryContainers with', containersData.length, 'containers');
         } else {
             console.warn('[Tally Auto-Save] Container storage variable not found');
             return;
         }
 
         // Trigger re-render if renderContainers function exists
+        // Use setTimeout to ensure DOM is ready and other scripts have initialized
         if (typeof renderContainers === 'function') {
-            renderContainers(true);
+            setTimeout(() => {
+                console.log('[Tally Auto-Save] Calling renderContainers(true)');
+                renderContainers(true);
+                console.log('[Tally Auto-Save] Containers rendered, current count:',
+                    typeof inMemory !== 'undefined' ? inMemory.length :
+                    typeof inMemoryContainers !== 'undefined' ? inMemoryContainers.length : 0);
+            }, 100);
+        } else {
+            console.warn('[Tally Auto-Save] renderContainers function not found');
         }
     }
 
