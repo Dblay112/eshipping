@@ -59,7 +59,7 @@
         header.addEventListener('click', function(e) {
           e.preventDefault();
           e.stopPropagation();
-          const card = this.closest('.sdt-mobile-card');
+          const card = this.closest('.pt-tally-card-mobile');
           if (card) {
             card.classList.toggle('expanded');
           }
@@ -68,7 +68,7 @@
         // Add touch event for better mobile support
         header.addEventListener('touchend', function(e) {
           e.preventDefault();
-          const card = this.closest('.sdt-mobile-card');
+          const card = this.closest('.pt-tally-card-mobile');
           if (card) {
             card.classList.toggle('expanded');
           }
