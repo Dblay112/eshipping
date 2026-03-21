@@ -151,7 +151,7 @@
       return;
     }
 
-    // Find SD record by number
+    // Find SD record by number (includes allocations in response)
     fetch(`/api/sd-details/?sd_number=${encodeURIComponent(sdNumber)}`)
       .then(r => r.json())
       .then(data => {
@@ -160,19 +160,24 @@
           return;
         }
 
-        // Load allocations
-        fetch(`/operations/${data.id}/allocations/`)
-          .then(r => r.json())
-          .then(allocData => {
-            if (allocData.allocations && allocData.allocations.length > 0) {
-              container.innerHTML = '';
-              allocData.allocations.forEach((alloc, contractIdx) => {
-                addContractSection(sdIndex, contractIdx, alloc);
-              });
-            } else {
-              container.innerHTML = '<div class="bf-empty-state">No contracts found for this SD</div>';
-            }
+        // Use allocations from SD details response (no second API call needed)
+        const allocations = (data.allocations || []).map(alloc => ({
+          id: alloc.id,
+          label: alloc.allocation_label,
+          contract_number: alloc.contract_number,
+          allocated_tonnage: alloc.allocated_tonnage,
+          balance: parseFloat(alloc.allocated_tonnage),
+          agent: alloc.agent
+        }));
+
+        if (allocations.length > 0) {
+          container.innerHTML = '';
+          allocations.forEach((alloc, contractIdx) => {
+            addContractSection(sdIndex, contractIdx, alloc);
           });
+        } else {
+          container.innerHTML = '<div class="bf-empty-state">No contracts found for this SD</div>';
+        }
       })
       .catch(err => {
         console.error('Error:', err);

@@ -244,7 +244,7 @@
       allocCard.style.display = 'block';
       submitBtn.disabled = true;
 
-      // First, fetch SD details to get the ID
+      // Fetch SD details (includes allocations in response)
       fetchWithTimeout(`/api/sd-details/?sd_number=${encodeURIComponent(sdNumber)}`)
         .then(r => {
           if (!r.ok) throw new Error('Network response was not ok');
@@ -255,19 +255,20 @@
             allocList.innerHTML = '<div class="sdt-empty-state"><p class="sdt-empty-text" style="color:#c62828;">SD not found in operations records.</p></div>';
             allocCard.style.display = 'block';
             submitBtn.disabled = true;
-            return null;
+            return;
           }
 
-          // Now fetch allocations for this SD
-          return fetchWithTimeout(`/operations/${sdData.id}/allocations/`);
-        })
-        .then(r => {
-          if (!r) return null;
-          if (!r.ok) throw new Error('Failed to load allocations');
-          return r.json();
-        })
-        .then(data => {
-          if (!data) return;
+          // Use allocations from SD details response (no second API call needed)
+          const data = {
+            allocations: (sdData.allocations || []).map(alloc => ({
+              id: alloc.id,
+              label: alloc.allocation_label,
+              contract_number: alloc.contract_number,
+              allocated_tonnage: alloc.allocated_tonnage,
+              balance: parseFloat(alloc.allocated_tonnage),
+              agent: alloc.agent
+            }))
+          };
 
           if (data.allocations && data.allocations.length > 0) {
             allocList.innerHTML = '';
