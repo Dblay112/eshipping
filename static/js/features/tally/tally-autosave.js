@@ -231,13 +231,18 @@
 
         console.log('[Tally Auto-Save] Restoring containers:', containersData.length, 'containers');
 
+        // Create a deep copy to avoid reference issues
+        const containersCopy = containersData.map(c => ({...c}));
+
         // Determine which global variable to use (different templates use different names)
         if (typeof inMemory !== 'undefined') {
-            window.inMemory = containersData;
-            console.log('[Tally Auto-Save] Set inMemory with', containersData.length, 'containers');
+            window.inMemory = containersCopy;
+            console.log('[Tally Auto-Save] Set inMemory with', containersCopy.length, 'containers');
+            console.log('[Tally Auto-Save] inMemory contents:', window.inMemory);
         } else if (typeof inMemoryContainers !== 'undefined') {
-            window.inMemoryContainers = containersData;
-            console.log('[Tally Auto-Save] Set inMemoryContainers with', containersData.length, 'containers');
+            window.inMemoryContainers = containersCopy;
+            console.log('[Tally Auto-Save] Set inMemoryContainers with', containersCopy.length, 'containers');
+            console.log('[Tally Auto-Save] inMemoryContainers contents:', window.inMemoryContainers);
         } else {
             console.warn('[Tally Auto-Save] Container storage variable not found');
             return;
@@ -247,8 +252,8 @@
         // Use setTimeout to ensure DOM is ready and other scripts have initialized
         if (typeof renderContainers === 'function') {
             setTimeout(() => {
-                console.log('[Tally Auto-Save] Calling renderContainers(true)');
-                renderContainers(true);
+                console.log('[Tally Auto-Save] Calling renderContainers(false) to avoid adding blank row');
+                renderContainers(false);
                 console.log('[Tally Auto-Save] Containers rendered, current count:',
                     typeof inMemory !== 'undefined' ? inMemory.length :
                     typeof inMemoryContainers !== 'undefined' ? inMemoryContainers.length : 0);
